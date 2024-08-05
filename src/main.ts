@@ -1,0 +1,138 @@
+import dotenv from 'dotenv';
+import { createConnection, Connection } from "typeorm";
+import { Employee } from "./entities/employee";
+import { Role, RoleTypes } from "./entities/role";
+import { Vacation } from "./entities/vacation";
+import { Team, TeamType } from './entities/team';
+import { StatusTypes, VacationStatus } from "./entities/vacationStatus";
+import express from "express";
+import session from 'express-session';
+import { vacationController } from './components/vacation/vacation.controller';
+import { userController } from './components/user/user.controller';
+import { authenticateToken } from "../middleware/authenticateToken";
+import passport from './auth';
+import swaggerJSDoc from 'swagger-jsdoc';
+import swaggerUi from 'swagger-ui-express';
+dotenv.config();
+
+const app = express();
+let connection: Connection;
+
+const main = async () => {
+    try {
+        connection = await createConnection({
+            type: 'mysql',
+            host: 'localhost',
+            port: 3306,
+            username: 'root',
+            password: 'root123',
+            database: 'khazna-db',
+            entities: [Employee, Role, Vacation, VacationStatus, Team],
+            synchronize: true
+        });
+
+        console.log("Connected to MySQL database");
+
+        const roleRepository = connection.getRepository(Role);
+        const existingRoles = await roleRepository.find();
+        if (existingRoles.length === 0) {
+            await roleRepository.save([
+                { role: RoleTypes.Admin },
+                { role: RoleTypes.User }
+            ]);
+        }
+
+        const vacationStatusRepository = connection.getRepository(VacationStatus);
+        const existingStatus = await vacationStatusRepository.find();
+        if (existingStatus.length === 0) {
+            await vacationStatusRepository.save([
+                { name: StatusTypes.Pending },
+                { name: StatusTypes.Accepted },
+                { name: StatusTypes.Rejected }
+            ]);
+        }
+
+        const teamRepository = connection.getRepository(Team);
+        const existingteam = await teamRepository.find();
+        if(existingteam.length === 0){
+            await teamRepository.save([
+               {type: TeamType.BACKEND},
+               {type: TeamType.FRONTEND},
+               {type: TeamType.TESTING} 
+            ]);
+        }
+
+        const swaggerOptions = {
+            definition: {
+                openapi: '3.0.0',
+                info: {
+                    title: 'Khazna API Project',
+                    version: '1.0.0'
+                },
+                servers: [
+                    {
+                        url: 'http://localhost:8080/'
+                    }
+                ]
+            },
+            apis: ['./src/components/**/*.ts']
+        };
+
+        const swaggerSpec = swaggerJSDoc(swaggerOptions);
+        
+        // Middleware
+        app.use(express.json());
+        app.use(session({
+            secret: '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',
+            resave: false,
+            saveUninitialized: false
+        }));
+        app.use(passport.initialize());
+        app.use(passport.session());
+
+        // Swagger docs
+        app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
+        app.get('/', (req, res) => {
+            res.send('<a href="/auth/google">Login with Google</a>');
+        });
+
+        app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+
+        app.get('/auth/google/callback',
+            passport.authenticate('google', { failureRedirect: '/' }),
+            (req: express.Request & { user?: Express.User }, res: express.Response) => {
+                if (req.user && (req.user as any).token) {
+                    // Successful authentication, redirect with the token
+                    res.redirect(`/token?jwt=${encodeURIComponent((req.user as any).token)}`);
+                } else {
+                    res.redirect('/');
+                }
+            }
+        );
+
+        app.get('/token', (req, res) => {
+            const token = req.query.jwt as string;
+            console.log(token);
+            if (token) {
+                res.send("Hello");
+            } else {
+                res.status(400).json({ error: 'No token provided' });
+            }
+        });
+        
+        app.use(authenticateToken); // Middleware Token 
+        app.use(userController); // user Endpoints   
+        app.use(vacationController); // vacation Endpoints
+
+        app.listen(8080, () => {
+            console.log("Server listening on port 8080...");
+        });
+    } catch (error) {
+        console.error("Error connecting to database:", error);
+    }
+};
+
+main();
+
+export { connection };
