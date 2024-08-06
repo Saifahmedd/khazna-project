@@ -7,9 +7,9 @@ interface AuthenticatedRequest extends Request {
 
 const checkAdminRole = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     try {
-        const userName = req.user.username;
+        const email = req.user.email;
         const user = await Employee.findOne({
-            where: { username: userName },
+            where: { email: email },
             relations: ['role']
         });
 

@@ -161,7 +161,7 @@ router.get('/vacation', async (req, res) => {
         return res.status(400).json({ message: "Employee ID is required" });
     }
 
-    const result = await fetchUserRequestsService(employeeId);
+    const result = await fetchUserRequestsService(parseInt(employeeId));
     return res.status(result.status).json(result.response);
 });
 

@@ -2,148 +2,102 @@ import express from 'express';
 import * as employeeService from './user.service';
 import * as vacationService from '../vacation/vacation.service';
 import { Vacation } from '../../entities/vacation';
+import { RoleTypes } from '../../entities/role';
 
 const router = express.Router();
+
 /**
  * @swagger
  *  /register:
- *  post:
- *    summary: Register a new employee
- *    description: This API registers a new employee and associates them with a role.
- *    requestBody:
- *      required: true
- *      content:
- *        application/json:
- *          schema:
- *            type: object
- *            properties:
- *              name:
- *                type: string
- *                example: Saif Ahmed
- *              username:
- *                type: string
- *                example: saifUsername
- *              password:
- *                type: string
- *                example: saifPassword
- *              role:
- *                type: string
- *                example: admin
- *              phonenumber:
- *                type: string
- *                example: 01023255440
- *              email:
- *                type: string
- *                example: saifahmedsalah11@gmail.com
- *    responses:
- *      200:
- *        description: Registration is made successfully
+ *    post:
+ *      summary: Register a new employee
+ *      description: This API registers a new employee and associates them with a role.
+ *      requestBody:
+ *        required: true
  *        content:
  *          application/json:
  *            schema:
  *              type: object
  *              properties:
- *                message:
+ *                name:
  *                  type: string
- *                  example: Registration is made successfully
- *                accessToken:
+ *                  example: Saif Ahmed
+ *                password:
  *                  type: string
- *                  example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
- *      400:
- *        description: Bad request
- *        content:
- *          application/json:
- *            schema:
- *              type: object
- *              properties:
- *                message:
+ *                  example: saifPassword
+ *                role:
  *                  type: string
- *                  example: Username already exists or invalid input
- *      500:
- *        description: Internal server error
- *        content:
- *          application/json:
- *            schema:
- *              type: object
- *              properties:
- *                message:
+ *                  example: admin
+ *                phonenumber:
  *                  type: string
- *                  example: Internal server error
+ *                  example: 01023255440
+ *                email:
+ *                  type: string
+ *                  example: saifahmedsalah11@gmail.com
+ *      responses:
+ *        200:
+ *          description: Registration is made successfully
+ *          content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ *                properties:
+ *                  message:
+ *                    type: string
+ *                    example: Registration is made successfully
+ *                  accessToken:
+ *                    type: string
+ *                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+ *        400:
+ *          description: Bad request
+ *          content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ *                properties:
+ *                  message:
+ *                    type: string
+ *                    example: Username already exists or invalid input
+ *        401:
+ *          description: Invalid input
+ *          content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ *                properties:
+ *                  message:
+ *                    type: string
+ *                    example: Invalid input
+ *        500:
+ *          description: Internal server error
+ *          content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ *                properties:
+ *                  message:
+ *                    type: string
+ *                    example: Internal server error
  */
 router.post('/register', async (req, res) => {
-    const { name, username, password, role, phonenumber, email } = req.body;
-    if (!name || !username || !password || !role || !phonenumber || !email) {
+    const { name, password, role, phonenumber, email } = req.body;
+    if (!name || !password || !role || !phonenumber || !email) {
         res.status(401).json({message: "Invalid input"});
     }
     try {
-        const result = await employeeService.registerEmployee(name, username, password, role, phonenumber, email);
+        const result = await employeeService.registerEmployee(name, password, role, phonenumber, email);
         res.status(200).json(result);
     } catch (error) {
         res.status(400).json({ message: error.message });
     }
 });
+
 /**
  * @swagger
  * /login:
  *  post:
- *      summary: Login as an employee
- *      description: This API is used to login
- *      requestBody:
- *          required: true
- *          content:
- *              application/json:
- *                  schema:
- *                      type: object
- *                      properties:
- *                          username:
- *                              type: string
- *                              example: saif_ahmed
- *                          password:
- *                              type: string
- *                              example: saifPassword
- *      responses:
- *          200:
- *              description: Logged In successfully
- *              content:
- *                  application/json:
- *                      schema:
- *                          type: object
- *                          properties:
- *                              message:
- *                                  type: string
- *                                  example: Logged in successfully
- *                              accessToken:
- *                                  type: string
- *                                  example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
- *          404:
- *              description: Incorrect password or cannot find this username
- *              content:
- *                  application/json:
- *                      schema:
- *                          type: object
- *                          properties:
- *                              message:
- *                                  type: string
- *                                  example: Incorrect password
- */
-router.post('/login', async (req, res) => {
-    const { email, password } = req.body;
-    if(!email || !password){
-        res.status(401).json({message: "Invalid inputs"});
-    }
-    try {
-        const result = await employeeService.loginEmployee(email, password);
-        res.status(200).json(result);
-    } catch (error) {
-        res.status(404).json({ message: error.message });
-    }
-});
-/**
- * @swagger
- * /delete/:username:
- *  delete:
- *    summary: Delete an employee
- *    description: This API deletes an employee and its associated team info.
+ *    summary: Login as an employee
+ *    description: This API is used to login
  *    requestBody:
  *      required: true
  *      content:
@@ -151,12 +105,15 @@ router.post('/login', async (req, res) => {
  *          schema:
  *            type: object
  *            properties:
- *              username:
+ *              email:
  *                type: string
- *                example: saifUsername
+ *                example: saifahmedsalah11@gmail.com
+ *              password:
+ *                type: string
+ *                example: saifPassword
  *    responses:
  *      200:
- *        description: Employee deleted successfully
+ *        description: Logged In successfully
  *        content:
  *          application/json:
  *            schema:
@@ -164,9 +121,22 @@ router.post('/login', async (req, res) => {
  *              properties:
  *                message:
  *                  type: string
- *                  example: Employee deleted successfully
+ *                  example: Logged in successfully
+ *                accessToken:
+ *                  type: string
+ *                  example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+ *      401:
+ *        description: Invalid inputs
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                message:
+ *                  type: string
+ *                  example: Invalid inputs
  *      404:
- *        description: Employee not found
+ *        description: Incorrect password or cannot find this username
  *        content:
  *          application/json:
  *            schema:
@@ -174,28 +144,48 @@ router.post('/login', async (req, res) => {
  *              properties:
  *                message:
  *                  type: string
- *                  example: Employee not found
- *      500:
- *        description: Internal server error
- *        content:
- *          application/json:
- *            schema:
- *              type: object
- *              properties:
- *                message:
- *                  type: string
- *                  example: Internal server error
+ *                  example: Incorrect password
  */
-router.delete('/delete/:username', async (req, res) => {
-    const { username } = req.params;
-    if(!username){
-        res.status(401).json({message: "Invalid input"});
+router.post('/login', async (req, res) => {
+    const { email, password } = req.body;
+    if(!email || !password){
+        res.status(401).json({message: "Invalid inputs"});
+        return;
     }
     try {
-        const result = await employeeService.deleteEmployee(username);
-        res.status(200).json({ message: result });
+        const loginResult = await employeeService.loginEmployee(email, password);
+        if (loginResult && loginResult.employee) {
+            const employeeId = loginResult.employee.id;
+            const role = loginResult.employee.role.role;
+
+            const vacationResult = await vacationService.fetchUserRequestsService(employeeId);
+
+            if (vacationResult.status === 200 && Array.isArray(vacationResult.response)) {
+                const requests: Vacation[] = vacationResult.response;
+                const differencesInDays: number[] = requests.map(request => {
+                    const dayFrom = request.dateFrom.getDate();
+                    const monthFrom = request.dateFrom.getMonth() + 1;
+                    const dayTo = request.dateTo.getDate();
+                    const monthTo = request.dateTo.getMonth() + 1;
+                    return getDaysDifference(dayFrom, monthFrom, dayTo, monthTo);
+                });
+
+                const daysTaken = differencesInDays.reduce((total, days) => total + days, 0);
+                const totalDays = role === RoleTypes.Admin ? 20 : 10;
+                const daysLeft = totalDays - daysTaken;
+
+                res.status(200).json({
+                    message: "Logged in successfully",
+                    daysLeft: daysLeft
+                });
+            } else {
+                res.status(500).json({ message: "Unexpected response format or status" });
+            }
+        } else {
+            res.status(404).json({ message: "Incorrect password or cannot find this username" });
+        }
     } catch (error) {
-        res.status(404).json({ message: error.message });
+        res.status(500).json({ message: "Error logging in" });
     }
 });
 

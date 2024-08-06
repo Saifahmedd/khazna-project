@@ -8,12 +8,11 @@ import { RoleTypes } from '../../entities/role';
 
 dotenv.config();
 
-export const registerEmployee = async (name: string, username: string, password: string, role: RoleTypes, phonenumber: string, email: string) => {
+export const registerEmployee = async (name: string, password: string, role: RoleTypes, phonenumber: string, email: string) => {
     const existingEmployee = await employeeRepository.findEmployeeByEmail(email);
     if (existingEmployee) {
         throw new Error("Email is already exists");
     }
-
     const hashedPassword = await bcrypt.hash(password, 10);
     const roleEntity = await employeeRepository.findRoleByRoleName(role);
     if (!roleEntity) {
@@ -22,7 +21,6 @@ export const registerEmployee = async (name: string, username: string, password:
 
     const employee = Employee.create({
         name,
-        username,
         password: hashedPassword,
         phoneNumber: phonenumber,
         email,
@@ -32,9 +30,8 @@ export const registerEmployee = async (name: string, username: string, password:
     await employeeRepository.saveEmployee(employee);
 
     const user = { 
-        username,
-        role: roleEntity.role,
-        email
+        email,
+        role: roleEntity.role
     };
 
     const accessToken = generateToken(user);
@@ -54,17 +51,5 @@ export const loginEmployee = async (email: string, password: string) => {
         throw new Error("Incorrect email or password");
     }
 
-    return { message: "Logged in successfully"};
-};
-
-export const deleteEmployee = async (email: string) => {
-    const employee = await employeeRepository.findEmployeeByEmail(email);
-
-    if (!employee) {
-        throw new Error("Employee not found");
-    }
-
-    await employeeRepository.deleteEmployee(employee);
-
-    return "Employee deleted successfully";
+    return {employee, message: "Logged in successfully"};
 };

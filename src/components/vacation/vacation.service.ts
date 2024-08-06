@@ -34,7 +34,7 @@ export const fetchSingleRequest = async (requestId: number)=>{
     }
 };
 
-export const createRequestService = async (employeeId: number, dateFromTimestamp: number, dateToTimestamp: number, reason: string) => {
+export const createRequestService = async (employeeId: number, dateFrom: string, dateTo: string, reason: string) => {
     try {
         const employee = await findEmployeeById(employeeId);
 
@@ -53,9 +53,6 @@ export const createRequestService = async (employeeId: number, dateFromTimestamp
             return { status: 404, response: { message: "Status not found" } };
         }
 
-        const dateFrom = new Date(dateFromTimestamp);
-        const dateTo = new Date(dateToTimestamp);
-
         const request = createVacationRequest(dateFrom, dateTo, reason, employee, status);
         await saveVacationRequest(request);
 
@@ -64,6 +61,7 @@ export const createRequestService = async (employeeId: number, dateFromTimestamp
         return { status: 500, response: { message: "Internal Server Error", error: error.message } };
     }
 };
+
 
 export const updateUserRequestService = async (requestId: number, reviewerId: number, dateFrom: Date, dateTo: Date, reason: string, status: VacationStatus) => {
     try {

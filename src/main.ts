@@ -103,7 +103,6 @@ const main = async () => {
             passport.authenticate('google', { failureRedirect: '/' }),
             (req: express.Request & { user?: Express.User }, res: express.Response) => {
                 if (req.user && (req.user as any).token) {
-                    // Successful authentication, redirect with the token
                     res.redirect(`/token?jwt=${encodeURIComponent((req.user as any).token)}`);
                 } else {
                     res.redirect('/');

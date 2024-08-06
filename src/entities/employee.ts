@@ -12,17 +12,14 @@ export class Employee extends BaseEntity {
     @Column()
     name: string;
 
-    @Column({ unique: true, nullable: true })
-    username: string;
+    @Column({ unique: true })
+    email: string;
 
     @Column({ nullable: true })
     password: string;
 
     @Column({ nullable: true })
     phoneNumber: string;
-
-    @Column({ unique: true })
-    email: string;
 
     @Column({ unique: true, nullable: true })
     googleId: string;
@@ -37,4 +34,7 @@ export class Employee extends BaseEntity {
     @ManyToOne(() => Team, team => team.employees)
     @JoinColumn({ name: 'teamId' })
     team: Team;
+
+    @Column({ nullable: true })
+    avatarId: string
 }

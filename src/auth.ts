@@ -37,8 +37,7 @@ passport.use(new GoogleStrategy({
           googleId: profile.id,
           name: profile.displayName,
           email,
-          username, // Set the username
-          role // Set the role
+          role
         });
 
         await Employee.save(user);

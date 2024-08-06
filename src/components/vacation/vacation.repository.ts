@@ -1,6 +1,6 @@
 import { Connection } from "typeorm";
 import { Employee } from "../../entities/employee";
- import { Vacation } from "../../entities/vacation";
+import { Vacation } from "../../entities/vacation";
 import { VacationStatus, StatusTypes } from "../../entities/vacationStatus";
 
 export const findVacationStatusByName = async (name: StatusTypes) => {
@@ -12,14 +12,13 @@ export const findRequestsByEmployeeId = async (employeeId: number) => {
         where: { employee: { id: employeeId } },
         relations: ['employee', 'status'],
     });
-
-    // Print the dateFrom column for each vacation request
+    
     requests.forEach((request) => {
         console.log(request.dateTo);
     });
 
     return requests;
-}; 
+};
 
 
 export const findRequestById = async (id: number) => {
@@ -31,9 +30,10 @@ export const updateRequest = async (request: Vacation, updateData: Partial<Vacat
     return await request.save();
 };
 
-export const createVacationRequest = (dateFrom: Date, dateTo: Date, reason: string, employee: Employee, status: VacationStatus) => {
+export const createVacationRequest = (dateFrom: string, dateTo: string, reason: string, employee: Employee, status: VacationStatus) => {
     return Vacation.create({ dateFrom, dateTo, reason, employee, status });
 };
+
 
 export const saveVacationRequest = async (request: Vacation) => {
     return await request.save();
