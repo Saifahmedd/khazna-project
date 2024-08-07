@@ -4,7 +4,7 @@ import * as employeeRepository from './user.repository';
 import { Employee } from '../../entities/employee';
 import {generateToken} from '../../../middleware/generateToken';
 import dotenv from 'dotenv';
-import { RoleTypes } from '../../entities/role';
+import { RoleTypes } from '../../entities/constants';
 
 dotenv.config();
 

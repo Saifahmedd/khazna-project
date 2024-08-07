@@ -3,7 +3,7 @@ import * as employeeService from './user.service';
 import * as vacationService from '../vacation/vacation.service';
 import * as employeeRepository from '../user/user.repository'
 import { Vacation } from '../../entities/vacation';
-import { RoleTypes } from '../../entities/role';
+import { RoleTypes } from '../../entities/constants';
 
 const router = express.Router();
 

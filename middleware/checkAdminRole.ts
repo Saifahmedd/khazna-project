@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { Employee } from '../src/entities/employee';
-import { RoleTypes } from '../src/entities/role';
+import { RoleTypes } from '../src/entities/constants';
 
 interface AuthenticatedRequest extends Request {
     user?: any;

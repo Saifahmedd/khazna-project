@@ -1,7 +1,7 @@
 import express from 'express';
 import { fetchUserRequestsService,filterRequests ,fetchSingleRequest ,createRequestService, updateUserRequestService, deleteUserRequestService, updateAdminRequestService, updateRequests } from './vacation.service';
 import { checkAdminRole } from "../../../middleware/checkAdminRole";
-import { StatusTypes, VacationStatus } from '../../entities/vacationStatus';
+import { StatusTypes } from '../../entities/constants';
 import {connection} from '../../main';
 
 const router = express.Router();
@@ -9,19 +9,23 @@ const router = express.Router();
  * @swagger
  * /vacation/filter:
  *   get:
- *     summary: Filter vacation requests by SQL query
- *     description: Execute a raw SQL query to filter vacation requests.
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               sql:
- *                 type: string
- *                 description: The SQL query to execute.
- *                 example: "SELECT * FROM Vacation"
+ *     summary: Filter vacation requests by a specific field
+ *     description: Filter vacation requests by specifying a field and value to match.
+ *     parameters:
+ *       - in: query
+ *         name: key
+ *         required: true
+ *         schema:
+ *           type: string
+ *           description: The field name to filter by (e.g., reason, employeeId).
+ *         example: reason
+ *       - in: query
+ *         name: value
+ *         required: true
+ *         schema:
+ *           type: string
+ *           description: The value to filter by (e.g., Tired, 1).
+ *         example: Tired
  *     responses:
  *       200:
  *         description: A successful response with filtered vacation requests.
@@ -45,22 +49,18 @@ const router = express.Router();
  *                   status:
  *                     type: string
  *       400:
- *         description: SQL statement is required.
+ *         description: Invalid request parameters.
  *       500:
  *         description: Internal Server Error.
  */
 router.get('/vacation/filter', async (req, res) => {
-    const { sql } = req.body;
-
-    if (!sql) {
+    const { key, value } = req.body;
+    if (!key || !value) {
         return res.status(400).json({ message: "SQL statement is required" });
     }
 
     try {
-        const result = await filterRequests(sql, connection);
-        if (result.status === 404) {
-            return res.status(404).json(result.response);
-        }
+        const result = await filterRequests(key, value, connection);
         return res.status(result.status).json(result.response);
     } catch (error) {
         return res.status(500).json({ message: "Internal Server Error", error: error.message });
@@ -266,8 +266,6 @@ router.post('/vacation', async (req, res) => {
         return res.status(400).json({ message: "Reason is required" });
     }
 
-
-
     const result = await createRequestService(employeeId, dateFrom, dateTo, reason);
     return res.status(result.status).json(result.response);
 });
@@ -383,7 +381,6 @@ router.put('/vacation/:requestId', async (req, res) => {
     const result = await updateUserRequestService(parseInt(requestId), reviewerId, dateFrom, dateTo, reason, status);
     return res.status(result.status).json(result.response);
 });
-
 
 /**
  * @swagger

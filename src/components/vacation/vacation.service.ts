@@ -1,10 +1,9 @@
 import { findEmployeeById, findVacationStatusByName, findRequestsByEmployeeId, createVacationRequest, findVacationById, saveVacationRequest, updateVacationRequest, deleteVacationRequest } from './vacation.repository';
-import { StatusTypes, VacationStatus } from '../../entities/vacationStatus';
+import { VacationStatus } from '../../entities/vacationStatus';
 import * as requestRepository from './vacation.repository';
-import { RoleTypes } from '../../entities/role';
+import { RoleTypes, StatusTypes } from '../../entities/constants';
 import { response } from 'express';
 import { Connection } from 'typeorm';
-
 
 export const fetchUserRequestsService = async (employeeId: number) => {
     try {
@@ -69,7 +68,6 @@ export const createRequestService = async (employeeId: number, dateFrom: string,
         return { status: 500, response: { message: "Internal Server Error", error: error.message } };
     }
 };
-
 
 export const updateUserRequestService = async (requestId: number, reviewerId: number, dateFrom: Date, dateTo: Date, reason: string, status: VacationStatus) => {
     try {
@@ -142,9 +140,9 @@ export const updateRequests = async ( requestId: number, reviewerId: number, dat
     }
 };
 
-
-export const filterRequests = async (sql: string, connection: Connection) => {
+export const filterRequests = async (key: string, value: string, connection: Connection) => {
     try {
+        const sql = `SELECT * FROM Vacation WHERE ${key} = '${value}'`;
         const requests = await requestRepository.filterRequestsBySQL(sql, connection);
         return { status: 200, response: requests };
     } catch (error) {

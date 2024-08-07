@@ -1,10 +1,10 @@
 import dotenv from 'dotenv';
 import { createConnection, Connection } from "typeorm";
 import { Employee } from "./entities/employee";
-import { Role, RoleTypes } from "./entities/role";
+import { Role } from "./entities/role";
 import { Vacation } from "./entities/vacation";
-import { Team, TeamType } from './entities/team';
-import { StatusTypes, VacationStatus } from "./entities/vacationStatus";
+import { Team } from './entities/team';
+import { VacationStatus } from "./entities/vacationStatus";
 import express from "express";
 import session from 'express-session';
 import { vacationController } from './components/vacation/vacation.controller';
@@ -13,6 +13,7 @@ import { authenticateToken } from "../middleware/authenticateToken";
 import passport from './auth';
 import swaggerJSDoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
+import { RoleTypes, TeamType, StatusTypes} from './entities/constants';
 dotenv.config();
 
 const app = express();

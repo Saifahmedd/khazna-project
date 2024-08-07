@@ -3,7 +3,8 @@ import { Strategy as GoogleStrategy } from 'passport-google-oauth2';
 import { Profile } from 'passport';
 import { Employee } from './entities/employee';
 import { generateToken } from '../middleware/generateToken';
-import { Role, RoleTypes } from './entities/role';
+import { Role } from './entities/role';
+import { RoleTypes } from './entities/constants';
 
 const GOOGLE_CLIENT_ID = '271432223949-pb1qjj9pv3dfne445cvk2989jk0cv7cd.apps.googleusercontent.com';
 const GOOGLE_CLIENT_SECRET = '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';

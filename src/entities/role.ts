@@ -1,10 +1,6 @@
 import { Entity, BaseEntity, Column, PrimaryGeneratedColumn, OneToMany } from "typeorm";
 import { Employee } from "./employee";
-
-export enum RoleTypes {
-    Admin = 'admin',
-    User = 'user'
-}
+import { RoleTypes } from "./constants";
 
 @Entity('role')
 export class Role extends BaseEntity {
