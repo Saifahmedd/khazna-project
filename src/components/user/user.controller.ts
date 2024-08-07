@@ -1,9 +1,5 @@
 import express from 'express';
 import * as employeeService from './user.service';
-import * as vacationService from '../vacation/vacation.service';
-import * as employeeRepository from '../user/user.repository'
-import { Vacation } from '../../entities/vacation';
-import { RoleTypes } from '../../entities/constants';
 
 const router = express.Router();
 
@@ -154,34 +150,16 @@ router.post('./login', async (req, res) => {
     }
     try {
         const result = employeeService.loginEmployee(email, password);
-        res.status(200).json("Logged in successfully");
+        res.status(200).json({employee: (await result).employee  ,message: "Logged in successfully"});
     } catch (error) {
         res.status(400).json({ message: error.message });
     }
 });
 
-const getDaysDifference = (dayFrom: number, monthFrom: number, dayTo: number, monthTo: number, vacationDates: string[]): number => {
-    const startDate = new Date(new Date().getFullYear(), monthFrom - 1, dayFrom);
-    const endDate = new Date(new Date().getFullYear(), monthTo - 1, dayTo);
-
-    let daysDifference = 0;
-
-    for (let currentDate = new Date(startDate); currentDate <= endDate; currentDate.setDate(currentDate.getDate() + 1)) {
-        const dayOfWeek = currentDate.getDay();
-        const formattedDate = `${currentDate.getDate()}/${currentDate.getMonth() + 1}/${currentDate.getFullYear()}`;
-
-        if (dayOfWeek !== 5 && dayOfWeek !== 6 && !vacationDates.includes(formattedDate)) {
-            daysDifference++;
-        }
-    }
-
-    return daysDifference;
-};
-
 /**
  * @swagger
  * /userInfo:
- *   get:
+ *   post:
  *     summary: Retrieve the number of vacation days left for a user.
  *     description: Fetches vacation requests for a specific employee and calculates the remaining vacation days based on the role.
  *     requestBody:
@@ -206,8 +184,18 @@ const getDaysDifference = (dayFrom: number, monthFrom: number, dayTo: number, mo
  *             schema:
  *               type: object
  *               properties:
+ *                 avatar:
+ *                   type: string
+ *                   description: The avatar ID of the employee.
+ *                 name:
+ *                   type: string
+ *                   description: The name of the employee.
+ *                 team:
+ *                   type: string
+ *                   description: The team the employee is part of.
  *                 daysLeft:
  *                   type: integer
+ *                   description: The number of vacation days left for the employee.
  *                   example: 10
  *       '401':
  *         description: Invalid input, employee ID is required.
@@ -219,6 +207,16 @@ const getDaysDifference = (dayFrom: number, monthFrom: number, dayTo: number, mo
  *                 message:
  *                   type: string
  *                   example: Invalid input
+ *       '404':
+ *         description: Employee not found.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Cannot find the employee
  *       '500':
  *         description: Internal server error.
  *         content:
@@ -238,49 +236,12 @@ router.get('/userInfo', async (req, res) => {
     }
 
     try {
-        const vacationDates = getVacationDates();
+        const result = await employeeService.getUserInfo(parseInt(employeeId));
 
-        const employee = await employeeRepository.findEmployeeById(parseInt(employeeId));
-        const result = await vacationService.fetchUserRequestsService(parseInt(employeeId));
-
-        if (result.status === 200 && Array.isArray(result.response)) {
-            const requests: Vacation[] = result.response;
-            const differencesInDays: number[] = [];
-
-            requests.forEach(request => {
-                const dayFrom = request.dateFrom.getDate();
-                const monthFrom = request.dateFrom.getMonth() + 1;
-
-                const dayTo = request.dateTo.getDate();
-                const monthTo = request.dateTo.getMonth() + 1;
-
-                const differenceInDays = getDaysDifference(dayFrom, monthFrom, dayTo, monthTo, vacationDates);
-                differencesInDays.push(differenceInDays);
-            });
-
-            let totaldays = 0;
-            let daysTaken = 0;
-
-            for (let i = 0; i < differencesInDays.length; i++) {
-                daysTaken += differencesInDays[i];
-            }
-
-            if (employee?.role.role === RoleTypes.Admin) {
-                totaldays = 20;
-            } else {
-                totaldays = 10;
-            }
-
-            const daysLeft = totaldays - daysTaken;
-            if (daysLeft >= 0) {
-                res.status(200).json({ avatar: employee?.avatarId, name: employee?.name, team: employee?.team, daysLeft: daysLeft });
-            }
-            else {
-                res.status(400).json({ message: "All vacation days are taken!" })
-            }
-
+        if (result.status === 200) {
+            res.status(200).json(result.data);
         } else {
-            res.status(500).json({ message: "Unexpected response format or status" });
+            res.status(result.status).json({ message: result.message });
         }
     } catch (error) {
         console.error("Error fetching user requests:", error.message);
@@ -288,13 +249,101 @@ router.get('/userInfo', async (req, res) => {
     }
 });
 
-const getVacationDates = () => {
-    return ["4/8/2024", "6/8/2024"];
-};
+/**
+ * @swagger
+ * /avatar:
+ *   put:
+ *     summary: Update an employee's avatar
+ *     description: This endpoint allows an employee to add or update their avatar by providing their employee ID and the avatar ID.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               employeeId:
+ *                 type: number
+ *                 description: The ID of the employee.
+ *                 example: 1
+ *               avatarId:
+ *                 type: number
+ *                 description: The ID of the avatar.
+ *                 example: 101
+ *     responses:
+ *       '200':
+ *         description: Avatar updated successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Avatar updated successfully
+ *                 employee:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: number
+ *                       example: 1
+ *                     name:
+ *                       type: string
+ *                       example: John Doe
+ *                     avatarId:
+ *                       type: number
+ *                       example: 101
+ *       '401':
+ *         description: Invalid input, employee ID and avatar ID are required.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Invalid input
+ *       '404':
+ *         description: Employee not found.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Cannot find the employee
+ *       '500':
+ *         description: Internal server error.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Internal server error
+ */
+router.put('/avatar', async (req, res) => {
+    const { employeeId, avatarId } = req.body;
 
-router.get('/calendarConfig', async (req, res) => {
-    const vacationDates = getVacationDates();
-    res.status(200).json({ vacationDates });
+    if (!employeeId || !avatarId) {
+        return res.status(401).json({ message: "Invalid input" });
+    }
+
+    try {
+        const result = await employeeService.addingAvatar(employeeId, avatarId);
+
+        if (result.status === 404) {
+            return res.status(404).json({ message: result.message });
+        }
+
+        return res.status(200).json({ message: "Avatar updated successfully", employee: result.employee });
+    } catch (error) {
+        console.error("Error adding avatar:", error.message);
+        return res.status(500).json({ message: "Internal server error" });
+    }
 });
+
 
 export { router as userController };

@@ -56,7 +56,7 @@ const router = express.Router();
 router.get('/vacation/filter', async (req, res) => {
     const { key, value } = req.body;
     if (!key || !value) {
-        return res.status(400).json({ message: "SQL statement is required" });
+        return res.status(400).json({ message: "key and value are required" });
     }
 
     try {

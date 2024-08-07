@@ -36,5 +36,5 @@ export class Employee extends BaseEntity {
     team: Team;
 
     @Column({ nullable: true })
-    avatarId: string
+    avatarId: number
 }

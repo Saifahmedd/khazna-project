@@ -21,3 +21,4 @@ export const deleteEmployee = (employee: Employee) => {
 export const findRoleByRoleName = (role: RoleTypes) => {
     return Role.findOneBy({ role });
 };
+
