@@ -12,10 +12,6 @@ export const findRequestsByEmployeeId = async (employeeId: number) => {
         where: { employee: { id: employeeId } },
         relations: ['employee', 'status'],
     });
-    
-    requests.forEach((request) => {
-        console.log(request.dateTo);
-    });
 
     return requests;
 };

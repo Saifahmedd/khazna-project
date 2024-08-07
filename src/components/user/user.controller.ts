@@ -1,6 +1,7 @@
 import express from 'express';
 import * as employeeService from './user.service';
 import * as vacationService from '../vacation/vacation.service';
+import * as employeeRepository from '../user/user.repository'
 import { Vacation } from '../../entities/vacation';
 import { RoleTypes } from '../../entities/role';
 
@@ -82,7 +83,7 @@ const router = express.Router();
 router.post('/register', async (req, res) => {
     const { name, password, role, phonenumber, email } = req.body;
     if (!name || !password || !role || !phonenumber || !email) {
-        res.status(401).json({message: "Invalid input"});
+        res.status(401).json({ message: "Invalid input" });
     }
     try {
         const result = await employeeService.registerEmployee(name, password, role, phonenumber, email);
@@ -146,64 +147,35 @@ router.post('/register', async (req, res) => {
  *                  type: string
  *                  example: Incorrect password
  */
-router.post('/login', async (req, res) => {
+router.post('./login', async (req, res) => {
     const { email, password } = req.body;
-    if(!email || !password){
-        res.status(401).json({message: "Invalid inputs"});
-        return;
+    if (!email || !password) {
+        res.status(401).json({ message: "Invalid input" });
     }
     try {
-        const loginResult = await employeeService.loginEmployee(email, password);
-        if (loginResult && loginResult.employee) {
-            const employeeId = loginResult.employee.id;
-            const role = loginResult.employee.role.role;
-
-            const vacationResult = await vacationService.fetchUserRequestsService(employeeId);
-
-            if (vacationResult.status === 200 && Array.isArray(vacationResult.response)) {
-                const requests: Vacation[] = vacationResult.response;
-                const differencesInDays: number[] = requests.map(request => {
-                    const dayFrom = request.dateFrom.getDate();
-                    const monthFrom = request.dateFrom.getMonth() + 1;
-                    const dayTo = request.dateTo.getDate();
-                    const monthTo = request.dateTo.getMonth() + 1;
-                    return getDaysDifference(dayFrom, monthFrom, dayTo, monthTo);
-                });
-
-                const daysTaken = differencesInDays.reduce((total, days) => total + days, 0);
-                const totalDays = role === RoleTypes.Admin ? 20 : 10;
-                const daysLeft = totalDays - daysTaken;
-
-                res.status(200).json({
-                    message: "Logged in successfully",
-                    daysLeft: daysLeft
-                });
-            } else {
-                res.status(500).json({ message: "Unexpected response format or status" });
-            }
-        } else {
-            res.status(404).json({ message: "Incorrect password or cannot find this username" });
-        }
+        const result = employeeService.loginEmployee(email, password);
+        res.status(200).json("Logged in successfully");
     } catch (error) {
-        res.status(500).json({ message: "Error logging in" });
+        res.status(400).json({ message: error.message });
     }
 });
 
-const calculateDayOfYear = (day: number, month: number): number => {
-    const daysInMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+const getDaysDifference = (dayFrom: number, monthFrom: number, dayTo: number, monthTo: number, vacationDates: string[]): number => {
+    const startDate = new Date(new Date().getFullYear(), monthFrom - 1, dayFrom);
+    const endDate = new Date(new Date().getFullYear(), monthTo - 1, dayTo);
 
-    let dayOfYear = day;
-    for (let i = 0; i < month - 1; i++) {
-        dayOfYear += daysInMonth[i];
+    let daysDifference = 0;
+
+    for (let currentDate = new Date(startDate); currentDate <= endDate; currentDate.setDate(currentDate.getDate() + 1)) {
+        const dayOfWeek = currentDate.getDay();
+        const formattedDate = `${currentDate.getDate()}/${currentDate.getMonth() + 1}/${currentDate.getFullYear()}`;
+
+        if (dayOfWeek !== 5 && dayOfWeek !== 6 && !vacationDates.includes(formattedDate)) {
+            daysDifference++;
+        }
     }
-    return dayOfYear;
-};
 
-const getDaysDifference = (dayFrom: number, monthFrom: number, dayTo: number, monthTo: number): number => {
-    const dayOfYearFrom = calculateDayOfYear(dayFrom, monthFrom);
-    const dayOfYearTo = calculateDayOfYear(dayTo, monthTo);
-
-    return dayOfYearTo - dayOfYearFrom;
+    return daysDifference;
 };
 
 /**
@@ -259,12 +231,16 @@ const getDaysDifference = (dayFrom: number, monthFrom: number, dayTo: number, mo
  *                   example: Error fetching user requests
  */
 router.get('/userInfo', async (req, res) => {
-    const { employeeId, role } = req.body;
+    const { employeeId } = req.body;
     if (!employeeId) {
         res.status(401).json({ message: "Invalid input" });
         return;
     }
+
     try {
+        const vacationDates = getVacationDates();
+
+        const employee = await employeeRepository.findEmployeeById(parseInt(employeeId));
         const result = await vacationService.fetchUserRequestsService(parseInt(employeeId));
 
         if (result.status === 200 && Array.isArray(result.response)) {
@@ -278,7 +254,7 @@ router.get('/userInfo', async (req, res) => {
                 const dayTo = request.dateTo.getDate();
                 const monthTo = request.dateTo.getMonth() + 1;
 
-                const differenceInDays = getDaysDifference(dayFrom, monthFrom, dayTo, monthTo);
+                const differenceInDays = getDaysDifference(dayFrom, monthFrom, dayTo, monthTo, vacationDates);
                 differencesInDays.push(differenceInDays);
             });
 
@@ -286,20 +262,24 @@ router.get('/userInfo', async (req, res) => {
             let daysTaken = 0;
 
             for (let i = 0; i < differencesInDays.length; i++) {
-                daysTaken = daysTaken + differencesInDays[i];
+                daysTaken += differencesInDays[i];
             }
 
-            if (role === 'Admin') {
+            if (employee?.role.role === RoleTypes.Admin) {
                 totaldays = 20;
             } else {
                 totaldays = 10;
             }
 
-            let daysLeft = totaldays - daysTaken;
+            const daysLeft = totaldays - daysTaken;
+            if (daysLeft >= 0) {
+                res.status(200).json({ avatar: employee?.avatarId, name: employee?.name, team: employee?.team, daysLeft: daysLeft });
+            }
+            else {
+                res.status(400).json({ message: "All vacation days are taken!" })
+            }
 
-            res.status(200).json({ daysLeft: daysLeft });
         } else {
-            console.error("Unexpected response format or status:", result);
             res.status(500).json({ message: "Unexpected response format or status" });
         }
     } catch (error) {
@@ -308,5 +288,13 @@ router.get('/userInfo', async (req, res) => {
     }
 });
 
+const getVacationDates = () => {
+    return ["4/8/2024", "6/8/2024"];
+};
+
+router.get('/calendarConfig', async (req, res) => {
+    const vacationDates = getVacationDates();
+    res.status(200).json({ vacationDates });
+});
 
 export { router as userController };

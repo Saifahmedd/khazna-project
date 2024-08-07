@@ -14,6 +14,7 @@ export const authenticateToken = (req: AuthenticatedRequest, res: Response, next
     }
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
+
     if (token == null) {
         console.log("No token provided");
         res.sendStatus(401);

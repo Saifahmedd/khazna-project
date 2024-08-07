@@ -14,7 +14,15 @@ export const fetchUserRequestsService = async (employeeId: number) => {
             return { status: 404, response: { message: "Employee not found" } };
         }
 
-        const requests = await findRequestsByEmployeeId(employeeId);
+        let requests = await findRequestsByEmployeeId(employeeId);
+        requests = requests.map(request => {
+        // Increment by 1, 86400000 => 1 day bas in milliseconds
+        request.dateFrom = new Date(request.dateFrom.getTime() + 86400000);
+        request.dateTo = new Date(request.dateTo.getTime() + 86400000);
+
+        return request;
+        });
+
         return { status: 200, response: requests };
     } catch (error) {
         return { status: 500, response: { message: "Error fetching requests", error: error.message } };

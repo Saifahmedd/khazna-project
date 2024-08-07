@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { Employee } from '../src/entities/employee';
+import { RoleTypes } from '../src/entities/role';
 
 interface AuthenticatedRequest extends Request {
     user?: any;
@@ -17,7 +18,7 @@ const checkAdminRole = async (req: AuthenticatedRequest, res: Response, next: Ne
             return res.status(404).json({ message: "User not found" });
         }
 
-        if (user.role.role !== "admin") {
+        if (user.role.role === RoleTypes.Admin) {
             return res.status(403).json({ message: "Access denied. Admins only." });
         }
 

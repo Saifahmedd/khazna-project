@@ -41,15 +41,16 @@ export const registerEmployee = async (name: string, password: string, role: Rol
 
 export const loginEmployee = async (email: string, password: string) => {
     const employee = await employeeRepository.findEmployeeByEmail(email);
-
-    if (!employee) {
-        throw new Error("Cannot find this email");
+    if(employee){
+        const checkPassword = await bcrypt.compare(password, employee.password);
+        if (!employee || !checkPassword) {
+            throw new Error("Incorrect email or password");
+        }
+    
+        return {employee, message: "Logged in successfully"};
+    }
+    else{
+        return {employee, message: "Incorrect email or password"}
     }
 
-    const checkPassword = await bcrypt.compare(password, employee.password);
-    if (!checkPassword) {
-        throw new Error("Incorrect email or password");
-    }
-
-    return {employee, message: "Logged in successfully"};
 };

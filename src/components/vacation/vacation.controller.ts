@@ -162,6 +162,7 @@ router.get('/vacation', async (req, res) => {
     }
 
     const result = await fetchUserRequestsService(parseInt(employeeId));
+
     return res.status(result.status).json(result.response);
 });
 
@@ -264,6 +265,8 @@ router.post('/vacation', async (req, res) => {
     if (!reason) {
         return res.status(400).json({ message: "Reason is required" });
     }
+
+
 
     const result = await createRequestService(employeeId, dateFrom, dateTo, reason);
     return res.status(result.status).json(result.response);

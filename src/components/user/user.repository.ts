@@ -5,6 +5,10 @@ export const findEmployeeByEmail = (email: string) => {
     return Employee.findOne({ where: { email }, relations: ['role'] });
 };
 
+export const findEmployeeById = (employeeId: number)=>{
+    return Employee.findOne({where: {id: employeeId}, relations: ['role', 'team']});
+}
+
 export const saveEmployee = (employee: Employee) => {
     return Employee.save(employee);
 };
