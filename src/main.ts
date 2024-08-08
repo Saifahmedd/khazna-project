@@ -7,8 +7,8 @@ import { Team } from './entities/team';
 import { VacationStatus } from "./entities/vacationStatus";
 import express from "express";
 import session from 'express-session';
-import { vacationController } from './components/vacation/vacation.controller';
-import { userController } from './components/user/user.controller';
+import { vacationRoutes } from './components/vacation/vacation.routes';
+import { userRoutes } from './components/user/user.routes';
 import { authenticateToken } from "../middleware/authenticateToken";
 import passport from './auth';
 import swaggerJSDoc from 'swagger-jsdoc';
@@ -122,8 +122,8 @@ const main = async () => {
         });
         
         app.use(authenticateToken); // Middleware Token 
-        app.use(userController); // user Endpoints   
-        app.use(vacationController); // vacation Endpoints
+        app.use(userRoutes); // user Endpoints   
+        app.use(vacationRoutes); // vacation Endpoints
 
         app.listen(8080, () => {
             console.log("Server listening on port 8080...");
