@@ -210,7 +210,7 @@ router.get('/userInfo', userController.getUserInfo);
 
 /**
  * @swagger
- * /avatar:
+ * /user/avatarId:
  *   put:
  *     summary: Update an employee's avatar
  *     description: This endpoint allows an employee to add or update their avatar by providing their employee ID and the avatar ID.
@@ -283,6 +283,6 @@ router.get('/userInfo', userController.getUserInfo);
  *                   type: string
  *                   example: Internal server error
  */
-router.put('/avatar', userController.updateAvatar);
+router.put('/user/avatarId', userController.updateAvatar);
 
 export { router as userRoutes };

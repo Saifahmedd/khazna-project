@@ -51,14 +51,15 @@ export const getUserInfo = async (req: Request, res: Response) => {
 };
 
 export const updateAvatar = async (req: Request, res: Response) => {
-    const { employeeId, avatarId } = req.body;
+    const { employeeId } = req.body;
+    const { avatarId } = req.params
 
     if (!employeeId || !avatarId) {
         return res.status(401).json({ message: "Invalid input" });
     }
 
     try {
-        const result = await employeeService.addingAvatar(employeeId, avatarId);
+        const result = await employeeService.addingAvatar(parseInt(employeeId), parseInt(avatarId));
 
         if (result.status === 404) {
             return res.status(404).json({ message: result.message });
