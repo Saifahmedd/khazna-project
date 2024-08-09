@@ -125,7 +125,7 @@ const main = async () => {
         app.use(userRoutes); // user Endpoints   
         app.use(vacationRoutes); // vacation Endpoints
 
-        app.listen(8080, () => {
+        app.listen(8080 || process.env.Port, () => {
             console.log("Server listening on port 8080...");
         });
     } catch (error) {
@@ -135,4 +135,4 @@ const main = async () => {
 
 main();
 
-export { connection };
+export {app, connection };

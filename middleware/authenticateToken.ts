@@ -9,7 +9,7 @@ interface AuthenticatedRequest extends Request {
 }
 
 export const authenticateToken = (req: AuthenticatedRequest, res: Response, next: NextFunction): void => {
-    if (req.path === '/register') {
+    if (req.path === '/register' || req.path === '/') {
         return next();
     }
     const authHeader = req.headers['authorization'];
