@@ -140,12 +140,12 @@ export const updateRequests = async ( requestId: number, reviewerId: number, dat
     }
 };
 
-export const filterRequests = async (key: string, value: string, connection: Connection) => {
-    try {
-        const sql = `SELECT * FROM Vacation WHERE ${key} = '${value}'`;
-        const requests = await requestRepository.filterRequestsBySQL(sql, connection);
-        return { status: 200, response: requests };
-    } catch (error) {
-        return { status: 500, response: { message: "Internal Server Error", error: error.message } };
-    }
-};
+// export const filterRequests = async (key: string, value: string, connection: Connection) => {
+//     try {
+//         const sql = `SELECT * FROM Vacation WHERE ${key} = '${value}'`;
+//         const requests = await requestRepository.filterRequestsBySQL(sql, connection);
+//         return { status: 200, response: requests };
+//     } catch (error) {
+//         return { status: 500, response: { message: "Internal Server Error", error: error.message } };
+//     }
+// };

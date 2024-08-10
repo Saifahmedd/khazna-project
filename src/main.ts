@@ -1,19 +1,20 @@
 import dotenv from 'dotenv';
-import { createConnection, Connection } from "typeorm";
-import { Employee } from "./entities/employee";
-import { Role } from "./entities/role";
-import { Vacation } from "./entities/vacation";
+import { createConnection, Connection } from 'typeorm';
+import { Employee } from './entities/employee';
+import { Role } from './entities/role';
+import { Vacation } from './entities/vacation';
 import { Team } from './entities/team';
-import { VacationStatus } from "./entities/vacationStatus";
-import express from "express";
+import { VacationStatus } from './entities/vacationStatus';
+import express from 'express';
 import session from 'express-session';
 import { vacationRoutes } from './components/vacation/vacation.routes';
 import { userRoutes } from './components/user/user.routes';
-import { authenticateToken } from "../middleware/authenticateToken";
+import { authenticateToken } from '../middleware/authenticateToken';
 import passport from './auth';
 import swaggerJSDoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
-import { RoleTypes, TeamType, StatusTypes} from './entities/constants';
+import { RoleTypes, TeamType, StatusTypes } from './entities/constants';
+
 dotenv.config();
 
 const app = express();
@@ -23,14 +24,16 @@ const main = async () => {
     try {
         connection = await createConnection({
             type: 'mysql',
-            host: 'localhost',
-            port: 3306,
-            username: 'root',
-            password: 'root123',
-            database: 'khazna-db',
+            host: process.env.DB_HOST as string || '127.0.0.1',
+            port: parseInt(process.env.DB_PORT as string, 10) || 3300,
+            username: process.env.DB_USERNAME as string || 'root',
+            password: process.env.DB_PASSWORD as string || 'root123',
+            database: process.env.DB_DATABASE as string || 'khazna',
             entities: [Employee, Role, Vacation, VacationStatus, Team],
-            synchronize: true
+            synchronize: true,
+            connectTimeout: 50000, // 30 seconds
         });
+        
 
         console.log("Connected to MySQL database");
 
@@ -39,7 +42,7 @@ const main = async () => {
         if (existingRoles.length === 0) {
             await roleRepository.save([
                 { role: RoleTypes.Admin },
-                { role: RoleTypes.User }
+                { role: RoleTypes.User },
             ]);
         }
 
@@ -49,17 +52,17 @@ const main = async () => {
             await vacationStatusRepository.save([
                 { name: StatusTypes.Pending },
                 { name: StatusTypes.Accepted },
-                { name: StatusTypes.Rejected }
+                { name: StatusTypes.Rejected },
             ]);
         }
 
         const teamRepository = connection.getRepository(Team);
-        const existingteam = await teamRepository.find();
-        if(existingteam.length === 0){
+        const existingTeams = await teamRepository.find();
+        if (existingTeams.length === 0) {
             await teamRepository.save([
-               {type: TeamType.BACKEND},
-               {type: TeamType.FRONTEND},
-               {type: TeamType.TESTING} 
+                { type: TeamType.BACKEND },
+                { type: TeamType.FRONTEND },
+                { type: TeamType.TESTING },
             ]);
         }
 
@@ -68,25 +71,25 @@ const main = async () => {
                 openapi: '3.0.0',
                 info: {
                     title: 'Khazna API Project',
-                    version: '1.0.0'
+                    version: '1.0.0',
                 },
                 servers: [
                     {
-                        url: 'http://localhost:8080/'
-                    }
-                ]
+                        url: process.env.SWAGGER_SERVER_URL as string || 'http://localhost:8080/',
+                    },
+                ],
             },
-            apis: ['./src/components/**/*.ts']
+            apis: ['./src/components/**/*.ts'],
         };
 
         const swaggerSpec = swaggerJSDoc(swaggerOptions);
-        
+
         // Middleware
         app.use(express.json());
         app.use(session({
-            secret: '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',
+            secret: process.env.SESSION_SECRET as string || 'secret',
             resave: false,
-            saveUninitialized: false
+            saveUninitialized: false,
         }));
         app.use(passport.initialize());
         app.use(passport.session());
@@ -97,6 +100,10 @@ const main = async () => {
         app.get('/', (req, res) => {
             res.send('<a href="/auth/google">Login with Google</a>');
         });
+
+        app.get('/test', (req, res) => {
+            res.send('Server is running');
+        });        
 
         app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 
@@ -120,13 +127,12 @@ const main = async () => {
                 res.status(400).json({ error: 'No token provided' });
             }
         });
-        
-        app.use(authenticateToken); // Middleware Token 
-        app.use(userRoutes); // user Endpoints   
-        app.use(vacationRoutes); // vacation Endpoints
 
-        app.listen(8080 || process.env.Port, () => {
-            console.log("Server listening on port 8080...");
+        app.use(authenticateToken); // Middleware Token
+        app.use(userRoutes); // User Endpoints
+        app.use(vacationRoutes); // Vacation Endpoints
+        app.listen(8080, () => {
+            console.log(`Server running on http://localhost:8080`);
         });
     } catch (error) {
         console.error("Error connecting to database:", error);
@@ -135,4 +141,5 @@ const main = async () => {
 
 main();
 
-export {app, connection };
+// Export default Express app for Vercel
+export default app;

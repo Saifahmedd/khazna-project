@@ -52,7 +52,7 @@ const router = express.Router();
  *       500:
  *         description: Internal Server Error.
  */
-router.get('/vacation/filter', vacationController.filterVacationRequests);
+// router.get('/vacation/filter', vacationController.filterVacationRequests);
 
 /**
  * @swagger

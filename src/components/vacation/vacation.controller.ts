@@ -1,21 +1,21 @@
 import { Request, Response } from 'express';
-import { fetchUserRequestsService, filterRequests, fetchSingleRequest, createRequestService, updateUserRequestService, deleteUserRequestService, updateAdminRequestService, updateRequests } from './vacation.service';
+import { fetchUserRequestsService, fetchSingleRequest, createRequestService, updateUserRequestService, deleteUserRequestService, updateAdminRequestService, updateRequests } from './vacation.service';
 import { StatusTypes } from '../../entities/constants';
-import { connection } from '../../main';
+// import { connection } from '../../main';
 
-export const filterVacationRequests = async (req: Request, res: Response) => {
-    const { key, value } = req.body;
-    if (!key || !value) {
-        return res.status(400).json({ message: "key and value are required" });
-    }
+// export const filterVacationRequests = async (req: Request, res: Response) => {
+//     const { key, value } = req.body;
+//     if (!key || !value) {
+//         return res.status(400).json({ message: "key and value are required" });
+//     }
 
-    try {
-        const result = await filterRequests(key, value, connection);
-        return res.status(result.status).json(result.response);
-    } catch (error) {
-        return res.status(500).json({ message: "Internal Server Error", error: error.message });
-    }
-};
+//     try {
+//         const result = await filterRequests(key, value, connection);
+//         return res.status(result.status).json(result.response);
+//     } catch (error) {
+//         return res.status(500).json({ message: "Internal Server Error", error: error.message });
+//     }
+// };
 
 export const getVacationRequestById = async (req: Request, res: Response) => {
     const { requestId } = req.params;
