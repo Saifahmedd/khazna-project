@@ -37,5 +37,5 @@
 	  "./src/**/*.tsx",
 	  "./src/types/**/*.d.ts" // Ensure this line is included to pick up custom types
 	]
-  }
+}
   

@@ -31,9 +31,7 @@ const main = async () => {
             database: process.env.DB_DATABASE as string || 'khazna',
             entities: [Employee, Role, Vacation, VacationStatus, Team],
             synchronize: true,
-            connectTimeout: 50000, // 30 seconds
-        });
-        
+        });       
 
         console.log("Connected to MySQL database");
 
@@ -131,6 +129,7 @@ const main = async () => {
         app.use(authenticateToken); // Middleware Token
         app.use(userRoutes); // User Endpoints
         app.use(vacationRoutes); // Vacation Endpoints
+        
         app.listen(8080, () => {
             console.log(`Server running on http://localhost:8080`);
         });
@@ -141,5 +140,4 @@ const main = async () => {
 
 main();
 
-// Export default Express app for Vercel
 export default app;
