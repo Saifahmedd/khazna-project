@@ -13,7 +13,7 @@ import { authenticateToken } from '../middleware/authenticateToken';
 import passport from './auth';
 import swaggerJSDoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
-import { initializeData } from './constants'; // Import the new file
+import { RoleTypes, TeamType, StatusTypes } from './entities/constants';
 
 dotenv.config();
 
@@ -35,8 +35,34 @@ const main = async () => {
 
         console.log("Connected to MySQL database");
 
-        // Initialize data
-        await initializeData(connection);
+        const roleRepository = connection.getRepository(Role);
+        const existingRoles = await roleRepository.find();
+        if (existingRoles.length === 0) {
+            await roleRepository.save([
+                { role: RoleTypes.Admin },
+                { role: RoleTypes.User },
+            ]);
+        }
+
+        const vacationStatusRepository = connection.getRepository(VacationStatus);
+        const existingStatus = await vacationStatusRepository.find();
+        if (existingStatus.length === 0) {
+            await vacationStatusRepository.save([
+                { name: StatusTypes.Pending },
+                { name: StatusTypes.Accepted },
+                { name: StatusTypes.Rejected },
+            ]);
+        }
+
+        const teamRepository = connection.getRepository(Team);
+        const existingTeams = await teamRepository.find();
+        if (existingTeams.length === 0) {
+            await teamRepository.save([
+                { type: TeamType.BACKEND },
+                { type: TeamType.FRONTEND },
+                { type: TeamType.TESTING },
+            ]);
+        }
 
         const swaggerOptions = {
             definition: {
@@ -56,6 +82,16 @@ const main = async () => {
 
         const swaggerSpec = swaggerJSDoc(swaggerOptions);
 
+        // Middleware
+        app.use(express.json());
+        app.use(session({
+            secret: process.env.SESSION_SECRET as string || 'secret',
+            resave: false,
+            saveUninitialized: false,
+        }));
+        app.use(passport.initialize());
+        app.use(passport.session());
+
         // Swagger docs
         app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
@@ -65,9 +101,32 @@ const main = async () => {
 
         app.get('/test', (req, res) => {
             res.send('Server is running');
+        });        
+
+        app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+
+        app.get('/auth/google/callback',
+            passport.authenticate('google', { failureRedirect: '/' }),
+            (req: express.Request & { user?: Express.User }, res: express.Response) => {
+                if (req.user && (req.user as any).token) {
+                    res.redirect(`/token?jwt=${encodeURIComponent((req.user as any).token)}`);
+                } else {
+                    res.redirect('/');
+                }
+            }
+        );
+
+        app.get('/token', (req, res) => {
+            const token = req.query.jwt as string;
+            console.log(token);
+            if (token) {
+                res.send("Hello");
+            } else {
+                res.status(400).json({ error: 'No token provided' });
+            }
         });
 
-        //app.use(authenticateToken); // Middleware Token
+        app.use(authenticateToken); // Middleware Token
         app.use(userRoutes); // User Endpoints
         app.use(vacationRoutes); // Vacation Endpoints
         

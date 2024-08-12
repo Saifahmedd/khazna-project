@@ -22,6 +22,7 @@ export const authenticateToken = (req: AuthenticatedRequest, res: Response, next
     }
 
     const secret = process.env.ACCESS_TOKEN_SECRET;
+    console.log(secret);
     if (!secret) {
         console.error("ACCESS_TOKEN_SECRET is not defined");
         throw new Error("ACCESS_TOKEN_SECRET is not defined");
