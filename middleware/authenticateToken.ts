@@ -2,7 +2,8 @@ import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 
-dotenv.config();
+dotenv.config({ path: 'C:/Users/hp/Desktop/khazna-project/src/.env' });
+console.log("ACCESS_TOKEN_SECRET:", process.env.ACCESS_TOKEN_SECRET);
 
 interface AuthenticatedRequest extends Request {
     user?: any;
@@ -22,7 +23,6 @@ export const authenticateToken = (req: AuthenticatedRequest, res: Response, next
     }
 
     const secret = process.env.ACCESS_TOKEN_SECRET;
-    console.log(secret);
     if (!secret) {
         console.error("ACCESS_TOKEN_SECRET is not defined");
         throw new Error("ACCESS_TOKEN_SECRET is not defined");

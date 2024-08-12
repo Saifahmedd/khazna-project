@@ -15,7 +15,7 @@ import swaggerJSDoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 import { RoleTypes, TeamType, StatusTypes } from './entities/constants';
 
-dotenv.config();
+dotenv.config({ path: 'C:/Users/hp/Desktop/khazna-project/src/.env' });
 
 const app = express();
 let connection: Connection;
@@ -24,11 +24,11 @@ const main = async () => {
     try {
         connection = await createConnection({
             type: 'mysql',
-            host: process.env.DB_HOST as string || '127.0.0.1',
-            port: parseInt(process.env.DB_PORT as string, 10) || 3300,
+            host: process.env.DB_HOST as string || 'localhost',
+            port: parseInt(process.env.DB_PORT as string, 10) || 3306,
             username: process.env.DB_USERNAME as string || 'root',
             password: process.env.DB_PASSWORD as string || 'root123',
-            database: process.env.DB_DATABASE as string || 'khazna',
+            database: process.env.DB_DATABASE as string || 'khazna-db',
             entities: [Employee, Role, Vacation, VacationStatus, Team],
             synchronize: true,
         });       
