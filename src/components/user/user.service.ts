@@ -11,99 +11,110 @@ import * as vacationService from '../vacation/vacation.service';
 dotenv.config();
 
 export const registerEmployee = async (name: string, password: string, role: RoleTypes, phonenumber: string, email: string) => {
-    const existingEmployee = await employeeRepository.findEmployeeByEmail(email);
-    if (existingEmployee) {
-        throw new Error("Email is already exists");
+    try {
+        const existingEmployee = await employeeRepository.findEmployeeByEmail(email);
+        if (existingEmployee) {
+            return { status: 409, message: "Email already exists" };
+        }
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        const roleEntity = await employeeRepository.findRoleByRoleName(role);
+        if (!roleEntity) {
+            return { status: 404, message: "Invalid role" };
+        }
+
+        const employee = Employee.create({
+            name,
+            password: hashedPassword,
+            phoneNumber: phonenumber,
+            email,
+            role: roleEntity
+        });
+
+        await employeeRepository.saveEmployee(employee);
+
+        return { status: 200, message: "Registration successful" };
+    } catch (error) {
+        return { status: 500, message: "Internal server error" };
     }
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const roleEntity = await employeeRepository.findRoleByRoleName(role);
-    if (!roleEntity) {
-        throw new Error("Invalid role");
-    }
-
-    const employee = Employee.create({
-        name,
-        password: hashedPassword,
-        phoneNumber: phonenumber,
-        email,
-        role: roleEntity
-    });
-
-    await employeeRepository.saveEmployee(employee);
-
-    const user = { 
-        email,
-        role: roleEntity.role
-    };
-
-    const accessToken = generateToken(user);
-
-    return { message: "Registration is made successfully", user, accessToken };
 };
 
 export const loginEmployee = async (email: string, password: string) => {
-    const employee = await employeeRepository.findEmployeeByEmail(email);
-    if(employee){
-        const checkPassword = await bcrypt.compare(password, employee.password);
-        if (!employee || !checkPassword) {
-            throw new Error("Incorrect email or password");
+    try {
+        const employee = await employeeRepository.findEmployeeByEmail(email);
+        if (!employee) {
+            return { status: 401, message: "Incorrect email or password" };
         }
-    
-        return {employee, message: "Logged in successfully"};
-    }
-    else{
-        return {employee, message: "Incorrect email or password"}
-    }
 
+        const isPasswordValid = await bcrypt.compare(password, employee.password);
+        if (!isPasswordValid) {
+            return { status: 401, message: "Incorrect email or password" };
+        }
+
+        const user = {
+            email,
+            role: employee.role
+        };
+
+        const accessToken = generateToken(user);
+
+        return {
+            status: 200,
+            employee,
+            message: "Logged in successfully",
+            accessToken
+        };
+    } catch (error) {
+        return { status: 500, message: "Internal server error" };
+    }
 };
 
+
 export const getUserInfo = async (employeeId: number) => {
-    const vacationDates = getVacationDates();
+    try {
+        const vacationDates = getVacationDates();
 
-    const employee = await employeeRepository.findEmployeeById(employeeId);
-    if (!employee) {
-        return { status: 404, message: "Cannot find the employee" };
-    }
+        const employee = await employeeRepository.findEmployeeById(employeeId);
+        if (!employee) {
+            return { status: 404, message: "Cannot find the employee" };
+        }
 
-    const result = await vacationService.fetchUserRequestsService(employeeId);
+        const result = await vacationService.fetchUserRequestsService(employeeId);
 
-    if (result.status === 200 && Array.isArray(result.response)) {
+        if (result.status !== 200 || !Array.isArray(result.response)) {
+            return { status: 500, message: "Unexpected response format or status" };
+        }
+
         const requests: Vacation[] = result.response;
-        const differencesInDays: number[] = [];
-
-        requests.forEach(request => {
+        const differencesInDays: number[] = requests.map(request => {
             const dayFrom = request.dateFrom.getDate();
             const monthFrom = request.dateFrom.getMonth() + 1;
 
             const dayTo = request.dateTo.getDate();
             const monthTo = request.dateTo.getMonth() + 1;
 
-            const differenceInDays = getDaysDifference(dayFrom, monthFrom, dayTo, monthTo, vacationDates);
-            differencesInDays.push(differenceInDays);
+            return getDaysDifference(dayFrom, monthFrom, dayTo, monthTo, vacationDates);
         });
 
-        let totalDays = employee.role.role === RoleTypes.Admin ? 20 : 10;
-        let daysTaken = differencesInDays.reduce((acc, curr) => acc + curr, 0);
-        let daysLeft = totalDays - daysTaken;
+        const totalDays = employee.role.role === RoleTypes.Admin ? 20 : 10;
+        const daysTaken = differencesInDays.reduce((acc, curr) => acc + curr, 0);
+        const daysLeft = totalDays - daysTaken;
 
-        if (daysLeft >= 0) {
-            return { 
-                status: 200,
-                data: { 
-                    avatar: employee.avatarId, 
-                    name: employee.name, 
-                    team: employee.team, 
-                    daysLeft 
-                } 
-            };
-        } else {
-            return {status: 400, message: "All vacation days are taken!" };
-        }
-
-    } else {
-        return { status: 500, message: "Unexpected response format or status" };
+        return { 
+            status: 200,
+            data: { 
+                avatar: employee.avatarId, 
+                name: employee.name, 
+                team: employee.team, 
+                daysLeft 
+            } 
+        };
+    } catch (error) {
+        return { status: 500, message: "Internal server error" };
     }
 };
+
 
 const getDaysDifference = (dayFrom: number, monthFrom: number, dayTo: number, monthTo: number, vacationDates: string[]): number => {
     const startDate = new Date(new Date().getFullYear(), monthFrom - 1, dayFrom);

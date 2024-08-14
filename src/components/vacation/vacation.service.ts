@@ -4,6 +4,7 @@ import * as requestRepository from './vacation.repository';
 import { RoleTypes, StatusTypes } from '../../entities/constants';
 import { response } from 'express';
 import { Connection } from 'typeorm';
+import { Vacation } from '../../entities/vacation';
 
 export const fetchUserRequestsService = async (employeeId: number) => {
     try {
@@ -15,11 +16,9 @@ export const fetchUserRequestsService = async (employeeId: number) => {
 
         let requests = await findRequestsByEmployeeId(employeeId);
         requests = requests.map(request => {
-        // Increment by 1, 86400000 => 1 day bas in milliseconds
-        request.dateFrom = new Date(request.dateFrom.getTime() + 86400000);
-        request.dateTo = new Date(request.dateTo.getTime() + 86400000);
-
-        return request;
+            request.dateFrom = new Date(request.dateFrom.getTime() + 86400000);
+            request.dateTo = new Date(request.dateTo.getTime() + 86400000);
+            return request;
         });
 
         return { status: 200, response: requests };
@@ -28,16 +27,16 @@ export const fetchUserRequestsService = async (employeeId: number) => {
     }
 };
 
-export const fetchSingleRequest = async (requestId: number)=>{
+export const fetchSingleRequest = async (requestId: number) => {
     try {
         const request = await requestRepository.findRequestById(requestId);
-        if(!request){
-            return { status: 404, response: { message: "Request is not found" } };
+        if (!request) {
+            return { status: 404, response: { message: "Request not found" } };
         }
 
-        return { status: 200, response: {message: "Request is fetched successfully", request}};
-    } catch(error){
-        return { status: 500, response: { message: "Error fetching requests", error: error.message } };
+        return { status: 200, response: { message: "Request fetched successfully", request } };
+    } catch (error) {
+        return { status: 500, response: { message: "Error fetching request", error: error.message } };
     }
 };
 
@@ -69,15 +68,28 @@ export const createRequestService = async (employeeId: number, dateFrom: string,
     }
 };
 
-export const updateUserRequestService = async (requestId: number, reviewerId: number, dateFrom: Date, dateTo: Date, reason: string, status: VacationStatus) => {
+export const updateUserRequestService = async (requestId: number, reviewerId: number, dateFrom: string, dateTo: string, reason: string, status: VacationStatus) => {
     try {
+        const dateFromParsed = new Date(dateFrom);
+        const dateToParsed = new Date(dateTo);
+
+        if (isNaN(dateFromParsed.getTime()) || isNaN(dateToParsed.getTime())) {
+            return { status: 400, response: { message: "Invalid date format" } };
+        }
+
         const request = await findVacationById(requestId);
 
         if (!request) {
             return { status: 404, response: { message: "Request not found" } };
         }
 
-        await updateVacationRequest(request, { reviewerId, dateFrom, dateTo, reason, status });
+        await updateVacationRequest(request, {
+            reviewerId,
+            dateFrom: dateFromParsed,
+            dateTo: dateToParsed,
+            reason,
+            status
+        });
 
         return { status: 200, response: { message: "Request updated successfully" } };
     } catch (error) {
@@ -118,34 +130,47 @@ export const updateAdminRequestService = async (requestId: number, status: Statu
 
         return { status: 200, response: updatedRequest };
     } catch (error) {
-        return { status: 500, response: { message: "Internal Server Error dddd", error: error.message } };
+        return { status: 500, response: { message: "Internal Server Error", error: error.message } };
     }
 };
 
-export const updateRequests = async ( requestId: number, reviewerId: number, dateFrom: Date, dateTo: Date, reason: string) => {
+export const updateRequests = async (requestId: number, reviewerId: number, dateFrom: string, dateTo: string, reason: string) => {
     try {
         const request = await requestRepository.findRequestById(requestId);
 
         if (!request) {
-            return { status: 404, response: { message: "Request not found" } }}
+            return { status: 404, response: { message: "Request not found" } };
+        }
+
+        const dateFromParsed = new Date(dateFrom);
+        const dateToParsed = new Date(dateTo);
+
+        if (isNaN(dateFromParsed.getTime()) || isNaN(dateToParsed.getTime())) {
+            return { status: 400, response: { message: "Invalid date format" } };
+        }
 
         if (reviewerId !== undefined) request.reviewerId = reviewerId;
-        if (dateFrom !== undefined) request.dateFrom = dateFrom;
-        if (dateTo !== undefined) request.dateTo = dateTo;
+        if (dateFromParsed !== undefined) request.dateFrom = dateFromParsed;
+        if (dateToParsed !== undefined) request.dateTo = dateToParsed;
         if (reason !== undefined) request.reason = reason;
-        request.save();
+
+        await request.save();
         return { status: 200, response: request };
     } catch (error) {
         return { status: 500, response: { message: "Internal Server Error", error: error.message } };
     }
 };
 
-// export const filterRequests = async (key: string, value: string, connection: Connection) => {
-//     try {
-//         const sql = `SELECT * FROM Vacation WHERE ${key} = '${value}'`;
-//         const requests = await requestRepository.filterRequestsBySQL(sql, connection);
-//         return { status: 200, response: requests };
-//     } catch (error) {
-//         return { status: 500, response: { message: "Internal Server Error", error: error.message } };
-//     }
-// };
+
+export const filterRequests = async (key: string, value: string, connection: Connection) => {
+    try {
+        
+        const sql = `SELECT * FROM Vacation WHERE ${key} = ?`;
+        const requests = await Vacation.query(sql, [value]);
+
+        return { status: 200, response: requests };
+    } catch (error) {
+        console.error('Error executing filterRequests:', error);
+        return { status: 500, response: { message: "Internal Server Error", error: error.message } };
+    }
+};

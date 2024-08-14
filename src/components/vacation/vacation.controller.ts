@@ -1,31 +1,35 @@
 import { Request, Response } from 'express';
-import { fetchUserRequestsService, fetchSingleRequest, createRequestService, updateUserRequestService, deleteUserRequestService, updateAdminRequestService, updateRequests } from './vacation.service';
+import { fetchUserRequestsService, filterRequests ,fetchSingleRequest, createRequestService, updateUserRequestService, deleteUserRequestService, updateAdminRequestService, updateRequests } from './vacation.service';
 import { StatusTypes } from '../../entities/constants';
-// import { connection } from '../../main';
+import { connection } from '../../main';
 
-// export const filterVacationRequests = async (req: Request, res: Response) => {
-//     const { key, value } = req.body;
-//     if (!key || !value) {
-//         return res.status(400).json({ message: "key and value are required" });
-//     }
+export const filterVacationRequests = async (req: Request, res: Response) => {
+    const { key, value } = req.body;
+    if (!key || !value) {
+        return res.status(400).json({ message: "Key and value are required" });
+    }
 
-//     try {
-//         const result = await filterRequests(key, value, connection);
-//         return res.status(result.status).json(result.response);
-//     } catch (error) {
-//         return res.status(500).json({ message: "Internal Server Error", error: error.message });
-//     }
-// };
+    try {
+        const result = await filterRequests(key, value, connection);
+        return res.status(result.status).json(result.response);
+    } catch (error) {
+        return res.status(500).json({ message: "Internal Server Error", error: error.message });
+    }
+};
 
 export const getVacationRequestById = async (req: Request, res: Response) => {
     const { requestId } = req.params;
 
-    if (!requestId) {
-        return res.status(400).json({ message: "Request ID is required" });
+    if (!requestId || isNaN(Number(requestId))) {
+        return res.status(400).json({ message: "Valid Request ID is required" });
     }
 
-    const result = await fetchSingleRequest(parseInt(requestId));
-    return res.status(result.status).json(result.response);
+    try {
+        const result = await fetchSingleRequest(parseInt(requestId));
+        return res.status(result.status).json(result.response);
+    } catch (error) {
+        return res.status(500).json({ message: "Internal Server Error", error: error.message });
+    }
 };
 
 export const getUserVacationRequests = async (req: Request, res: Response) => {
@@ -35,9 +39,13 @@ export const getUserVacationRequests = async (req: Request, res: Response) => {
         return res.status(400).json({ message: "Employee ID is required" });
     }
 
-    const result = await fetchUserRequestsService(parseInt(employeeId));
+    try {
+        const result = await fetchUserRequestsService(parseInt(employeeId));
 
-    return res.status(result.status).json(result.response);
+        return res.status(result.status).json(result.response);
+    } catch (error) {
+        return res.status(500).json({ message: "Internal Server Error", error: error.message });
+    }
 };
 
 export const createVacationRequest = async (req: Request, res: Response) => {
@@ -68,50 +76,66 @@ export const updateUserVacationRequest = async (req: Request, res: Response) => 
         return res.status(400).json({ message: "Request ID is required" });
     }
 
-    const result = await updateUserRequestService(parseInt(requestId), reviewerId, dateFrom, dateTo, reason, status);
-    return res.status(result.status).json(result.response);
+    if (!reviewerId || !dateFrom || !dateTo || !reason || !status) {
+        return res.status(400).json({ message: "All fields are required" });
+    }
+
+    try {
+        const result = await updateUserRequestService(parseInt(requestId), reviewerId, dateFrom, dateTo, reason, status);
+        return res.status(result.status).json(result.response);
+    } catch (error) {
+        return res.status(500).json({ message: "Internal Server Error", error: error.message });
+    }
 };
 
 export const deleteVacationRequest = async (req: Request, res: Response) => {
     const { requestId } = req.body;
 
-    if (!requestId) {
-        return res.status(400).json({ message: "Request ID is required" });
+    if (!requestId || isNaN(Number(requestId))) {
+        return res.status(400).json({ message: "Valid Request ID is required" });
     }
 
-    const result = await deleteUserRequestService(requestId);
-    return res.status(result.status).json(result.response);
+    try {
+        const result = await deleteUserRequestService(parseInt(requestId, 10));
+        return res.status(result.status).json(result.response);
+    } catch (error) {
+        return res.status(500).json({ message: "Internal Server Error", error: error.message });
+    }
 };
 
 export const updateAdminVacationRequest = async (req: Request, res: Response) => {
     const { requestId, status } = req.params;
 
-    if (!requestId) {
-        return res.status(400).json({ message: "Request ID is required" });
+    if (!requestId || isNaN(Number(requestId))) {
+        return res.status(400).json({ message: "Valid Request ID is required" });
     }
     if (!status) {
         return res.status(400).json({ message: "Status is required" });
     }
 
-    const result = await updateAdminRequestService(parseInt(requestId), status as StatusTypes);
-    return res.status(result.status).json(result.response);
+    try {
+        const result = await updateAdminRequestService(parseInt(requestId, 10), status as StatusTypes);
+        return res.status(result.status).json(result.response);
+    } catch (error) {
+        return res.status(500).json({ message: "Internal Server Error", error: error.message });
+    }
 };
 
 export const updateAdminVacationRequestDetails = async (req: Request, res: Response) => {
     const { reviewerId, dateFrom, dateTo, reason } = req.body;
     const { requestId } = req.params;
 
-    if (!requestId) {
-        return res.status(400).json({ message: "Request ID is required" });
+    if (!requestId || isNaN(Number(requestId))) {
+        return res.status(400).json({ message: "Valid Request ID is required" });
+    }
+
+    if (!reviewerId || !dateFrom || !dateTo || !reason) {
+        return res.status(400).json({ message: "All fields are required" });
     }
 
     try {
-        const result = await updateRequests(parseInt(requestId), reviewerId, dateFrom, dateTo, reason);
-
-        if (result.status === 404) {
-            return res.status(404).json(result.response);
-        }
-
+        const result = await updateRequests(parseInt(requestId, 10), reviewerId, dateFrom, dateTo, reason);
+        
         return res.status(result.status).json(result.response);
     } catch (error) {
         return res.status(500).json({ message: "Internal Server Error", error: error.message });

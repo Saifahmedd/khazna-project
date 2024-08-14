@@ -1,5 +1,3 @@
-// src/utils/initializeData.ts
-
 import { Connection } from 'typeorm';
 import { Role } from './entities/role';
 import { VacationStatus } from './entities/vacationStatus';

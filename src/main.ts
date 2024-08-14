@@ -13,12 +13,14 @@ import { authenticateToken } from '../middleware/authenticateToken';
 import passport from './auth';
 import swaggerJSDoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
-import { RoleTypes, TeamType, StatusTypes } from './entities/constants';
-
+import { initializeData } from './constants';
+import cors from "cors"
 dotenv.config({ path: 'C:/Users/hp/Desktop/khazna-project/src/.env' });
 
 const app = express();
 let connection: Connection;
+
+app.use(cors());
 
 const main = async () => {
     try {
@@ -35,34 +37,7 @@ const main = async () => {
 
         console.log("Connected to MySQL database");
 
-        const roleRepository = connection.getRepository(Role);
-        const existingRoles = await roleRepository.find();
-        if (existingRoles.length === 0) {
-            await roleRepository.save([
-                { role: RoleTypes.Admin },
-                { role: RoleTypes.User },
-            ]);
-        }
-
-        const vacationStatusRepository = connection.getRepository(VacationStatus);
-        const existingStatus = await vacationStatusRepository.find();
-        if (existingStatus.length === 0) {
-            await vacationStatusRepository.save([
-                { name: StatusTypes.Pending },
-                { name: StatusTypes.Accepted },
-                { name: StatusTypes.Rejected },
-            ]);
-        }
-
-        const teamRepository = connection.getRepository(Team);
-        const existingTeams = await teamRepository.find();
-        if (existingTeams.length === 0) {
-            await teamRepository.save([
-                { type: TeamType.BACKEND },
-                { type: TeamType.FRONTEND },
-                { type: TeamType.TESTING },
-            ]);
-        }
+        await initializeData(connection);
 
         const swaggerOptions = {
             definition: {
@@ -77,7 +52,7 @@ const main = async () => {
                     },
                 ],
             },
-            apis: ['./src/components/**/*.ts'],
+            apis: ['./src/swagger.ts'],
         };
 
         const swaggerSpec = swaggerJSDoc(swaggerOptions);
@@ -139,5 +114,7 @@ const main = async () => {
 };
 
 main();
+
+export { connection };
 
 export default app;
