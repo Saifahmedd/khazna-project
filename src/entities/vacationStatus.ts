@@ -1,6 +1,6 @@
 import { Entity, BaseEntity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
 import { Vacation } from './vacation';
-import { StatusTypes } from './constants';
+import { StatusTypes } from './constants/constants';
 
 @Entity('vacation_status')
 export class VacationStatus extends BaseEntity {

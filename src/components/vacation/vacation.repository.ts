@@ -2,7 +2,7 @@ import { Connection } from "typeorm";
 import { Employee } from "../../entities/employee";
 import { Vacation } from "../../entities/vacation";
 import { VacationStatus } from "../../entities/vacationStatus";
-import { StatusTypes } from "../../entities/constants";
+import { StatusTypes } from "../../entities/constants/constants";
 
 export const findVacationStatusByName = async (name: StatusTypes) => {
     return await VacationStatus.findOneBy({ name });

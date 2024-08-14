@@ -4,7 +4,7 @@ import * as employeeRepository from './user.repository';
 import { Employee } from '../../entities/employee';
 import {generateToken} from '../../../middleware/generateToken';
 import dotenv from 'dotenv';
-import { RoleTypes } from '../../entities/constants';
+import { RoleTypes } from '../../entities/constants/constants';
 import { Vacation } from '../../entities/vacation';
 import * as vacationService from '../vacation/vacation.service';
 

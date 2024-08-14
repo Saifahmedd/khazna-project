@@ -4,7 +4,7 @@ import { Profile } from 'passport';
 import { Employee } from './entities/employee';
 import { generateToken } from '../middleware/generateToken';
 import { Role } from './entities/role';
-import { RoleTypes } from './entities/constants';
+import { RoleTypes } from './entities/constants/constants';
 
 const GOOGLE_CLIENT_ID = '271432223949-pb1qjj9pv3dfne445cvk2989jk0cv7cd.apps.googleusercontent.com';
 const GOOGLE_CLIENT_SECRET = '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';
@@ -47,10 +47,8 @@ passport.use(new GoogleStrategy({
         console.log("Already have an Account");
       }
 
-      // Generate JWT token
       const token = await generateToken({ id: user.id, name: user.name, email: user.email });
 
-      // Pass user and token to req.user
       return done(null, { ...user, token });
     } catch (err) {
       console.error("Error in Google Strategy Callback:", err);

@@ -48,11 +48,11 @@ const main = async () => {
                 },
                 servers: [
                     {
-                        url: process.env.SWAGGER_SERVER_URL as string || 'http://localhost:8080/',
+                        url: 'http://localhost:8080/',
                     },
                 ],
             },
-            apis: ['./src/swagger.ts'],
+            apis: ['./src/swagger/*.ts'],
         };
 
         const swaggerSpec = swaggerJSDoc(swaggerOptions);
@@ -72,11 +72,7 @@ const main = async () => {
 
         app.get('/', (req, res) => {
             res.send('<a href="/auth/google">Login with Google</a>');
-        });
-
-        app.get('/test', (req, res) => {
-            res.send('Server is running');
-        });        
+        });      
 
         app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 

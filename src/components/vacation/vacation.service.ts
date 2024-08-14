@@ -1,7 +1,7 @@
 import { findEmployeeById, findVacationStatusByName, findRequestsByEmployeeId, createVacationRequest, findVacationById, saveVacationRequest, updateVacationRequest, deleteVacationRequest } from './vacation.repository';
 import { VacationStatus } from '../../entities/vacationStatus';
 import * as requestRepository from './vacation.repository';
-import { RoleTypes, StatusTypes } from '../../entities/constants';
+import { RoleTypes, StatusTypes } from '../../entities/constants/constants';
 import { response } from 'express';
 import { Connection } from 'typeorm';
 import { Vacation } from '../../entities/vacation';

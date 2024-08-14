@@ -638,7 +638,7 @@
  *                   type: string
  *                   example: "Error fetching requests"
  */
-//vacation
+//vacation/:requestId
 /**
  * @swagger
  * /vacation/:requestId:

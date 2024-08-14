@@ -2,7 +2,7 @@ import { Connection } from 'typeorm';
 import { Role } from './entities/role';
 import { VacationStatus } from './entities/vacationStatus';
 import { Team } from './entities/team';
-import { RoleTypes, TeamType, StatusTypes } from './entities/constants';
+import { RoleTypes, TeamType, StatusTypes } from './entities/constants/constants';
 
 export const initializeData = async (connection: Connection) => {
     const roleRepository = connection.getRepository(Role);

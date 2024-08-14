@@ -1,6 +1,6 @@
 import { Entity, BaseEntity, Column, PrimaryGeneratedColumn, OneToMany } from "typeorm";
 import { Employee } from "./employee";
-import { TeamType } from "./constants";
+import { TeamType } from "./constants/constants";
 
 @Entity('team')
 export class Team extends BaseEntity {

@@ -1,6 +1,6 @@
 import { Employee } from "../../entities/employee";
 import { Role } from "../../entities/role";
-import { RoleTypes } from "../../entities/constants"
+import { RoleTypes } from "../../entities/constants/constants"
 
 export const findEmployeeByEmail = (email: string) => {
     return Employee.findOne({ where: { email }, relations: ['role'] });
