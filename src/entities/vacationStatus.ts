@@ -1,6 +1,11 @@
 import { Entity, BaseEntity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
 import { Vacation } from './vacation';
-import { StatusTypes } from './constants/constants';
+
+export enum StatusTypes {
+    Pending = 'pending',
+    Accepted = 'accepted',
+    Rejected = 'rejected'
+}
 
 @Entity('vacation_status')
 export class VacationStatus extends BaseEntity {

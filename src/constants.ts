@@ -1,8 +1,8 @@
 import { Connection } from 'typeorm';
-import { Role } from './entities/role';
-import { VacationStatus } from './entities/vacationStatus';
-import { Team } from './entities/team';
-import { RoleTypes, TeamType, StatusTypes } from './entities/constants/constants';
+import { Role, RoleTypes } from './entities/role';
+import { VacationStatus,  StatusTypes} from './entities/vacationStatus';
+import { Team, TeamType } from './entities/team';
+import { Reason, ReasonTypes } from './entities/reason';
 
 export const initializeData = async (connection: Connection) => {
     const roleRepository = connection.getRepository(Role);
@@ -31,6 +31,16 @@ export const initializeData = async (connection: Connection) => {
             { type: TeamType.BACKEND },
             { type: TeamType.FRONTEND },
             { type: TeamType.TESTING },
+        ]);
+    }
+
+    const reasonRepository = connection.getRepository(Reason);
+    const existingReasons = await reasonRepository.find();
+    if (existingReasons.length === 0) {
+        await reasonRepository.save([
+            { name: ReasonTypes.SICK_LEAVE },
+            { name: ReasonTypes.PERSONAL },
+            { name: ReasonTypes.EMERGENCY },
         ]);
     }
 };

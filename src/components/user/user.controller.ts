@@ -36,7 +36,7 @@ export const registerEmployee = async (req: Request, res: Response) => {
 
     try {
         const result = await employeeService.registerEmployee(name, password, role, phonenumber, email);
-        return res.status(result.status).json(result);
+        return res.status(result.status).json(result.message);
     } catch (error) {
         return res.status(500).json({ message: "Internal server error" });
     }
@@ -47,14 +47,6 @@ export const loginEmployee = async (req: Request, res: Response) => {
 
     if (!email || !password) {
         return res.status(400).json({ message: "Missing inputs" });
-    }
-
-    if (!checkPassword(password)) {
-        return res.status(400).json({ message: "Invalid password" });
-    }
-
-    if (!checkEmail(email)) {
-        return res.status(400).json({ message: "Invalid email" });
     }
 
     try {

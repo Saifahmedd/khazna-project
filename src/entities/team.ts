@@ -1,6 +1,11 @@
 import { Entity, BaseEntity, Column, PrimaryGeneratedColumn, OneToMany } from "typeorm";
 import { Employee } from "./employee";
-import { TeamType } from "./constants/constants";
+
+export enum TeamType {
+    FRONTEND = "frontend",
+    BACKEND = "backend",
+    TESTING = "testing",
+}
 
 @Entity('team')
 export class Team extends BaseEntity {

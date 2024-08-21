@@ -1,12 +1,12 @@
 import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
 import * as employeeRepository from './user.repository';
 import { Employee } from '../../entities/employee';
 import {generateToken} from '../../../middleware/generateToken';
 import dotenv from 'dotenv';
-import { RoleTypes } from '../../entities/constants/constants';
+import { RoleTypes } from '../../entities/role';
 import { Vacation } from '../../entities/vacation';
 import * as vacationService from '../vacation/vacation.service';
+import { ReasonTypes } from '../../entities/reason';
 
 dotenv.config();
 
@@ -34,7 +34,7 @@ export const registerEmployee = async (name: string, password: string, role: Rol
 
         await employeeRepository.saveEmployee(employee);
 
-        return { status: 200, message: "Registration successful" };
+        return { status: 200, message: "Registration is made successful" };
     } catch (error) {
         return { status: 500, message: "Internal server error" };
     }
@@ -87,26 +87,37 @@ export const getUserInfo = async (employeeId: number) => {
         }
 
         const requests: Vacation[] = result.response;
-        const differencesInDays: number[] = requests.map(request => {
+        let sickLeaveDaysTaken = 0;
+        let emergencyDaysTaken = 0;
+
+        requests.forEach(request => {
             const dayFrom = request.dateFrom.getDate();
             const monthFrom = request.dateFrom.getMonth() + 1;
 
             const dayTo = request.dateTo.getDate();
             const monthTo = request.dateTo.getMonth() + 1;
 
-            return getDaysDifference(dayFrom, monthFrom, dayTo, monthTo, vacationDates);
+            const daysDifference = getDaysDifference(dayFrom, monthFrom, dayTo, monthTo, vacationDates);
+
+            if (request.reason.name === ReasonTypes.SICK_LEAVE) {
+                sickLeaveDaysTaken += daysDifference;
+            } else if (request.reason.name === ReasonTypes.EMERGENCY) {
+                emergencyDaysTaken += daysDifference;
+            }
         });
 
-        const totalDays = employee.role.role === RoleTypes.Admin ? 20 : 10;
-        const daysTaken = differencesInDays.reduce((acc, curr) => acc + curr, 0);
-        const daysLeft = totalDays - daysTaken;
+        const totalSickLeaveDays = 30;
+        const totalEmergencyDays = 20;
+
+        const daysLeft = {
+            sickLeaveDaysLeft: totalSickLeaveDays - sickLeaveDaysTaken,
+            emergencyDaysLeft: totalEmergencyDays - emergencyDaysTaken
+        };
 
         return { 
             status: 200,
             data: { 
-                avatar: employee.avatarId, 
-                name: employee.name, 
-                team: employee.team, 
+                employee,
                 daysLeft 
             } 
         };
@@ -114,7 +125,6 @@ export const getUserInfo = async (employeeId: number) => {
         return { status: 500, message: "Internal server error" };
     }
 };
-
 
 const getDaysDifference = (dayFrom: number, monthFrom: number, dayTo: number, monthTo: number, vacationDates: string[]): number => {
     const startDate = new Date(new Date().getFullYear(), monthFrom - 1, dayFrom);
@@ -133,9 +143,11 @@ const getDaysDifference = (dayFrom: number, monthFrom: number, dayTo: number, mo
 
     return daysDifference;
 };
+
 const getVacationDates = () => {
     return ["4/8/2024", "6/8/2024"];
 };
+
 
 export const addingAvatar = async (employeeId: number, avatarId: number) => {
     const employee = await employeeRepository.findEmployeeById(employeeId);

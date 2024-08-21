@@ -1,8 +1,8 @@
-import { findEmployeeById, findVacationStatusByName, findRequestsByEmployeeId, createVacationRequest, findVacationById, saveVacationRequest, updateVacationRequest, deleteVacationRequest } from './vacation.repository';
-import { VacationStatus } from '../../entities/vacationStatus';
+import { findEmployeeById, findVacationStatusByName, findRequestsByEmployeeId, createVacationRequest, findVacationById, saveVacationRequest, updateVacationRequest, deleteVacationRequest, findReasonByName } from './vacation.repository';
+import { VacationStatus, StatusTypes } from '../../entities/vacationStatus';
 import * as requestRepository from './vacation.repository';
-import { RoleTypes, StatusTypes } from '../../entities/constants/constants';
-import { response } from 'express';
+import { RoleTypes } from '../../entities/role';
+import { ReasonTypes } from '../../entities/reason';
 import { Connection } from 'typeorm';
 import { Vacation } from '../../entities/vacation';
 
@@ -40,7 +40,7 @@ export const fetchSingleRequest = async (requestId: number) => {
     }
 };
 
-export const createRequestService = async (employeeId: number, dateFrom: string, dateTo: string, reason: string) => {
+export const createRequestService = async (employeeId: number, dateFrom: Date, dateTo: Date, reason: ReasonTypes) => {
     try {
         const employee = await findEmployeeById(employeeId);
 
@@ -59,7 +59,11 @@ export const createRequestService = async (employeeId: number, dateFrom: string,
             return { status: 404, response: { message: "Status not found" } };
         }
 
-        const request = createVacationRequest(dateFrom, dateTo, reason, employee, status);
+        const reasonEntity = await findReasonByName(reason);
+        if (!reasonEntity) {
+            return { status: 404, response: { message: "Reason not found" } };
+        }
+        const request = createVacationRequest(dateFrom, dateTo, reasonEntity, employee, status);
         await saveVacationRequest(request);
 
         return { status: 201, response: { message: "Inserted a Request successfully", request } };
@@ -68,7 +72,7 @@ export const createRequestService = async (employeeId: number, dateFrom: string,
     }
 };
 
-export const updateUserRequestService = async (requestId: number, reviewerId: number, dateFrom: string, dateTo: string, reason: string, status: VacationStatus) => {
+export const updateUserRequestService = async (requestId: number, reviewerId: number, dateFrom: string, dateTo: string, reason: ReasonTypes, status: VacationStatus) => {
     try {
         const dateFromParsed = new Date(dateFrom);
         const dateToParsed = new Date(dateTo);
@@ -83,11 +87,16 @@ export const updateUserRequestService = async (requestId: number, reviewerId: nu
             return { status: 404, response: { message: "Request not found" } };
         }
 
+        const reasonEntity = await findReasonByName(reason);
+        if (!reasonEntity) {
+            return { status: 404, response: { message: "Reason not found" } };
+        }
+
         await updateVacationRequest(request, {
             reviewerId,
             dateFrom: dateFromParsed,
             dateTo: dateToParsed,
-            reason,
+            reason: reasonEntity,
             status
         });
 
@@ -134,7 +143,7 @@ export const updateAdminRequestService = async (requestId: number, status: Statu
     }
 };
 
-export const updateRequests = async (requestId: number, reviewerId: number, dateFrom: string, dateTo: string, reason: string) => {
+export const updateRequests = async (requestId: number, reviewerId: number, dateFrom: string, dateTo: string, reason: ReasonTypes) => {
     try {
         const request = await requestRepository.findRequestById(requestId);
 
@@ -152,8 +161,13 @@ export const updateRequests = async (requestId: number, reviewerId: number, date
         if (reviewerId !== undefined) request.reviewerId = reviewerId;
         if (dateFromParsed !== undefined) request.dateFrom = dateFromParsed;
         if (dateToParsed !== undefined) request.dateTo = dateToParsed;
-        if (reason !== undefined) request.reason = reason;
-
+        if (reason) {
+            const reasonEntity = await findReasonByName(reason);
+            if (!reasonEntity) {
+                return { status: 404, response: { message: "Reason not found" } };
+            }
+            request.reason = reasonEntity;
+        }
         await request.save();
         return { status: 200, response: request };
     } catch (error) {

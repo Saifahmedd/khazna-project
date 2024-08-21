@@ -182,15 +182,8 @@
  *             schema:
  *               type: object
  *               properties:
- *                 avatar:
- *                   type: string
- *                   example: "avatarId123"
- *                 name:
- *                   type: string
- *                   example: "Saif Ahmed"
- *                 team:
- *                   type: string
- *                   example: "Engineering"
+ *                 employee:
+ *                   type: object
  *                 daysLeft:
  *                   type: integer
  *                   example: 10

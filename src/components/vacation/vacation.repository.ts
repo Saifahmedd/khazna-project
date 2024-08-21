@@ -1,8 +1,8 @@
 import { Connection } from "typeorm";
 import { Employee } from "../../entities/employee";
 import { Vacation } from "../../entities/vacation";
-import { VacationStatus } from "../../entities/vacationStatus";
-import { StatusTypes } from "../../entities/constants/constants";
+import { VacationStatus, StatusTypes } from "../../entities/vacationStatus";
+import { Reason, ReasonTypes } from "../../entities/reason";
 
 export const findVacationStatusByName = async (name: StatusTypes) => {
     return await VacationStatus.findOneBy({ name });
@@ -26,10 +26,19 @@ export const updateRequest = async (request: Vacation, updateData: Partial<Vacat
     return await request.save();
 };
 
-export const createVacationRequest = (dateFrom: string, dateTo: string, reason: string, employee: Employee, status: VacationStatus) => {
+export const createVacationRequest = (dateFrom: Date, dateTo: Date, reason: Reason, employee: Employee, status: VacationStatus) => {
     return Vacation.create({ dateFrom, dateTo, reason, employee, status });
 };
 
+export const findReasonByName = async (reasonName: ReasonTypes): Promise<Reason | null> => {
+    try {
+        const reason = await Reason.findOne({ where: { name: reasonName } });
+        return reason || null;
+    } catch (error) {
+        console.error("Error finding reason by name:", error);
+        throw new Error("Could not find reason");
+    }
+};
 
 export const saveVacationRequest = async (request: Vacation) => {
     return await request.save();

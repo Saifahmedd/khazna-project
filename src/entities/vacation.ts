@@ -1,6 +1,7 @@
 import { Entity, BaseEntity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn, CreateDateColumn } from "typeorm";
 import { Employee } from "./employee";
 import { VacationStatus } from "./vacationStatus";
+import { Reason } from "./reason";
 
 @Entity('vacation')
 export class Vacation extends BaseEntity {
@@ -19,6 +20,10 @@ export class Vacation extends BaseEntity {
     @JoinColumn({ name: 'statusId' })
     status: VacationStatus;
 
+    @ManyToOne(() => Reason, reason => reason.vacations, { onDelete: 'SET NULL' })
+    @JoinColumn({ name: 'reasonId' })
+    reason: Reason;
+
     @Column()
     dateFrom: Date;
 
@@ -27,7 +32,4 @@ export class Vacation extends BaseEntity {
 
     @CreateDateColumn()
     createdAt: Date;
-
-    @Column()
-    reason: string;
 }

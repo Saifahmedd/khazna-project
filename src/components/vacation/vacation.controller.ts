@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { fetchUserRequestsService, filterRequests ,fetchSingleRequest, createRequestService, updateUserRequestService, deleteUserRequestService, updateAdminRequestService, updateRequests } from './vacation.service';
-import { StatusTypes } from '../../entities/constants/constants';
+import { StatusTypes } from '../../entities/vacationStatus';
 import { connection } from '../../main';
 
 export const filterVacationRequests = async (req: Request, res: Response) => {
