@@ -7,10 +7,11 @@ import { RoleTypes } from '../../entities/role';
 import { Vacation } from '../../entities/vacation';
 import * as vacationService from '../vacation/vacation.service';
 import { ReasonTypes } from '../../entities/reason';
+import { TeamType } from '../../entities/team';
 
 dotenv.config();
 
-export const registerEmployee = async (name: string, password: string, role: RoleTypes, phonenumber: string, email: string) => {
+export const registerEmployee = async (name: string, password: string, team: TeamType, phonenumber: string, email: string) => {
     try {
         const existingEmployee = await employeeRepository.findEmployeeByEmail(email);
         if (existingEmployee) {
@@ -19,9 +20,9 @@ export const registerEmployee = async (name: string, password: string, role: Rol
 
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        const roleEntity = await employeeRepository.findRoleByRoleName(role);
-        if (!roleEntity) {
-            return { status: 404, message: "Invalid role" };
+        const teamEntity = await employeeRepository.findTeamByTeamType(team);
+        if (!teamEntity) {
+            return { status: 404, message: "Invalid team" };
         }
 
         const employee = Employee.create({
@@ -29,7 +30,7 @@ export const registerEmployee = async (name: string, password: string, role: Rol
             password: hashedPassword,
             phoneNumber: phonenumber,
             email,
-            role: roleEntity
+            team: teamEntity
         });
 
         await employeeRepository.saveEmployee(employee);
@@ -157,6 +158,22 @@ export const addingAvatar = async (employeeId: number, avatarId: number) => {
     }
 
     employee.avatarId = avatarId;
+    await employeeRepository.saveEmployee(employee);
+
+    return { status: 200, employee };
+};
+
+export const updateRole = async (employeeId: number, role: RoleTypes) => {
+    const employee = await employeeRepository.findEmployeeById(employeeId);
+
+    if(!employee){
+        return { status: 404, message: "Cannot find the employee" };
+    }
+    const roleEntity = await employeeRepository.findRoleByRoleName(role);
+    if (!roleEntity) {
+        return { status: 404, message: "Invalid role" };
+    }
+    employee.role = roleEntity
     await employeeRepository.saveEmployee(employee);
 
     return { status: 200, employee };

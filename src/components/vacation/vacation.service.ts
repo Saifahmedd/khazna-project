@@ -1,10 +1,9 @@
-import { findEmployeeById, findVacationStatusByName, findRequestsByEmployeeId, createVacationRequest, findVacationById, saveVacationRequest, updateVacationRequest, deleteVacationRequest, findReasonByName } from './vacation.repository';
+import { findEmployeeById, findVacationStatusByName, findRequestsByEmployeeId, createVacationRequest, findVacationById, saveVacationRequest, updateVacationRequest, deleteVacationRequest, fetchVacationsByTeam, findReasonByName, filterRequestsBySQL } from './vacation.repository';
 import { VacationStatus, StatusTypes } from '../../entities/vacationStatus';
 import * as requestRepository from './vacation.repository';
 import { RoleTypes } from '../../entities/role';
 import { ReasonTypes } from '../../entities/reason';
 import { Connection } from 'typeorm';
-import { Vacation } from '../../entities/vacation';
 
 export const fetchUserRequestsService = async (employeeId: number) => {
     try {
@@ -49,7 +48,7 @@ export const createRequestService = async (employeeId: number, dateFrom: Date, d
         }
 
         let status;
-        if (employee.role.role === RoleTypes.Admin) {
+        if (employee.role.role === RoleTypes.SuperAdmin) {
             status = await findVacationStatusByName(StatusTypes.Accepted);
         } else {
             status = await findVacationStatusByName(StatusTypes.Pending);
@@ -178,13 +177,29 @@ export const updateRequests = async (requestId: number, reviewerId: number, date
 
 export const filterRequests = async (key: string, value: string, connection: Connection) => {
     try {
-        
+
         const sql = `SELECT * FROM Vacation WHERE ${key} = ?`;
-        const requests = await Vacation.query(sql, [value]);
+        const requests = filterRequestsBySQL(sql, connection);
 
         return { status: 200, response: requests };
     } catch (error) {
         console.error('Error executing filterRequests:', error);
         return { status: 500, response: { message: "Internal Server Error", error: error.message } };
+    }
+};
+
+
+export const getVacationsByTeam = async (teamId: number, connection: Connection) => {
+    try {
+        const vacations = await fetchVacationsByTeam(teamId, connection);
+
+        if (vacations.length === 0) {
+            return { status: 404, message: "No vacation requests found for the specified team" };
+        }
+
+        return { status: 200, data: vacations };
+    } catch (error) {
+        console.error('Error in getVacationsByTeam service:', error);
+        return { status: 500, message: "Internal Server Error" };
     }
 };

@@ -1,5 +1,6 @@
 import express from 'express';
 import * as userController from './user.controller';
+import { checkSuperAdminRole } from '../../../middleware/checkSuperAdminRole';
 
 const router = express.Router();
 
@@ -7,8 +8,10 @@ router.post('/register', userController.registerEmployee);
 
 router.post('/login', userController.loginEmployee);
 
-router.get('/userInfo', userController.getUserInfo);
+router.get('/userInfo/:employeeId', userController.getUserInfo);
 
-router.put('/user/avatarId', userController.updateAvatar);
+router.put('/user/:avatarId', userController.updateAvatar);
+
+router.put('/user/role/:employeeId/:role', checkSuperAdminRole ,userController.updateRole);
 
 export { router as userRoutes };

@@ -2,6 +2,7 @@ import { Entity, BaseEntity, Column, PrimaryGeneratedColumn, OneToMany } from "t
 import { Employee } from "./employee";
 
 export enum RoleTypes {
+    SuperAdmin = 'superadmin',
     Admin = 'admin',
     User = 'user'
 }

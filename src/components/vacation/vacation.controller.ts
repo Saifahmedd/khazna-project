@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { fetchUserRequestsService, filterRequests ,fetchSingleRequest, createRequestService, updateUserRequestService, deleteUserRequestService, updateAdminRequestService, updateRequests } from './vacation.service';
+import { getVacationsByTeam, fetchUserRequestsService, filterRequests, fetchSingleRequest, createRequestService, updateUserRequestService, deleteUserRequestService, updateAdminRequestService, updateRequests } from './vacation.service';
 import { StatusTypes } from '../../entities/vacationStatus';
 import { connection } from '../../main';
 
@@ -135,8 +135,24 @@ export const updateAdminVacationRequestDetails = async (req: Request, res: Respo
 
     try {
         const result = await updateRequests(parseInt(requestId, 10), reviewerId, dateFrom, dateTo, reason);
-        
+
         return res.status(result.status).json(result.response);
+    } catch (error) {
+        return res.status(500).json({ message: "Internal Server Error", error: error.message });
+    }
+};
+
+export const getVacationRequestsByTeam = async (req: Request, res: Response) => {
+    const { teamId } = req.params;
+
+    if (!teamId) {
+        return res.status(400).json({ message: "Team ID is required" });
+    }
+
+    try {
+        const result = await getVacationsByTeam(parseInt(teamId), connection);
+
+        return res.status(result.status).json(result.data);
     } catch (error) {
         return res.status(500).json({ message: "Internal Server Error", error: error.message });
     }

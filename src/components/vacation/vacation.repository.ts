@@ -63,11 +63,30 @@ export const findEmployeeById = async (employeeId: number) => {
         relations: ['role', 'team']
     });
 };
+
 export const filterRequestsBySQL = async (sql: string, connection: Connection) => {
     try {
         const result = await connection.query(sql);
         return result;
     } catch (err) {
         throw new Error(`Error executing query: ${err.message}`);
+    }
+};
+
+export const fetchVacationsByTeam = async (teamId: number, connection: Connection) => {
+    try {
+        // Fetch vacation requests for employees belonging to the specified team
+        const vacations = await connection
+            .getRepository(Vacation)
+            .createQueryBuilder('vacation')
+            .innerJoinAndSelect('vacation.employee', 'employee')
+            .innerJoinAndSelect('employee.team', 'team')
+            .where('team.id = :teamId', { teamId })
+            .getMany();
+
+        return vacations;
+    } catch (error) {
+        console.error('Error fetching vacations by team:', error);
+        throw new Error('Failed to fetch vacations by team');
     }
 };

@@ -1,4 +1,6 @@
 import dotenv from 'dotenv';
+import fs from 'fs';
+import path from 'path';
 import { createConnection, Connection } from 'typeorm';
 import { Employee } from './entities/employee';
 import { Role } from './entities/role';
@@ -59,6 +61,10 @@ const main = async () => {
         // Swagger docs
         app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
+        // const outputFile = path.resolve(__dirname, 'swagger.json');
+        // fs.writeFileSync(outputFile, JSON.stringify(swaggerSpec, null, 2));
+
+        app.use(express.json());
         app.use(authenticateToken); // Middleware Token
         app.use(userRoutes); // User Endpoints
         app.use(vacationRoutes); // Vacation Endpoints

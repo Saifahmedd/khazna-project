@@ -1,5 +1,7 @@
 import { Request, Response } from 'express';
 import * as employeeService from './user.service';
+import { RoleTypes } from '../../entities/role';
+import { TeamType } from '../../entities/team';
 
 const checkPassword = (password: string): boolean => {
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{7,17}$/;
@@ -16,9 +18,9 @@ const checkPhone = (phone: string): boolean => {
 }
 
 export const registerEmployee = async (req: Request, res: Response) => {
-    const { name, password, role, phonenumber, email } = req.body;
+    const { name, password, team, phonenumber, email } = req.body;
 
-    if (!name || !password || !role || !phonenumber || !email) {
+    if (!name || !password || !team || !phonenumber || !email) {
         return res.status(400).json({ message: "Missing input" });
     }
 
@@ -35,12 +37,14 @@ export const registerEmployee = async (req: Request, res: Response) => {
     }
 
     try {
-        const result = await employeeService.registerEmployee(name, password, role, phonenumber, email);
+        const teamType = TeamType[team.toUpperCase() as keyof typeof TeamType]; // Convert to enum
+        const result = await employeeService.registerEmployee(name, password, teamType, phonenumber, email);
         return res.status(result.status).json(result.message);
     } catch (error) {
         return res.status(500).json({ message: "Internal server error" });
     }
 };
+
 
 export const loginEmployee = async (req: Request, res: Response) => {
     const { email, password } = req.body;
@@ -62,7 +66,7 @@ export const loginEmployee = async (req: Request, res: Response) => {
 };
 
 export const getUserInfo = async (req: Request, res: Response) => {
-    const { employeeId } = req.body;
+    const { employeeId } = req.params;
 
     if (!employeeId) {
         return res.status(400).json({ message: "Invalid input" });
@@ -99,6 +103,23 @@ export const updateAvatar = async (req: Request, res: Response) => {
         return res.status(200).json({ message: "Avatar updated successfully", employee: result.employee });
     } catch (error) {
         console.error("Error adding avatar:", error);
+        return res.status(500).json({ message: "Internal server error" });
+    }
+};
+
+export const updateRole = async (req: Request, res: Response) => {
+    const {employeeId, role} = req.params;
+    
+    if(!employeeId || !role){
+        return res.status(400).json({ message: "Invalid input" });
+    }
+    try{
+        const roleEnum = RoleTypes[role as keyof typeof RoleTypes];
+        const result = await employeeService.updateRole(parseInt(employeeId), roleEnum);
+
+        return res.status(result.status).json({message: result.message, employee: result.employee});
+    } catch (error) {
+        console.error(error);
         return res.status(500).json({ message: "Internal server error" });
     }
 };

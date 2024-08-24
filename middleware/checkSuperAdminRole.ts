@@ -6,7 +6,7 @@ interface AuthenticatedRequest extends Request {
     user?: any;
 }
 
-const checkAdminRole = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+const checkSuperAdminRole = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     try {
         const email = req.user.email;
         const user = await Employee.findOne({
@@ -18,8 +18,8 @@ const checkAdminRole = async (req: AuthenticatedRequest, res: Response, next: Ne
             return res.status(404).json({ message: "User not found" });
         }
 
-        if (user.role.role === RoleTypes.Admin || user.role.role === RoleTypes.SuperAdmin) {
-            return res.status(403).json({ message: "Access denied. Admins or Super Admins only." });
+        if (user.role.role === RoleTypes.SuperAdmin) {
+            return res.status(403).json({ message: "Access denied. Super Admins only." });
         }
 
         next();
@@ -29,4 +29,4 @@ const checkAdminRole = async (req: AuthenticatedRequest, res: Response, next: Ne
     }
 };
 
-export { checkAdminRole };
+export { checkSuperAdminRole };
