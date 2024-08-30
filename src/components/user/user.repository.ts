@@ -24,7 +24,5 @@ export const findRoleByRoleName = (role: RoleTypes) => {
 };
 
 export const findTeamByTeamType = (team: TeamType) => {
-    return Team.findOneBy({ type: team }); // Make sure to use 'type' instead of 'team'
+    return Team.findOneBy({ type: team });
 };
-
-

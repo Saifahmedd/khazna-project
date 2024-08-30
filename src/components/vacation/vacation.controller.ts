@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { getVacationsByTeam, fetchUserRequestsService, filterRequests, fetchSingleRequest, createRequestService, updateUserRequestService, deleteUserRequestService, updateAdminRequestService, updateRequests } from './vacation.service';
+import { fetchUserRequestsServiceByPages ,getVacationsByTeam, fetchUserRequestsService, filterRequests, fetchSingleRequest, createRequestService, updateUserRequestService, deleteUserRequestService, updateAdminRequestService, updateRequests } from './vacation.service';
 import { StatusTypes } from '../../entities/vacationStatus';
 import { connection } from '../../main';
 
@@ -33,15 +33,21 @@ export const getVacationRequestById = async (req: Request, res: Response) => {
 };
 
 export const getUserVacationRequests = async (req: Request, res: Response) => {
-    const { employeeId } = req.body;
+    const { employeeId, page, limit, column, order} = req.body;
 
     if (!employeeId) {
-        return res.status(400).json({ message: "Employee ID is required" });
+        return res.status(400).json({ message: "employeeId is required" });
+    }
+    if ((!page && limit) || (page && !limit)) {
+        return res.status(400).json({ message: "page, limit are required" });
+    }
+    if ((!column && order) || (column && !order)) {
+        return res.status(400).json({ message: "column, order are required" });
     }
 
     try {
-        const result = await fetchUserRequestsService(parseInt(employeeId));
-
+        const result = await fetchUserRequestsServiceByPages(parseInt(employeeId), parseInt(page), parseInt(limit), column, order);
+        
         return res.status(result.status).json(result.response);
     } catch (error) {
         return res.status(500).json({ message: "Internal Server Error", error: error.message });
@@ -49,7 +55,9 @@ export const getUserVacationRequests = async (req: Request, res: Response) => {
 };
 
 export const createVacationRequest = async (req: Request, res: Response) => {
-    const { employeeId, dateFrom, dateTo, reason } = req.body;
+    const { employeeId, date, reason } = req.body;
+
+    const [dateFrom, dateTo] = date.split(",").map(Number);
 
     if (!employeeId) {
         return res.status(400).json({ message: "Employee ID is required" });
@@ -64,7 +72,10 @@ export const createVacationRequest = async (req: Request, res: Response) => {
         return res.status(400).json({ message: "Reason is required" });
     }
 
-    const result = await createRequestService(employeeId, dateFrom, dateTo, reason);
+    const dateFromObj = new Date(dateFrom);
+    const dateToObj = new Date(dateTo);
+
+    const result = await createRequestService(employeeId, dateFromObj, dateToObj, reason);
     return res.status(result.status).json(result.response);
 };
 
@@ -74,10 +85,6 @@ export const updateUserVacationRequest = async (req: Request, res: Response) => 
 
     if (!requestId) {
         return res.status(400).json({ message: "Request ID is required" });
-    }
-
-    if (!reviewerId || !dateFrom || !dateTo || !reason || !status) {
-        return res.status(400).json({ message: "All fields are required" });
     }
 
     try {
@@ -146,7 +153,7 @@ export const getVacationRequestsByTeam = async (req: Request, res: Response) => 
     const { teamId } = req.params;
 
     if (!teamId) {
-        return res.status(400).json({ message: "Team ID is required" });
+        return res.status(400).json({ message: "teamId is required" });
     }
 
     try {

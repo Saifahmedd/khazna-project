@@ -18,7 +18,7 @@ const checkSuperAdminRole = async (req: AuthenticatedRequest, res: Response, nex
             return res.status(404).json({ message: "User not found" });
         }
 
-        if (user.role.role === RoleTypes.SuperAdmin) {
+        if (user.role.role != RoleTypes.SuperAdmin) {
             return res.status(403).json({ message: "Access denied. Super Admins only." });
         }
 

@@ -17,9 +17,9 @@ router.put('/vacation/:requestId', vacationController.updateUserVacationRequest)
 
 router.delete('/vacation', vacationController.deleteVacationRequest);
 
-router.put('/vacation/admin/:requestId/:status', checkAdminRole, vacationController.updateAdminVacationRequest);
+router.put('/vacation/:requestId/admin/:status', checkAdminRole, vacationController.updateAdminVacationRequest);
 
-router.put('/vacation/admin/:requestId', checkAdminRole, vacationController.updateAdminVacationRequestDetails);
+router.put('/vacation/:requestId/admin', checkAdminRole, vacationController.updateAdminVacationRequestDetails);
 
 router.get('/vacation/admin/team/:teamId', checkAdminRole, vacationController.getVacationRequestsByTeam);
 

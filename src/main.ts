@@ -1,9 +1,7 @@
 import dotenv from 'dotenv';
-import fs from 'fs';
-import path from 'path';
 import { createConnection, Connection } from 'typeorm';
 import { Employee } from './entities/employee';
-import { Role } from './entities/role';
+import { Role, RoleTypes } from './entities/role';
 import { Vacation } from './entities/vacation';
 import { Team } from './entities/team';
 import { VacationStatus } from './entities/vacationStatus';
@@ -27,14 +25,14 @@ const main = async () => {
     try {
         connection = await createConnection({
             type: 'mysql',
-            host: process.env.DB_HOST as string || 'localhost',
-            port: parseInt(process.env.DB_PORT as string, 10) || 3306,
-            username: process.env.DB_USERNAME as string || 'root',
-            password: process.env.DB_PASSWORD as string || 'root123',
-            database: process.env.DB_DATABASE as string || 'khazna-db',
+            host: process.env.DB_HOST as string,
+            port: parseInt(process.env.DB_PORT as string, 10),
+            username: process.env.DB_USERNAME as string,
+            password: process.env.DB_PASSWORD as string,
+            database: process.env.DB_DATABASE as string,
             entities: [Employee, Role, Vacation, VacationStatus, Team, Reason],
             synchronize: true,
-        });       
+        });
 
         console.log("Connected to MySQL database");
 

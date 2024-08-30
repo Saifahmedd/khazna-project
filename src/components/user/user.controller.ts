@@ -37,7 +37,7 @@ export const registerEmployee = async (req: Request, res: Response) => {
     }
 
     try {
-        const teamType = TeamType[team.toUpperCase() as keyof typeof TeamType]; // Convert to enum
+        const teamType = TeamType[team.toUpperCase() as keyof typeof TeamType];
         const result = await employeeService.registerEmployee(name, password, teamType, phonenumber, email);
         return res.status(result.status).json(result.message);
     } catch (error) {

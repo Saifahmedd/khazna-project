@@ -152,10 +152,10 @@
  *                   type: string
  *                   example: "Internal server error"
  */
-//userInfo/{employeeId}
+//user/:employeeId/info
 /**
  * @swagger
- * /userInfo/{employeeId}:
+ * /user/{employeeId}/info:
  *   get:
  *     summary: Get user information
  *     parameters:
@@ -440,7 +440,7 @@
  * /vacation:
  *   post:
  *     summary: Create a new vacation request
- *     description: Creates a new vacation request for an employee. The employee ID, start date, end date, and reason are required.
+ *     description: Creates a new vacation request for an employee. The employee ID, start timestamp, end timestamp, and reason are required.
  *     requestBody:
  *       required: true
  *       content:
@@ -458,15 +458,15 @@
  *                 description: The ID of the employee making the request.
  *                 example: 1
  *               dateFrom:
- *                 type: string
- *                 format: date-time
- *                 description: The start date of the vacation request.
- *                 example: "2024-08-01T00:00:00Z"
+ *                 type: integer
+ *                 format: int64
+ *                 description: The start timestamp of the vacation request.
+ *                 example: 1690848000
  *               dateTo:
- *                 type: string
- *                 format: date-time
- *                 description: The end date of the vacation request.
- *                 example: "2024-08-07T00:00:00Z"
+ *                 type: integer
+ *                 format: int64
+ *                 description: The end timestamp of the vacation request.
+ *                 example: 1691452800
  *               reason:
  *                 type: string
  *                 description: The reason for the vacation request.
@@ -494,23 +494,23 @@
  *                       description: The ID of the employee.
  *                       example: 1
  *                     dateFrom:
- *                       type: string
- *                       format: date-time
- *                       description: The start date of the vacation request.
- *                       example: "2024-08-01T00:00:00Z"
+ *                       type: integer
+ *                       format: int64
+ *                       description: The start timestamp of the vacation request.
+ *                       example: 1690848000
  *                     dateTo:
- *                       type: string
- *                       format: date-time
- *                       description: The end date of the vacation request.
- *                       example: "2024-08-07T00:00:00Z"
+ *                       type: integer
+ *                       format: int64
+ *                       description: The end timestamp of the vacation request.
+ *                       example: 1691452800
  *                     reason:
  *                       type: string
  *                       description: The reason for the vacation request.
- *                       example: "Vacation for family trip"
+ *                       example: "Vacation"
  *                     status:
  *                       type: string
  *                       description: The status of the vacation request.
- *                       example: "Pending"  # Provide a single example value
+ *                       example: "Pending"
  *       '400':
  *         description: Bad Request. Missing or invalid parameters.
  *         content:
@@ -545,23 +545,35 @@
  *                   type: string
  *                   example: "Error creating vacation request"
  */
-//vacation/{employeeId}
+//vacation
 /**
  * @swagger
- * /vacation/{employeeId}:
+ * /vacation:
  *   get:
- *     summary: Get all vacation requests for an employee
- *     description: Retrieves all vacation requests for a specific employee based on the provided employee ID.
+ *     summary: Retrieve user vacation requests
+ *     description: Retrieves a paginated list of vacation requests for a specific employee.
  *     parameters:
- *       - in: path
+ *       - in: query
  *         name: employeeId
  *         required: true
  *         schema:
  *           type: integer
- *         example: 1
+ *         description: The ID of the employee
+ *       - in: query
+ *         name: page
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The page number for pagination
+ *       - in: query
+ *         name: limit
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The number of records per page
  *     responses:
  *       200:
- *         description: Successfully retrieved vacation requests for the employee
+ *         description: A list of user vacation requests
  *         content:
  *           application/json:
  *             schema:
@@ -571,23 +583,22 @@
  *                 properties:
  *                   id:
  *                     type: integer
- *                     example: 1
+ *                     description: The request ID
  *                   dateFrom:
- *                     type: string
- *                     format: date-time
- *                     example: "2024-08-01T00:00:00Z"
+ *                     type: integer
+ *                     format: int64
+ *                     description: Start timestamp of the vacation
+ *                     example: 1690848000
  *                   dateTo:
- *                     type: string
- *                     format: date-time
- *                     example: "2024-08-07T00:00:00Z"
- *                   reason:
- *                     type: string
- *                     example: "Vacation for family trip"
+ *                     type: integer
+ *                     format: int64
+ *                     description: End timestamp of the vacation
+ *                     example: 1691452800
  *                   status:
  *                     type: string
- *                     example: "Pending"
+ *                     description: Status of the request
  *       400:
- *         description: Missing Employee ID
+ *         description: Missing or invalid parameters
  *         content:
  *           application/json:
  *             schema:
@@ -595,7 +606,7 @@
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "Employee ID is required"
+ *                   description: Error message
  *       404:
  *         description: Employee not found
  *         content:
@@ -605,7 +616,7 @@
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "Employee not found"
+ *                   description: Error message
  *       500:
  *         description: Internal server error
  *         content:
@@ -615,7 +626,7 @@
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "Error fetching requests"
+ *                   description: Error message
  */
 //vacation/:requestId
 /**
@@ -765,10 +776,10 @@
  *                   type: string
  *                   example: "Error deleting vacation request"
  */
-//vacation/admin/:requestId/:status
+//vacation/:requestId/admin/:status
 /**
  * @swagger
- * /vacation/admin/{requestId}/{status}:
+ * /vacation/{requestId}/admin/{status}:
  *   put:
  *     summary: Update the status of a vacation request by admin
  *     description: Updates the status of a vacation request identified by the `requestId` and `status`.
@@ -833,10 +844,10 @@
  *                   type: string
  *                   example: "Error updating admin vacation request"
  */
-//vacation/admin/{requestId}
+//vacation/:requestId/admin
 /**
  * @swagger
- * /vacation/admin/{requestId}:
+ * /vacation/{requestId}/admin:
  *   put:
  *     summary: Update details of a vacation request by admin
  *     description: Updates the details of a vacation request identified by the `requestId`.
@@ -939,8 +950,6 @@
  *   get:
  *     summary: Get vacation requests by team
  *     description: Fetches all vacation requests for employees in the specified team.
- *     tags:
- *       - Vacation
  *     parameters:
  *       - name: teamId
  *         in: path
@@ -979,10 +988,10 @@
  *                   type: string
  *                   example: Internal server error.
  */
-//user/role/{employeeId}/{role}
+//user/:employeeId/role/:role
 /**
  * @swagger
- * /user/role/{employeeId}/{role}:
+ * /user/{employeeId}/role/{role}:
  *   put:
  *     summary: Update the role of an employee
  *     description: Update the role of an employee by their ID.

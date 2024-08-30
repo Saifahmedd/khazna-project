@@ -20,14 +20,15 @@ export class Vacation extends BaseEntity {
     @JoinColumn({ name: 'statusId' })
     status: VacationStatus;
 
-    @ManyToOne(() => Reason, reason => reason.vacations, { onDelete: 'SET NULL' })
+    @ManyToOne(() => Reason, reason => reason.vacations, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'reasonId' })
     reason: Reason;
 
-    @Column()
+    // Use 'timestamp' to ensure it's handled as a date in SQL
+    @Column({ type: 'timestamp' })
     dateFrom: Date;
 
-    @Column()
+    @Column({ type: 'timestamp' })
     dateTo: Date;
 
     @CreateDateColumn()

@@ -3,14 +3,18 @@ import { Role, RoleTypes } from './entities/role';
 import { VacationStatus,  StatusTypes} from './entities/vacationStatus';
 import { Team, TeamType } from './entities/team';
 import { Reason, ReasonTypes } from './entities/reason';
+import { Employee } from './entities/employee';
+import bcrypt from 'bcrypt';
+import * as employeeRepository from '././components/user/user.repository';
 
 export const initializeData = async (connection: Connection) => {
     const roleRepository = connection.getRepository(Role);
     const existingRoles = await roleRepository.find();
     if (existingRoles.length === 0) {
         await roleRepository.save([
+            { role: RoleTypes.SuperAdmin},
             { role: RoleTypes.Admin },
-            { role: RoleTypes.User },
+            { role: RoleTypes.User }
         ]);
     }
 
@@ -42,5 +46,28 @@ export const initializeData = async (connection: Connection) => {
             { name: ReasonTypes.PERSONAL },
             { name: ReasonTypes.EMERGENCY },
         ]);
+    }
+
+    const superAdminRole = await employeeRepository.findRoleByRoleName(RoleTypes.SuperAdmin)
+    if (!superAdminRole) {
+        console.error('SuperAdmin role not found. Please check your initialization data.');
+        return;
+    }
+
+    const defaultSuperAdminEmail = 'superadmin@khazna.com';
+    let superAdmin = await Employee.findOne({ where: { email: defaultSuperAdminEmail } });
+
+    if (!superAdmin) {
+        const hashedPassword = await bcrypt.hash('SuperAdminPassword123!', 10);
+
+        superAdmin = Employee.create({
+            name: 'SuperAdmin',
+            email: defaultSuperAdminEmail,
+            password: hashedPassword,
+            phoneNumber: '01023255440',
+            role: superAdminRole,
+        });
+
+        await Employee.save(superAdmin);
     }
 };

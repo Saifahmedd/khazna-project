@@ -11,10 +11,35 @@ export const findVacationStatusByName = async (name: StatusTypes) => {
 export const findRequestsByEmployeeId = async (employeeId: number) => {
     const requests = await Vacation.find({
         where: { employee: { id: employeeId } },
-        relations: ['employee', 'status'],
+        relations: ['employee', 'status', 'reason']
     });
 
     return requests;
+};
+
+export const findRequestsByEmployeeIdWithSkip = async (employeeId: number,skip: number | null,take: number | null,column: string | null,order: 'ASC' | 'DESC' | null) => {
+    try {
+        const queryBuilder = (Vacation).createQueryBuilder('vacation')
+            .where('vacation.employeeId = :employeeId', { employeeId })
+            .leftJoinAndSelect('vacation.employee', 'employee')
+            .leftJoinAndSelect('vacation.status', 'status')
+            .leftJoinAndSelect('vacation.reason', 'reason');
+
+        if (column && order) {
+            queryBuilder.orderBy(`vacation.${column}`, order);
+        }
+
+        if (skip && take) {
+            queryBuilder.skip(skip);
+            queryBuilder.take(take);
+        }
+
+        const requests = await queryBuilder.getMany();
+
+        return { status: 200, response: requests };
+    } catch (error) {
+        return { status: 500, response: { message: "Error fetching requests", error: error.message } };
+    }
 };
 
 export const findRequestById = async (id: number) => {

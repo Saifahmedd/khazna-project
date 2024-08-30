@@ -31,7 +31,7 @@ export class Employee extends BaseEntity {
     @OneToMany(() => Vacation, vacation => vacation.employee, { cascade: true })
     requests: Vacation[];
 
-    @ManyToOne(() => Team, team => team.employees)
+    @ManyToOne(() => Team, team => team.employees, {nullable: true})
     @JoinColumn({ name: 'teamId' })
     team: Team;
 

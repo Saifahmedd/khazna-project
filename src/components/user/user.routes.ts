@@ -8,10 +8,10 @@ router.post('/register', userController.registerEmployee);
 
 router.post('/login', userController.loginEmployee);
 
-router.get('/userInfo/:employeeId', userController.getUserInfo);
+router.get('/user/:employeeId/info', userController.getUserInfo);
 
 router.put('/user/:avatarId', userController.updateAvatar);
 
-router.put('/user/role/:employeeId/:role', checkSuperAdminRole ,userController.updateRole);
+router.put('/user/:employeeId/role/:role' ,checkSuperAdminRole, userController.updateRole);
 
 export { router as userRoutes };
