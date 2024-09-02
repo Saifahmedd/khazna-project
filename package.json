@@ -1,12 +1,12 @@
 {
   "name": "khazna-project",
   "version": "1.0.0",
-  "main": "main.ts",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon src/main.ts",
-    "start": "npm run dev"
-  },
+  "main": "main.ts","scripts": {
+  "test": "echo \"Error: no test specified\" && exit 1",
+  "dev": "nodemon src/main.ts",
+  "start": "npm run dev",
+  "build": "tsc"
+},
   "author": "",
   "engines": {
     "node": "20.x"
