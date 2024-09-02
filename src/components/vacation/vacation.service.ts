@@ -95,7 +95,7 @@ export const createRequestService = async (employeeId: number, dateFrom: Date, d
         }
 
         let status;
-        if (employee.role.role === RoleTypes.SuperAdmin) {
+        if (employee.role && employee.role.role === RoleTypes.SuperAdmin) {
             status = await findVacationStatusByName(StatusTypes.Accepted);
         } else {
             status = await findVacationStatusByName(StatusTypes.Pending);
@@ -118,6 +118,7 @@ export const createRequestService = async (employeeId: number, dateFrom: Date, d
         return { status: 500, response: { message: "Internal Server Error", error: error.message } };
     }
 };
+
 
 export const updateUserRequestService = async (requestId: number,reviewerId?: number,dateFrom?: string,dateTo?: string,reason?: ReasonTypes,status?: VacationStatus) => {
     try {
@@ -160,7 +161,7 @@ export const updateUserRequestService = async (requestId: number,reviewerId?: nu
             return { status: 404, response: { message: "Request not found" } };
         }
 
-        await updateVacationRequest(request, updateData);
+        await updateVacationRequest(request.vacation, updateData);
 
         return { status: 200, response: { message: "Request updated successfully" } };
     } catch (error) {
@@ -177,11 +178,11 @@ export const deleteUserRequestService = async (requestId: number) => {
             return { status: 404, response: { message: "Request not found" } };
         }
 
-        if(request.employee.role.role != RoleTypes.SuperAdmin  && request.status.name != StatusTypes.Pending){
+        if(request.role.role != RoleTypes.SuperAdmin  && request.vacation.status.name != StatusTypes.Pending){
             return { status: 403, response: { message: "Cannot delete this request" } };
         }
 
-        await deleteVacationRequest(request);
+        await deleteVacationRequest(request.vacation);
 
         return { status: 200, response: { message: "Request deleted successfully" } };
     } catch (error) {
@@ -201,8 +202,8 @@ export const updateAdminRequestService = async (requestId: number, status: Statu
             return { status: 404, response: { message: "Status not found" } };
         }
 
-        request.status = vacationStatus;
-        const updatedRequest = await saveVacationRequest(request);
+        request.vacation.status = vacationStatus;
+        const updatedRequest = await saveVacationRequest(request.vacation);
 
         return { status: 200, response: updatedRequest };
     } catch (error) {

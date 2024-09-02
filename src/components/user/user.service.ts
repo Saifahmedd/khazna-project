@@ -87,28 +87,17 @@ export const getUserInfo = async (employeeId: number) => {
         }
 
         const requests: Vacation[] = result.response;
-        let sickLeaveDaysTaken = 0;
-        let emergencyDaysTaken = 0;
+        let totalDaysTaken = 0;
 
         requests.forEach(request => {
             if (!request.reason) {
                 return;
             }
             const daysDifference = getDaysDifference(request.dateFrom, request.dateTo, vacationDates);
-            if (request.reason.name === ReasonTypes.SICK_LEAVE) {
-                sickLeaveDaysTaken += daysDifference;
-            } else if (request.reason.name === ReasonTypes.EMERGENCY) {
-                emergencyDaysTaken += daysDifference;
-            }
+            totalDaysTaken += daysDifference;
         });
 
-        const totalSickLeaveDays = 30;
-        const totalEmergencyDays = 20;
-
-        const daysLeft = {
-            sickLeaveDaysLeft: totalSickLeaveDays - sickLeaveDaysTaken,
-            emergencyDaysLeft: totalEmergencyDays - emergencyDaysTaken,
-        };
+        const daysLeft = 21 - totalDaysTaken;
 
         return { 
             status: 200,
@@ -123,32 +112,47 @@ export const getUserInfo = async (employeeId: number) => {
     }
 };
 
-
 function getDaysDifference(startDate: Date, endDate: Date, vacationDates: Date[]): number {
-    const start = new Date(startDate);
-    const end = new Date(endDate);
-    
-    const differenceInTime = end.getTime() - start.getTime();
-    
-    const differenceInDays = Math.ceil(differenceInTime / (1000 * 3600 * 24));
-    
-    const filteredDays = vacationDates.reduce((acc, vacDate) => {
-        const vacTime = vacDate.getTime();
-        if (vacTime >= start.getTime() && vacTime <= end.getTime()) {
-            acc += 1;
+    const currentYear = new Date().getFullYear();
+
+    let start = new Date(startDate);
+    if (start.getFullYear() < currentYear) {
+        start = new Date(currentYear, 0, 1);
+    }
+
+    let end = new Date(endDate);
+
+    const yearEnd = new Date(currentYear, 11, 31, 23, 59, 59, 999);
+    if (end > yearEnd) {
+        end = yearEnd;
+    }
+
+    if (end < start) {
+        return 0;
+    }
+
+    const filteredDays = new Set(vacationDates.map(date => date.toDateString()));
+
+    let totalDays = 0;
+
+    for (let currentDate = new Date(start); currentDate <= end; currentDate.setDate(currentDate.getDate() + 1)) {
+        const dayOfWeek = currentDate.getDay();
+        const isWeekend = dayOfWeek === 5 || dayOfWeek === 6; // 5 = Friday, 6 = Saturday
+        const isVacationDate = filteredDays.has(currentDate.toDateString());
+
+        if (!isWeekend && !isVacationDate) {
+            console.log("Current date:", currentDate.toDateString());
+            totalDays += 1;
         }
-        return acc;
-    }, 0);
-    
-    return differenceInDays - filteredDays;
+    }
+
+    return totalDays;
 }
 
 const getVacationDates = (): Date[] => {
     const dateStrings = ["4/8/2024", "6/8/2024"];
     return dateStrings.map(dateString => new Date(dateString));
 };
-
-
 
 export const addingAvatar = async (employeeId: number, avatarId: number) => {
     const employee = await employeeRepository.findEmployeeById(employeeId);

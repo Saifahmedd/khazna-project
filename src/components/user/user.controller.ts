@@ -12,7 +12,7 @@ const checkPassword = (password: string): boolean => {
 };
 
 const checkEmail = (email: string): boolean => {
-    const emailRegex = /^[^\s@]+@khazna\.app$/;
+    const emailRegex = /^[^\s@]+@gmail\.com$/;
     return emailRegex.test(email);
 };
 

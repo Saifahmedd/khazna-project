@@ -21,9 +21,6 @@ export class Employee extends BaseEntity {
     @Column({ nullable: true })
     phoneNumber: string;
 
-    @Column({ unique: true, nullable: true })
-    googleId: string;
-
     @ManyToOne(() => Role, role => role.employees, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'roleId' })
     role: Role;

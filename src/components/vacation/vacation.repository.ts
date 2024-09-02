@@ -70,8 +70,22 @@ export const saveVacationRequest = async (request: Vacation) => {
 };
 
 export const findVacationById = async (requestId: number) => {
-    return await Vacation.findOne({ where: { id: requestId } });
-};
+    const vacation = await Vacation.findOne({
+        where: { id: requestId },
+        relations: ['employee', 'employee.role', 'status', 'reason']
+    })
+    if (!vacation) {
+        throw new Error(`Vacation with ID ${requestId} not found`);
+    }
+
+    const role = vacation.employee?.role;
+    if (!role) {
+        throw new Error('Role information is missing for the employee');
+    }
+
+    return { vacation, role };
+
+    ;};
 
 export const updateVacationRequest = async (request: Vacation, updateData: Partial<Vacation>) => {
     Object.assign(request, updateData);
