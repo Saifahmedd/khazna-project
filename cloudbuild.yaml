@@ -1,35 +1,22 @@
 steps:
-  # Build the application
+  # Step 1: Build the container image
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', 'gcr.io/${PROJECT_ID}/${_SERVICE_NAME}', '.']
+    args: ['build', '-t', 'gcr.io/$PROJECT_ID/api-image:$SHORT_SHA', '.']
 
-  # Push the image to Google Container Registry
+  # Step 2: Push the image to Google Container Registry
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['push', 'gcr.io/${PROJECT_ID}/${_SERVICE_NAME}']
+    args: ['push', 'gcr.io/$PROJECT_ID/api-image:$SHORT_SHA']
 
-  # Deploy to Google App Engine
-  - name: 'gcr.io/cloud-builders/gke-deploy'
-    args:
-      - run
-      - '--image=gcr.io/${PROJECT_ID}/${_SERVICE_NAME}'
-      - '--platform=managed'
-      - '--region=${_REGION}'
-      - '--cluster=${_CLUSTER}'
-      - '--namespace=${_NAMESPACE}'
-
-  # Deploy to Google Cloud Run
+  # Step 3: Deploy the image to Cloud Run
   - name: 'gcr.io/cloud-builders/gcloud'
     args:
-      - run
-      - deploy
-      - ${_SERVICE_NAME}
-      - --image=gcr.io/${PROJECT_ID}/${_SERVICE_NAME}
-      - --platform=managed
-      - --region=${_REGION}
+      - 'run'
+      - 'deploy'
+      - 'api-service'  # Change this to your Cloud Run service name
+      - '--image=gcr.io/$PROJECT_ID/api-image:$SHORT_SHA'
+      - '--platform=managed'
+      - '--region=us-central1'  # Change this to your preferred region
+      - '--allow-unauthenticated'
 
-options:
-  substitution:
-    _SERVICE_NAME: 'my-service'
-    _REGION: 'us-central1'
-    _CLUSTER: 'my-cluster'
-    _NAMESPACE: 'my-namespace'
+substitutions:
+  _DEPLOY_REGION: us-central1
