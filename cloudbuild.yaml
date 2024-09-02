@@ -20,3 +20,6 @@ steps:
 
 substitutions:
   _DEPLOY_REGION: us-central1
+
+options:
+  logging: CLOUD_LOGGING_ONLY  # Use Cloud Logging only
