@@ -5,11 +5,11 @@ steps:
 
 - name: 'gcr.io/cloud-builders/npm'
   entrypoint: 'bash'
-  args: ['-c', 'npm run build'] # Ensure the build script is defined and works
+  args: ['-c', 'npx tsc'] # Use npx to run tsc
 
 - name: 'gcr.io/cloud-builders/npm'
   entrypoint: 'bash'
-  args: ['-c', 'npm start'] # Make sure this command starts your application correctly
+  args: ['-c', 'npm start']
 
 - name: 'gcr.io/cloud-builders/gcloud'
   args: ['run', 'deploy', 'SERVICE_NAME', '--image', 'gcr.io/$PROJECT_ID/IMAGE_NAME', '--platform', 'managed']
