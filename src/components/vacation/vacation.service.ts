@@ -6,7 +6,7 @@ import { ReasonTypes } from '../../entities/reason';
 import { Connection } from 'typeorm';
 import { Vacation } from '../../entities/vacation';
 
-export const fetchUserRequestsServiceByPages = async (employeeId: number,page: number,limit: number,column: string | null,order: 'ASC' | 'DESC' | null) => {
+export const fetchUserRequestsServiceByPages = async (employeeId: number,page: number,limit: number,column: string | null, order: 'ASC' | 'DESC' | null) => {
     try {
         const employee = await findEmployeeById(employeeId);
 
@@ -177,6 +177,10 @@ export const deleteUserRequestService = async (requestId: number) => {
             return { status: 404, response: { message: "Request not found" } };
         }
 
+        if(request.employee.role.role != RoleTypes.SuperAdmin  && request.status.name != StatusTypes.Pending){
+            return { status: 403, response: { message: "Cannot delete this request" } };
+        }
+
         await deleteVacationRequest(request);
 
         return { status: 200, response: { message: "Request deleted successfully" } };
@@ -252,7 +256,6 @@ export const filterRequests = async (key: string, value: string, connection: Con
     }
 };
 
-
 export const getVacationsByTeam = async (teamId: number, connection: Connection) => {
     try {
         const vacations = await fetchVacationsByTeam(teamId, connection);
@@ -264,6 +267,21 @@ export const getVacationsByTeam = async (teamId: number, connection: Connection)
         return { status: 200, data: vacations };
     } catch (error) {
         console.error('Error in getVacationsByTeam service:', error);
+        return { status: 500, data: "Internal Server Error" };
+    }
+};
+
+export const getAllVacations = async (connection: Connection) => {
+    try {
+        const vacations = await requestRepository.findAllRequests(connection);
+
+        if (vacations.length === 0) {
+            return { status: 404, data: "No vacation requests found" };
+        }
+
+        return { status: 200, data: vacations };
+    } catch (error) {
+        console.error('Error in getAllVacations service:', error);
         return { status: 500, data: "Internal Server Error" };
     }
 };

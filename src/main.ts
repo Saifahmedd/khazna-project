@@ -11,6 +11,8 @@ import { userRoutes } from './components/user/user.routes';
 import { authenticateToken } from '../middleware/authenticateToken';
 import swaggerJSDoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
+import path from 'path';
+import fs from 'fs';
 import { initializeData } from './constants';
 import cors from "cors"
 import { Reason } from './entities/reason';

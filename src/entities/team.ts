@@ -5,6 +5,7 @@ export enum TeamType {
     FRONTEND = "frontend",
     BACKEND = "backend",
     TESTING = "testing",
+    PRODUCT = "product"
 }
 
 @Entity('team')

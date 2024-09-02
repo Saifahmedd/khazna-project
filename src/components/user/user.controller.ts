@@ -2,30 +2,38 @@ import { Request, Response } from 'express';
 import * as employeeService from './user.service';
 import { RoleTypes } from '../../entities/role';
 import { TeamType } from '../../entities/team';
+import crypto from 'crypto';
+import nodemailer from 'nodemailer';
+import { Check } from 'typeorm';
 
 const checkPassword = (password: string): boolean => {
-    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{7,17}$/;
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>])[A-Za-z\d!@#$%^&*(),.?":{}|<>]{8,}$/;
     return passwordRegex.test(password);
 };
 
 const checkEmail = (email: string): boolean => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const emailRegex = /^[^\s@]+@khazna\.app$/;
     return emailRegex.test(email);
 };
 
 const checkPhone = (phone: string): boolean => {
     return phone.length === 11;
-}
+};
+
+const checkName = (name: string): boolean => {
+    const nameRegex = /^[A-Za-z]+$/;
+    return nameRegex.test(name);
+};
 
 export const registerEmployee = async (req: Request, res: Response) => {
-    const { name, password, team, phonenumber, email } = req.body;
+    const { name, team, phonenumber, email } = req.body;
 
-    if (!name || !password || !team || !phonenumber || !email) {
+    if (!name || !team || !phonenumber || !email) {
         return res.status(400).json({ message: "Missing input" });
     }
 
-    if (!checkPassword(password)) {
-        return res.status(400).json({ message: "Invalid password" });
+    if(!checkName(name)) {
+        return res.status(400).json({ message: "Invalid name" });
     }
 
     if (!checkEmail(email)) {
@@ -33,18 +41,39 @@ export const registerEmployee = async (req: Request, res: Response) => {
     }
 
     if (!checkPhone(phonenumber)) {
-        return res.status(400).json({ message: "Invalid phone number" });
+        return res.status(400).json({ message: "Invalid phonenumber" });
     }
 
     try {
         const teamType = TeamType[team.toUpperCase() as keyof typeof TeamType];
+
+        const password = crypto.randomBytes(8).toString('hex');
+
+        // Send email with the generated password
+        const transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASSWORD
+            },
+            secure: true,
+        });
+
+        const mailOptions = {
+            from: process.env.EMAIL_USER,
+            to: email,
+            subject: 'Your Account Password',
+            text: `Hello ${name},\n\nYour account has been created. Here is your password: ${password}\n\nPlease change it after logging in.\n\nLogin here: https://accounts.google.com\n\nBest regards,\n ${process.env.SuperAdminName}`
+        };
+
+        await transporter.sendMail(mailOptions);
+
         const result = await employeeService.registerEmployee(name, password, teamType, phonenumber, email);
         return res.status(result.status).json(result.message);
     } catch (error) {
         return res.status(500).json({ message: "Internal server error" });
     }
 };
-
 
 export const loginEmployee = async (req: Request, res: Response) => {
     const { email, password } = req.body;
@@ -123,3 +152,24 @@ export const updateRole = async (req: Request, res: Response) => {
         return res.status(500).json({ message: "Internal server error" });
     }
 };
+
+export const changePassword = async (req: Request, res: Response) => {
+    const {employeeId} = req.params;
+    const {oldPassword, newPassword} = req.body;
+
+    if(!employeeId || !oldPassword || !newPassword){
+        return res.status(400).json({ message: "Invalid input" });
+    }
+    
+    if(!checkPassword(newPassword)){
+        return res.status(400).json({ message: "Invalid Password" });
+    }
+
+    try{
+        const result = await employeeService.changePassword(parseInt(employeeId), oldPassword, newPassword);
+        return res.status(result.status).json({message: "Password changed successfully"});
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: "Internal server error" });
+    }
+}

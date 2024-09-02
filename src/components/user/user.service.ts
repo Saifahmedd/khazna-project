@@ -178,3 +178,21 @@ export const updateRole = async (employeeId: number, role: RoleTypes) => {
 
     return { status: 200, employee };
 };
+
+export const changePassword = async(employeeId:number, oldPassword:string, newPassword:string) => {
+    const employee = await employeeRepository.findEmployeeById(employeeId);
+    if(!employee){
+        return { status: 404, message: "Cannot find the employee" };
+    }
+
+    if(!await bcrypt.compare(oldPassword, employee.password)){
+        return { status: 401, message: "Incorrect old password" };
+    }
+    
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    employee.password = hashedPassword
+    await employeeRepository.saveEmployee(employee);
+
+    return { status: 200, employee};
+};

@@ -288,7 +288,7 @@
  *                   type: string
  *                   example: "Internal server error"
  */
-//vacation/filter
+//vacation/filter/:key/:value
 /**
  * @swagger
  * /vacation/filter:
@@ -545,7 +545,7 @@
  *                   type: string
  *                   example: "Error creating vacation request"
  */
-//vacation
+//vacation/:employeeId/:page/:limit/:column/:order
 /**
  * @swagger
  * /vacation:
@@ -1053,4 +1053,56 @@
  *                 message:
  *                   type: string
  *                   example: Internal server error.
+ */
+//vacation/allVacations
+/**
+ * @openapi
+ * /vacation/allVacations:
+ *   get:
+ *     summary: Retrieve all vacation requests
+ *     description: Retrieves a list of all vacation requests.
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved vacation requests
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: integer
+ *                         description: Vacation request ID
+ *                       employee:
+ *                         type: object
+ *                         properties:
+ *                           id:
+ *                             type: integer
+ *                             description: Employee ID
+ *                           name:
+ *                             type: string
+ *                             description: Employee name
+ *                       status:
+ *                         type: object
+ *                         properties:
+ *                           name:
+ *                             type: string
+ *                             description: Status name
+ *                       reason:
+ *                         type: object
+ *                         properties:
+ *                           name:
+ *                             type: string
+ *                             description: Reason name
+ *       404:
+ *         description: No vacation requests found
+ *       500:
+ *         description: Internal Server Error
  */

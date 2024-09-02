@@ -35,6 +35,7 @@ export const initializeData = async (connection: Connection) => {
             { type: TeamType.BACKEND },
             { type: TeamType.FRONTEND },
             { type: TeamType.TESTING },
+            { type: TeamType.PRODUCT },
         ]);
     }
 

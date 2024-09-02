@@ -115,3 +115,19 @@ export const fetchVacationsByTeam = async (teamId: number, connection: Connectio
         throw new Error('Failed to fetch vacations by team');
     }
 };
+
+export const findAllRequests = async (connection: Connection) => {
+    try {
+        const requests = await connection
+            .getRepository(Vacation)
+            .createQueryBuilder('vacation')
+            .innerJoinAndSelect('vacation.employee', 'employee')
+            .innerJoinAndSelect('vacation.status', 'status')
+            .innerJoinAndSelect('vacation.reason', 'reason')
+            .getMany();
+
+        return requests;
+    } catch (error) {
+        throw new Error('Failed to fetch all requests');
+    }
+};

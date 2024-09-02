@@ -1,10 +1,10 @@
 import { Request, Response } from 'express';
-import { fetchUserRequestsServiceByPages ,getVacationsByTeam, fetchUserRequestsService, filterRequests, fetchSingleRequest, createRequestService, updateUserRequestService, deleteUserRequestService, updateAdminRequestService, updateRequests } from './vacation.service';
+import { getAllVacations, fetchUserRequestsServiceByPages ,getVacationsByTeam, fetchUserRequestsService, filterRequests, fetchSingleRequest, createRequestService, updateUserRequestService, deleteUserRequestService, updateAdminRequestService, updateRequests } from './vacation.service';
 import { StatusTypes } from '../../entities/vacationStatus';
 import { connection } from '../../main';
 
 export const filterVacationRequests = async (req: Request, res: Response) => {
-    const { key, value } = req.body;
+    const { key, value } = req.params;
     if (!key || !value) {
         return res.status(400).json({ message: "Key and value are required" });
     }
@@ -33,7 +33,7 @@ export const getVacationRequestById = async (req: Request, res: Response) => {
 };
 
 export const getUserVacationRequests = async (req: Request, res: Response) => {
-    const { employeeId, page, limit, column, order} = req.body;
+    const { employeeId, page, limit, column, order } = req.params;
 
     if (!employeeId) {
         return res.status(400).json({ message: "employeeId is required" });
@@ -46,7 +46,9 @@ export const getUserVacationRequests = async (req: Request, res: Response) => {
     }
 
     try {
-        const result = await fetchUserRequestsServiceByPages(parseInt(employeeId), parseInt(page), parseInt(limit), column, order);
+        const orderType = (order?.toUpperCase() === 'ASC' || order?.toUpperCase() === 'DESC') ? order.toUpperCase() as 'ASC' | 'DESC' : null;
+
+        const result = await fetchUserRequestsServiceByPages(parseInt(employeeId), parseInt(page), parseInt(limit), column, orderType);
         
         return res.status(result.status).json(result.response);
     } catch (error) {
@@ -159,6 +161,15 @@ export const getVacationRequestsByTeam = async (req: Request, res: Response) => 
     try {
         const result = await getVacationsByTeam(parseInt(teamId), connection);
 
+        return res.status(result.status).json(result.data);
+    } catch (error) {
+        return res.status(500).json({ message: "Internal Server Error", error: error.message });
+    }
+};
+
+export const getAllVacationRequests = async (req: Request, res: Response) => {
+    try {
+        const result = await getAllVacations(connection);
         return res.status(result.status).json(result.data);
     } catch (error) {
         return res.status(500).json({ message: "Internal Server Error", error: error.message });
