@@ -1,11 +1,11 @@
 steps:
   # Step 1: Build the container image
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', 'gcr.io/$PROJECT_ID/api-image:$SHORT_SHA', '.']
+    args: ['build', '-t', 'gcr.io/khazna-434418/api-image:$SHORT_SHA', '.']
 
   # Step 2: Push the image to Google Container Registry
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['push', 'gcr.io/$PROJECT_ID/api-image:$SHORT_SHA']
+    args: ['push', 'gcr.io/khazna-434418/api-image:$SHORT_SHA']
 
   # Step 3: Deploy the image to Cloud Run
   - name: 'gcr.io/cloud-builders/gcloud'
@@ -13,7 +13,7 @@ steps:
       - 'run'
       - 'deploy'
       - 'api-service'  # Change this to your Cloud Run service name
-      - '--image=gcr.io/$PROJECT_ID/api-image:$SHORT_SHA'
+      - '--image=gcr.io/khazna-434418/api-image:$SHORT_SHA'
       - '--platform=managed'
       - '--region=us-central1'  # Change this to your preferred region
       - '--allow-unauthenticated'
