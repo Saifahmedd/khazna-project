@@ -4,7 +4,7 @@ import { Employee } from "./employee";
 export enum RoleTypes {
     SuperAdmin = 'superadmin',
     Admin = 'admin',
-    User = 'user'
+    Employee = 'employee'
 }
 
 @Entity('role')
@@ -16,7 +16,7 @@ export class Role extends BaseEntity {
     @Column({
         type: "enum",
         enum: RoleTypes,
-        default: RoleTypes.User
+        default: RoleTypes.Employee
     })
     role: RoleTypes;
 

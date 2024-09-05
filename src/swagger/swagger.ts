@@ -4,6 +4,7 @@
  * /register:
  *   post:
  *     summary: Register a new employee
+ *     tags: [Employees]
  *     requestBody:
  *       required: true
  *       content:
@@ -12,27 +13,26 @@
  *             type: object
  *             required:
  *               - name
- *               - password
  *               - team
  *               - phonenumber
  *               - email
  *             properties:
  *               name:
  *                 type: string
- *                 description: The name of the employee
- *               password:
- *                 type: string
- *                 description: The password of the employee
+ *                 description: Employee's name
+ *                 example: Saif Ahmed
  *               team:
  *                 type: string
- *                 enum: [FrontEnd, BackEnd, Testing]
- *                 description: The team to which the employee belongs
+ *                 description: The team type the employee belongs to
+ *                 example: Backend
  *               phonenumber:
  *                 type: string
- *                 description: The phone number of the employee
+ *                 description: Employee's phone number
+ *                 example: 01023255440
  *               email:
  *                 type: string
- *                 description: The email address of the employee
+ *                 description: Employee's email address
+ *                 example: saif.ahmed@khazna.app
  *     responses:
  *       200:
  *         description: Registration successful
@@ -53,7 +53,17 @@
  *               properties:
  *                 message:
  *                   type: string
- *                   example: Missing input / Invalid email / Invalid password / Invalid phone number
+ *                   example: Missing input
+ *       404:
+ *         description: Team or role not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Invalid team or role
  *       409:
  *         description: Email already exists
  *         content:
@@ -64,16 +74,6 @@
  *                 message:
  *                   type: string
  *                   example: Email already exists
- *       404:
- *         description: Invalid team
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Invalid team
  *       500:
  *         description: Internal server error
  *         content:
@@ -90,7 +90,8 @@
  * @swagger
  * /login:
  *   post:
- *     summary: Login an employee
+ *     summary: Log in an employee
+ *     tags: [Employees]
  *     requestBody:
  *       required: true
  *       content:
@@ -103,13 +104,15 @@
  *             properties:
  *               email:
  *                 type: string
- *                 example: saifahmedsalah11@gmail.com
+ *                 description: Employee's email address
+ *                 example: saif.ahmed@khazna.app
  *               password:
  *                 type: string
- *                 example: Password123
+ *                 description: Employee's password
+ *                 example: saifPassword7!
  *     responses:
  *       200:
- *         description: Successfully logged in
+ *         description: Login successful
  *         content:
  *           application/json:
  *             schema:
@@ -117,12 +120,29 @@
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "Logged in successfully"
+ *                   example: Logged in successfully
+ *                 employee:
+ *                   type: object
+ *                   description: Employee information
+ *                   properties:
+ *                     id:
+ *                       type: number
+ *                       example: 1
+ *                     name:
+ *                       type: string
+ *                       example: Saif Ahmed
+ *                     email:
+ *                       type: string
+ *                       example: saif.ahmed@khazna.app
+ *                     role:
+ *                       type: string
+ *                       example: Employee
  *                 accessToken:
  *                   type: string
- *                   example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+ *                   description: JWT access token
+ *                   example: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
  *       400:
- *         description: Missing or invalid inputs
+ *         description: Missing inputs
  *         content:
  *           application/json:
  *             schema:
@@ -130,9 +150,9 @@
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "Missing or invalid inputs"
+ *                   example: Missing inputs
  *       401:
- *         description: Unauthorized - Incorrect email or password
+ *         description: Incorrect email or password
  *         content:
  *           application/json:
  *             schema:
@@ -140,7 +160,7 @@
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "Incorrect email or password"
+ *                   example: Incorrect email or password
  *       500:
  *         description: Internal server error
  *         content:
@@ -150,7 +170,7 @@
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "Internal server error"
+ *                   example: Internal server error
  */
 //user/:employeeId/info
 /**
@@ -158,16 +178,18 @@
  * /user/{employeeId}/info:
  *   get:
  *     summary: Get user information
+ *     tags: [Employees]
  *     parameters:
  *       - in: path
  *         name: employeeId
  *         required: true
  *         schema:
  *           type: integer
+ *         description: ID of the employee to retrieve information for
  *         example: 1
  *     responses:
  *       200:
- *         description: Successfully retrieved user information
+ *         description: User information retrieved successfully
  *         content:
  *           application/json:
  *             schema:
@@ -175,11 +197,32 @@
  *               properties:
  *                 employee:
  *                   type: object
+ *                   description: Employee information
+ *                   properties:
+ *                     id:
+ *                       type: number
+ *                       example: 1
+ *                     name:
+ *                       type: string
+ *                       example: John Doe
+ *                     email:
+ *                       type: string
+ *                       example: johndoe@example.com
+ *                     phoneNumber:
+ *                       type: string
+ *                       example: +1234567890
+ *                     role:
+ *                       type: string
+ *                       example: Employee
+ *                     team:
+ *                       type: string
+ *                       example: Engineering
  *                 daysLeft:
  *                   type: integer
- *                   example: 10
+ *                   description: Number of vacation days remaining
+ *                   example: 15
  *       400:
- *         description: Invalid input or all vacation days are taken
+ *         description: Invalid input, employeeId is required
  *         content:
  *           application/json:
  *             schema:
@@ -187,7 +230,7 @@
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "Invalid input"
+ *                   example: Invalid input
  *       404:
  *         description: Employee not found
  *         content:
@@ -197,7 +240,7 @@
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "Cannot find the employee"
+ *                   example: Cannot find the employee
  *       500:
  *         description: Internal server error
  *         content:
@@ -207,33 +250,30 @@
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "Internal server error"
+ *                   example: Error fetching user info
  */
 //user/{avatarId}
 /**
  * @swagger
  * /user/{avatarId}:
  *   put:
- *     summary: Update an employee's avatar
+ *     summary: Update employee's avatar
+ *     tags: [Employees]
  *     parameters:
  *       - in: path
  *         name: avatarId
  *         required: true
  *         schema:
  *           type: integer
- *         description: The ID of the new avatar
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - employeeId
- *             properties:
- *               employeeId:
- *                 type: integer
- *                 example: 1
+ *         description: ID of the avatar to be added
+ *         example: 5
+ *       - in: query
+ *         name: employeeId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The ID of the employee whose avatar is being updated
+ *         example: 1
  *     responses:
  *       200:
  *         description: Avatar updated successfully
@@ -244,7 +284,7 @@
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "Avatar updated successfully"
+ *                   example: Avatar updated successfully
  *                 employee:
  *                   type: object
  *                   properties:
@@ -256,9 +296,9 @@
  *                       example: Saif Ahmed
  *                     avatarId:
  *                       type: integer
- *                       example: 101
+ *                       example: 5
  *       400:
- *         description: Invalid input
+ *         description: Invalid input, missing employeeId or avatarId
  *         content:
  *           application/json:
  *             schema:
@@ -266,7 +306,7 @@
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "Invalid input"
+ *                   example: Invalid input
  *       404:
  *         description: Employee not found
  *         content:
@@ -276,7 +316,7 @@
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "Cannot find the employee"
+ *                   example: Cannot find the employee
  *       500:
  *         description: Internal server error
  *         content:
@@ -286,30 +326,204 @@
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "Internal server error"
+ *                   example: Internal server error
  */
-//vacation/filter/:key/:value
+//user/:employeeId/role/:role
+/**
+ * @swagger
+ * /user/{employeeId}/role/{role}:
+ *   put:
+ *     summary: Update an employee's role
+ *     tags: [Employees]
+ *     parameters:
+ *       - in: path
+ *         name: employeeId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID of the employee whose role is being updated
+ *         example: 1
+ *       - in: path
+ *         name: role
+ *         required: true
+ *         schema:
+ *           type: string
+ *           enum: [Admin, Employee, SuperAdmin]
+ *         description: New role for the employee
+ *         example: Admin
+ *     responses:
+ *       200:
+ *         description: Role updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Role updated successfully
+ *                 employee:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: integer
+ *                       example: 1
+ *                     name:
+ *                       type: string
+ *                       example: Saif Ahmed
+ *                     role:
+ *                       type: string
+ *                       example: Admin
+ *       400:
+ *         description: Invalid input, missing employeeId or role
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Invalid input
+ *       404:
+ *         description: Employee or role not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Cannot find the employee or Invalid role
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Internal server error
+ */
+//user/:employeeId/changePass
+/**
+ * @swagger
+ * /user/{employeeId}/changePass:
+ *   put:
+ *     summary: Change an employee's password
+ *     tags: [Employees]
+ *     parameters:
+ *       - in: path
+ *         name: employeeId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID of the employee whose password is being changed
+ *         example: 1
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               oldPassword:
+ *                 type: string
+ *                 description: Current password of the employee
+ *                 example: oldPass123
+ *               newPassword:
+ *                 type: string
+ *                 description: New password for the employee
+ *                 example: newPass123
+ *     responses:
+ *       200:
+ *         description: Password changed successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Password changed successfully
+ *       400:
+ *         description: Invalid input or password format
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Invalid input or Invalid Password
+ *       401:
+ *         description: Incorrect old password
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Incorrect old password
+ *       404:
+ *         description: Employee not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Cannot find the employee
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Internal server error
+ */
+//vacation/filter
 /**
  * @swagger
  * /vacation/filter:
  *   get:
- *     summary: Filter vacation requests based on a specific key and value
+ *     summary: Filter vacation requests
+ *     tags: [Vacation]
  *     parameters:
  *       - in: query
- *         name: key
- *         required: true
+ *         name: status
  *         schema:
  *           type: string
- *         description: The key to filter the vacation requests by (e.g., status, employeeId)
+ *           enum: [pending, approved, rejected]
+ *         description: Filter by vacation status
+ *         example: pending
  *       - in: query
- *         name: value
- *         required: true
+ *         name: date
  *         schema:
  *           type: string
- *         description: The value to filter the vacation requests by
+ *           description: Comma-separated date range for filtering (e.g., "startTimestamp,endTimestamp")
+ *           example: "1627849200000,1627935600000"
+ *         description: Filter by date range (timestamp format)
+ *       - in: query
+ *         name: employeeId
+ *         schema:
+ *           type: integer
+ *         description: Filter by employee ID
+ *         example: 1
+ *       - in: query
+ *         name: reviewerId
+ *         schema:
+ *           type: integer
+ *         description: Filter by reviewer ID
+ *         example: 2
  *     responses:
  *       200:
- *         description: Successfully retrieved filtered vacation requests
+ *         description: List of filtered vacation requests
  *         content:
  *           application/json:
  *             schema:
@@ -322,20 +536,18 @@
  *                     example: 1
  *                   employeeId:
  *                     type: integer
- *                     example: 2
- *                   dateFrom:
- *                     type: string
- *                     format: date-time
- *                     example: "2024-08-01T00:00:00Z"
- *                   dateTo:
- *                     type: string
- *                     format: date-time
- *                     example: "2024-08-05T00:00:00Z"
+ *                     example: 1
  *                   status:
  *                     type: string
- *                     example: "Pending"
+ *                     example: approved
+ *                   date:
+ *                     type: string
+ *                     example: "1627849200000,1627935600000"
+ *                   reason:
+ *                     type: string
+ *                     example: Vacation
  *       400:
- *         description: Key and value are required
+ *         description: Invalid input, such as missing or incorrectly formatted filters
  *         content:
  *           application/json:
  *             schema:
@@ -343,9 +555,112 @@
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "key and value are required"
+ *                   example: "At least one filter is required"
  *       500:
- *         description: Internal Server Error
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Internal Server Error
+ *                 error:
+ *                   type: string
+ *                   example: Error message
+ */
+//vacation/:employeeId/:page/:limit/:column/:order
+/**
+ * @swagger
+ * /vacation/{employeeId}/{page}/{limit}/{column}/{order}:
+ *   get:
+ *     summary: Retrieve vacation requests for a specific employee with pagination, sorting, and ordering
+ *     tags: [Vacation]
+ *     parameters:
+ *       - in: path
+ *         name: employeeId
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: The ID of the employee whose vacation requests are to be retrieved
+ *         example: 1
+ *       - in: path
+ *         name: page
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: The page number to retrieve
+ *         example: 1
+ *       - in: path
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: The number of records to retrieve per page
+ *         example: 10
+ *       - in: path
+ *         name: column
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The column to sort the results by
+ *         example: "status"
+ *       - in: path
+ *         name: order
+ *         schema:
+ *           type: string
+ *           enum: [ASC, DESC]
+ *         required: true
+ *         description: The order of sorting (ASC for ascending, DESC for descending)
+ *         example: "ASC"
+ *     responses:
+ *       200:
+ *         description: List of vacation requests for the specified employee
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: integer
+ *                     example: 1
+ *                   employeeId:
+ *                     type: integer
+ *                     example: 1
+ *                   status:
+ *                     type: string
+ *                     example: accepted
+ *                   date:
+ *                     type: string
+ *                     example: "1627849200000,1627935600000"
+ *                   reason:
+ *                     type: string
+ *                     example: Vacation
+ *       400:
+ *         description: Invalid input, such as missing required parameters
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "page, limit are required"
+ *       404:
+ *         description: Employee not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Employee not found"
+ *       500:
+ *         description: Internal server error
  *         content:
  *           application/json:
  *             schema:
@@ -356,65 +671,42 @@
  *                   example: "Internal Server Error"
  *                 error:
  *                   type: string
- *                   example: "Error message"
+ *                   example: Error message
  */
-//vacation/:requestId
+//vacation/allVacations
 /**
  * @swagger
- * /vacation/{requestId}:
+ * /vacation/superAdmin/allVacations:
  *   get:
- *     summary: Get a single vacation request by ID
- *     description: Retrieves a specific vacation request using its ID.
- *     parameters:
- *       - in: path
- *         name: requestId
- *         required: true
- *         schema:
- *           type: integer
- *         description: The ID of the vacation request to retrieve.
+ *     summary: Retrieve all vacation requests for a super admin
+ *     tags: [Vacation]
  *     responses:
  *       200:
- *         description: Successfully retrieved the vacation request
+ *         description: List of all vacation requests
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "Request fetched successfully"
- *                 request:
- *                   type: object
- *                   properties:
- *                     id:
- *                       type: integer
- *                       example: 1
- *                     dateFrom:
- *                       type: string
- *                       format: date-time
- *                       example: "2024-08-01T00:00:00Z"
- *                     dateTo:
- *                       type: string
- *                       format: date-time
- *                       example: "2024-08-07T00:00:00Z"
- *                     reason:
- *                       type: string
- *                       example: "Vacation for family trip"
- *                     status:
- *                       type: string
- *                       example: "Pending"
- *       400:
- *         description: Invalid Request ID provided
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "Valid Request ID is required"
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: integer
+ *                     example: 1
+ *                   employeeId:
+ *                     type: integer
+ *                     example: 1
+ *                   status:
+ *                     type: string
+ *                     example: accepted
+ *                   date:
+ *                     type: string
+ *                     example: "1627849200000,1627935600000"
+ *                   reason:
+ *                     type: string
+ *                     example: Vacation
  *       404:
- *         description: Vacation request not found
+ *         description: No vacation requests found
  *         content:
  *           application/json:
  *             schema:
@@ -422,7 +714,7 @@
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "Request not found"
+ *                   example: "No vacation requests found"
  *       500:
  *         description: Internal server error
  *         content:
@@ -432,7 +724,10 @@
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "Error fetching request"
+ *                   example: "Internal Server Error"
+ *                 error:
+ *                   type: string
+ *                   example: Error message
  */
 //vacation
 /**
@@ -440,40 +735,29 @@
  * /vacation:
  *   post:
  *     summary: Create a new vacation request
- *     description: Creates a new vacation request for an employee. The employee ID, start timestamp, end timestamp, and reason are required.
+ *     tags: [Vacation]
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
- *             required:
- *               - employeeId
- *               - dateFrom
- *               - dateTo
- *               - reason
  *             properties:
  *               employeeId:
  *                 type: integer
- *                 description: The ID of the employee making the request.
  *                 example: 1
- *               dateFrom:
- *                 type: integer
- *                 format: int64
- *                 description: The start timestamp of the vacation request.
- *                 example: 1690848000
- *               dateTo:
- *                 type: integer
- *                 format: int64
- *                 description: The end timestamp of the vacation request.
- *                 example: 1691452800
+ *                 description: ID of the employee requesting the vacation
+ *               date:
+ *                 type: string
+ *                 example: "1627849200000,1627935600000"
+ *                 description: Comma-separated timestamps for the start and end dates of the vacation
  *               reason:
  *                 type: string
- *                 description: The reason for the vacation request.
- *                 example: "Vacation for family trip"
+ *                 example: "Vacation"
+ *                 description: Reason for the vacation
  *     responses:
- *       '201':
- *         description: Vacation request created successfully.
+ *       201:
+ *         description: Vacation request created successfully
  *         content:
  *           application/json:
  *             schema:
@@ -487,32 +771,21 @@
  *                   properties:
  *                     id:
  *                       type: integer
- *                       description: The ID of the vacation request.
  *                       example: 1
  *                     employeeId:
  *                       type: integer
- *                       description: The ID of the employee.
  *                       example: 1
- *                     dateFrom:
- *                       type: integer
- *                       format: int64
- *                       description: The start timestamp of the vacation request.
- *                       example: 1690848000
- *                     dateTo:
- *                       type: integer
- *                       format: int64
- *                       description: The end timestamp of the vacation request.
- *                       example: 1691452800
- *                     reason:
- *                       type: string
- *                       description: The reason for the vacation request.
- *                       example: "Vacation"
  *                     status:
  *                       type: string
- *                       description: The status of the vacation request.
- *                       example: "Pending"
- *       '400':
- *         description: Bad Request. Missing or invalid parameters.
+ *                       example: "pending"
+ *                     date:
+ *                       type: string
+ *                       example: "1627849200000,1627935600000"
+ *                     reason:
+ *                       type: string
+ *                       example: "Vacation"
+ *       400:
+ *         description: Bad Request (missing or invalid parameters)
  *         content:
  *           application/json:
  *             schema:
@@ -521,8 +794,8 @@
  *                 message:
  *                   type: string
  *                   example: "Employee ID is required"
- *       '404':
- *         description: Not Found. Employee or status not found.
+ *       404:
+ *         description: Employee, status, or reason not found
  *         content:
  *           application/json:
  *             schema:
@@ -531,92 +804,6 @@
  *                 message:
  *                   type: string
  *                   example: "Employee not found"
- *       '500':
- *         description: Internal Server Error. An unexpected error occurred.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "Internal Server Error"
- *                 error:
- *                   type: string
- *                   example: "Error creating vacation request"
- */
-//vacation/:employeeId/:page/:limit/:column/:order
-/**
- * @swagger
- * /vacation:
- *   get:
- *     summary: Retrieve user vacation requests
- *     description: Retrieves a paginated list of vacation requests for a specific employee.
- *     parameters:
- *       - in: query
- *         name: employeeId
- *         required: true
- *         schema:
- *           type: integer
- *         description: The ID of the employee
- *       - in: query
- *         name: page
- *         required: true
- *         schema:
- *           type: integer
- *         description: The page number for pagination
- *       - in: query
- *         name: limit
- *         required: true
- *         schema:
- *           type: integer
- *         description: The number of records per page
- *     responses:
- *       200:
- *         description: A list of user vacation requests
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 type: object
- *                 properties:
- *                   id:
- *                     type: integer
- *                     description: The request ID
- *                   dateFrom:
- *                     type: integer
- *                     format: int64
- *                     description: Start timestamp of the vacation
- *                     example: 1690848000
- *                   dateTo:
- *                     type: integer
- *                     format: int64
- *                     description: End timestamp of the vacation
- *                     example: 1691452800
- *                   status:
- *                     type: string
- *                     description: Status of the request
- *       400:
- *         description: Missing or invalid parameters
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   description: Error message
- *       404:
- *         description: Employee not found
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   description: Error message
  *       500:
  *         description: Internal server error
  *         content:
@@ -626,7 +813,10 @@
  *               properties:
  *                 message:
  *                   type: string
- *                   description: Error message
+ *                   example: "Internal Server Error"
+ *                 error:
+ *                   type: string
+ *                   example: Error message
  */
 //vacation/:requestId
 /**
@@ -634,14 +824,15 @@
  * /vacation/{requestId}:
  *   put:
  *     summary: Update a vacation request
- *     description: Updates the details of a vacation request identified by the `requestId`.
+ *     tags: [Vacation]
  *     parameters:
  *       - in: path
  *         name: requestId
  *         required: true
- *         description: The ID of the vacation request to update.
+ *         description: ID of the vacation request to update
  *         schema:
  *           type: integer
+ *           example: 1
  *     requestBody:
  *       required: true
  *       content:
@@ -651,30 +842,23 @@
  *             properties:
  *               reviewerId:
  *                 type: integer
- *                 description: The ID of the reviewer.
- *               dateFrom:
+ *                 example: 2
+ *                 description: ID of the reviewer for the vacation request
+ *               date:
  *                 type: string
- *                 format: date
- *                 description: The start date of the vacation request.
- *               dateTo:
- *                 type: string
- *                 format: date
- *                 description: The end date of the vacation request.
+ *                 example: "1627849200000,1627935600000"
+ *                 description: Comma-separated timestamps for the start and end dates of the vacation
  *               reason:
  *                 type: string
- *                 description: The reason for the vacation request.
+ *                 example: "Sick Leave"
+ *                 description: Reason for the vacation
  *               status:
  *                 type: string
- *                 description: The status of the vacation request. (e.g., Pending, Accepted, Rejected)
- *             required:
- *               - reviewerId
- *               - dateFrom
- *               - dateTo
- *               - reason
- *               - status
+ *                 example: "Approved"
+ *                 description: Status of the vacation request
  *     responses:
- *       '200':
- *         description: Request updated successfully.
+ *       200:
+ *         description: Vacation request updated successfully
  *         content:
  *           application/json:
  *             schema:
@@ -683,8 +867,8 @@
  *                 message:
  *                   type: string
  *                   example: "Request updated successfully"
- *       '400':
- *         description: Bad Request. The request parameters or body are invalid.
+ *       400:
+ *         description: Bad Request (invalid date format or missing request ID)
  *         content:
  *           application/json:
  *             schema:
@@ -692,9 +876,19 @@
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "All fields are required"
- *       '404':
- *         description: Not Found. The request ID does not exist.
+ *                   example: "Invalid date format"
+ *       403:
+ *         description: Forbidden (request cannot be updated)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Cannot update this request"
+ *       404:
+ *         description: Not Found (request, reason, or status not found)
  *         content:
  *           application/json:
  *             schema:
@@ -703,8 +897,8 @@
  *                 message:
  *                   type: string
  *                   example: "Request not found"
- *       '500':
- *         description: Internal Server Error. An unexpected error occurred.
+ *       500:
+ *         description: Internal server error
  *         content:
  *           application/json:
  *             schema:
@@ -715,7 +909,7 @@
  *                   example: "Internal Server Error"
  *                 error:
  *                   type: string
- *                   example: "Error updating vacation request"
+ *                   example: Error message
  */
 //vacation/:requestId
 /**
@@ -723,17 +917,18 @@
  * /vacation/{requestId}:
  *   delete:
  *     summary: Delete a vacation request
- *     description: Deletes a vacation request identified by the `requestId`.
+ *     tags: [Vacation]
  *     parameters:
  *       - in: path
  *         name: requestId
  *         required: true
  *         schema:
  *           type: integer
- *         description: The ID of the vacation request to delete.
+ *         description: ID of the vacation request to delete
+ *         example: 1
  *     responses:
  *       200:
- *         description: Request deleted successfully.
+ *         description: Vacation request deleted successfully
  *         content:
  *           application/json:
  *             schema:
@@ -743,7 +938,7 @@
  *                   type: string
  *                   example: "Request deleted successfully"
  *       400:
- *         description: Bad Request. The request ID is invalid or missing.
+ *         description: Bad Request (invalid or missing request ID)
  *         content:
  *           application/json:
  *             schema:
@@ -752,8 +947,18 @@
  *                 message:
  *                   type: string
  *                   example: "Valid Request ID is required"
+ *       403:
+ *         description: Forbidden (request cannot be deleted)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Cannot delete this request"
  *       404:
- *         description: Not Found. The request ID does not exist.
+ *         description: Not Found (request not found)
  *         content:
  *           application/json:
  *             schema:
@@ -763,7 +968,7 @@
  *                   type: string
  *                   example: "Request not found"
  *       500:
- *         description: Internal Server Error. An unexpected error occurred.
+ *         description: Internal server error
  *         content:
  *           application/json:
  *             schema:
@@ -774,44 +979,42 @@
  *                   example: "Internal Server Error"
  *                 error:
  *                   type: string
- *                   example: "Error deleting vacation request"
+ *                   example: Error message
  */
 //vacation/:requestId/admin/:status
 /**
  * @swagger
  * /vacation/{requestId}/admin/{status}:
  *   put:
- *     summary: Update the status of a vacation request by admin
- *     description: Updates the status of a vacation request identified by the `requestId` and `status`.
+ *     summary: Update a vacation request status by an admin
+ *     tags: [Vacation]
  *     parameters:
  *       - in: path
  *         name: requestId
+ *         required: true
  *         schema:
  *           type: integer
- *         required: true
- *         description: The ID of the vacation request to update.
+ *         description: ID of the vacation request to update
  *       - in: path
  *         name: status
+ *         required: true
  *         schema:
  *           type: string
- *         required: true
- *         description: The new status of the vacation request.
+ *           enum: [Approved, Rejected, Pending]
+ *         description: New status to set for the vacation request
  *     responses:
- *       '200':
- *         description: Request updated successfully.
+ *       200:
+ *         description: Vacation request status updated successfully
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
- *                 id:
- *                   type: integer
- *                   description: The ID of the vacation request.
- *                 status:
+ *                 message:
  *                   type: string
- *                   description: The updated status of the vacation request.
- *       '400':
- *         description: Bad Request. Invalid `requestId` or missing `status`.
+ *                   example: "Request updated successfully"
+ *       400:
+ *         description: Bad Request (invalid or missing request ID or status)
  *         content:
  *           application/json:
  *             schema:
@@ -820,107 +1023,8 @@
  *                 message:
  *                   type: string
  *                   example: "Valid Request ID is required"
- *       '404':
- *         description: Not Found. The request ID or status does not exist.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "Request not found"  # Provide specific examples, not combined
- *       '500':
- *         description: Internal Server Error. An unexpected error occurred.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "Internal Server Error"
- *                 error:
- *                   type: string
- *                   example: "Error updating admin vacation request"
- */
-//vacation/:requestId/admin
-/**
- * @swagger
- * /vacation/{requestId}/admin:
- *   put:
- *     summary: Update details of a vacation request by admin
- *     description: Updates the details of a vacation request identified by the `requestId`.
- *     parameters:
- *       - in: path
- *         name: requestId
- *         required: true
- *         schema:
- *           type: integer
- *         description: The ID of the vacation request to update.
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               reviewerId:
- *                 type: integer
- *                 description: The ID of the reviewer.
- *               dateFrom:
- *                 type: string
- *                 format: date
- *                 description: The start date of the vacation.
- *               dateTo:
- *                 type: string
- *                 format: date
- *                 description: The end date of the vacation.
- *               reason:
- *                 type: string
- *                 description: The reason for the vacation.
- *             required:
- *               - reviewerId
- *               - dateFrom
- *               - dateTo
- *               - reason
- *     responses:
- *       '200':
- *         description: Request updated successfully.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 id:
- *                   type: integer
- *                   description: The ID of the vacation request.
- *                 reviewerId:
- *                   type: integer
- *                   description: The ID of the reviewer.
- *                 dateFrom:
- *                   type: string
- *                   format: date
- *                   description: The updated start date of the vacation.
- *                 dateTo:
- *                   type: string
- *                   format: date
- *                   description: The updated end date of the vacation.
- *                 reason:
- *                   type: string
- *                   description: The updated reason for the vacation.
- *       '400':
- *         description: Bad Request. Invalid or missing data.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "Invalid request data or missing fields"
- *       '404':
- *         description: Not Found. The request ID does not exist.
+ *       404:
+ *         description: Not Found (request or status not found)
  *         content:
  *           application/json:
  *             schema:
@@ -929,8 +1033,8 @@
  *                 message:
  *                   type: string
  *                   example: "Request not found"
- *       '500':
- *         description: Internal Server Error. An unexpected error occurred.
+ *       500:
+ *         description: Internal server error
  *         content:
  *           application/json:
  *             schema:
@@ -941,34 +1045,49 @@
  *                   example: "Internal Server Error"
  *                 error:
  *                   type: string
- *                   example: "Error updating vacation request"
+ *                   example: Error message
  */
-//vacation/admin/{teamId}
+//vacation/admin/team/{teamId}
 /**
  * @swagger
- * /vacation/admin/{teamId}:
+ * /vacation/admin/team/{teamId}:
  *   get:
- *     summary: Get vacation requests by team
- *     description: Fetches all vacation requests for employees in the specified team.
+ *     summary: Retrieve vacation requests for a specific team
+ *     tags: [Vacation]
  *     parameters:
- *       - name: teamId
- *         in: path
- *         description: ID of the team to fetch vacation requests for
+ *       - in: path
+ *         name: teamId
  *         required: true
  *         schema:
  *           type: integer
+ *         description: ID of the team to fetch vacation requests for
  *     responses:
- *       '200':
- *         description: Successfully retrieved vacation requests
+ *       200:
+ *         description: Successfully retrieved vacation requests for the specified team
  *         content:
  *           application/json:
  *             schema:
  *               type: array
  *               items:
  *                 type: object
- *                 additionalProperties: true
- *       '404':
- *         description: No employees found for this team
+ *                 properties:
+ *                   id:
+ *                     type: integer
+ *                     example: 1
+ *                   employeeId:
+ *                     type: integer
+ *                     example: 123
+ *                   date:
+ *                     type: string
+ *                     example: "1698835200000,1699344000000"
+ *                   reason:
+ *                     type: string
+ *                     example: "Personal"
+ *                   status:
+ *                     type: string
+ *                     example: "Pending"
+ *       400:
+ *         description: Bad Request (missing or invalid teamId)
  *         content:
  *           application/json:
  *             schema:
@@ -976,133 +1095,28 @@
  *               properties:
  *                 message:
  *                   type: string
- *                   example: No employees found for this team.
- *       '500':
- *         description: Internal Server Error
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Internal server error.
- */
-//user/:employeeId/role/:role
-/**
- * @swagger
- * /user/{employeeId}/role/{role}:
- *   put:
- *     summary: Update the role of an employee
- *     description: Update the role of an employee by their ID.
- *     parameters:
- *       - in: path
- *         name: employeeId
- *         schema:
- *           type: integer
- *         required: true
- *         description: The ID of the employee to update.
- *       - in: path
- *         name: role
- *         schema:
- *           type: string
- *           enum: [admin, user, manager]
- *         required: true
- *         description: The new role to assign to the employee.
- *     responses:
- *       '200':
- *         description: Role updated successfully.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Role updated successfully.
- *                 employee:
- *                   type: object
- *                   additionalProperties: true
- *       '400':
- *         description: Invalid input.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Invalid input.
- *       '404':
- *         description: Employee or role not found.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Employee or role not found.
- *       '500':
- *         description: Internal server error.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Internal server error.
- */
-//vacation/allVacations
-/**
- * @openapi
- * /vacation/allVacations:
- *   get:
- *     summary: Retrieve all vacation requests
- *     description: Retrieves a list of all vacation requests.
- *     responses:
- *       200:
- *         description: Successfully retrieved vacation requests
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 status:
- *                   type: integer
- *                   description: The HTTP status code
- *                 data:
- *                   type: array
- *                   items:
- *                     type: object
- *                     properties:
- *                       id:
- *                         type: integer
- *                         description: Vacation request ID
- *                       employee:
- *                         type: object
- *                         properties:
- *                           id:
- *                             type: integer
- *                             description: Employee ID
- *                           name:
- *                             type: string
- *                             description: Employee name
- *                       status:
- *                         type: object
- *                         properties:
- *                           name:
- *                             type: string
- *                             description: Status name
- *                       reason:
- *                         type: object
- *                         properties:
- *                           name:
- *                             type: string
- *                             description: Reason name
+ *                   example: "teamId is required"
  *       404:
- *         description: No vacation requests found
+ *         description: Not Found (no vacation requests found for the specified team)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: string
+ *                   example: "No vacation requests found for the specified team"
  *       500:
- *         description: Internal Server Error
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Internal Server Error"
+ *                 error:
+ *                   type: string
+ *                   example: Error message
  */

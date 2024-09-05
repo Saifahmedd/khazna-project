@@ -8,6 +8,7 @@ import { Vacation } from '../../entities/vacation';
 import * as vacationService from '../vacation/vacation.service';
 import { ReasonTypes } from '../../entities/reason';
 import { TeamType } from '../../entities/team';
+import { StatusTypes } from '../../entities/vacationStatus';
 
 dotenv.config();
 
@@ -25,11 +26,17 @@ export const registerEmployee = async (name: string, password: string, team: Tea
             return { status: 404, message: "Invalid team" };
         }
 
+        const role = await employeeRepository.findRoleByRoleName(RoleTypes.Employee);
+        if (!role) {
+            return { status: 404, message: "Invalid role" };
+        }
+
         const employee = Employee.create({
             name,
             password: hashedPassword,
             phoneNumber: phonenumber,
             email,
+            role,
             team: teamEntity
         });
 
@@ -54,6 +61,7 @@ export const loginEmployee = async (email: string, password: string) => {
         }
 
         const user = {
+            employeeId: employee.id,
             email,
             role: employee.role
         };
@@ -64,7 +72,7 @@ export const loginEmployee = async (email: string, password: string) => {
             status: 200,
             employee,
             message: "Logged in successfully",
-            accessToken
+            accessToken: "Bearer " + accessToken
         };
     } catch (error) {
         return { status: 500, message: "Internal server error" };
@@ -90,7 +98,7 @@ export const getUserInfo = async (employeeId: number) => {
         let totalDaysTaken = 0;
 
         requests.forEach(request => {
-            if (!request.reason) {
+            if (request.status.name === StatusTypes.Rejected) {
                 return;
             }
             const daysDifference = getDaysDifference(request.dateFrom, request.dateTo, vacationDates);

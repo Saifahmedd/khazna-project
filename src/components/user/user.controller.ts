@@ -12,7 +12,7 @@ const checkPassword = (password: string): boolean => {
 };
 
 const checkEmail = (email: string): boolean => {
-    const emailRegex = /^[^\s@]+@gmail\.com$/;
+    const emailRegex = /^[^\s@]+@khazna\.app$/;
     return emailRegex.test(email);
 };
 
@@ -36,9 +36,9 @@ export const registerEmployee = async (req: Request, res: Response) => {
         return res.status(400).json({ message: "Invalid name" });
     }
 
-    if (!checkEmail(email)) {
-        return res.status(400).json({ message: "Invalid email" });
-    }
+    // if (!checkEmail(email)) {
+    //     return res.status(400).json({ message: "Invalid email" });
+    // }
 
     if (!checkPhone(phonenumber)) {
         return res.status(400).json({ message: "Invalid phonenumber" });

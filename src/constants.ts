@@ -14,7 +14,7 @@ export const initializeData = async (connection: Connection) => {
         await roleRepository.save([
             { role: RoleTypes.SuperAdmin},
             { role: RoleTypes.Admin },
-            { role: RoleTypes.User }
+            { role: RoleTypes.Employee }
         ]);
     }
 
@@ -23,7 +23,7 @@ export const initializeData = async (connection: Connection) => {
     if (existingStatus.length === 0) {
         await vacationStatusRepository.save([
             { name: StatusTypes.Pending },
-            { name: StatusTypes.Accepted },
+            { name: StatusTypes.Approved },
             { name: StatusTypes.Rejected },
         ]);
     }
@@ -55,7 +55,7 @@ export const initializeData = async (connection: Connection) => {
         return;
     }
 
-    const defaultSuperAdminEmail = 'superadmin@khazna.com';
+    const defaultSuperAdminEmail = 'superadmin@khazna.app';
     let superAdmin = await Employee.findOne({ where: { email: defaultSuperAdminEmail } });
 
     if (!superAdmin) {

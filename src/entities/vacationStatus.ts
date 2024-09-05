@@ -3,7 +3,7 @@ import { Vacation } from './vacation';
 
 export enum StatusTypes {
     Pending = 'pending',
-    Accepted = 'accepted',
+    Approved = 'approved',
     Rejected = 'rejected'
 }
 

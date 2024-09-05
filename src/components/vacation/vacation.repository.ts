@@ -23,7 +23,9 @@ export const findRequestsByEmployeeIdWithSkip = async (employeeId: number,skip: 
             .where('vacation.employeeId = :employeeId', { employeeId })
             .leftJoinAndSelect('vacation.employee', 'employee')
             .leftJoinAndSelect('vacation.status', 'status')
-            .leftJoinAndSelect('vacation.reason', 'reason');
+            .leftJoinAndSelect('vacation.reason', 'reason')
+            .leftJoinAndSelect('employee.role', 'role')
+            .leftJoinAndSelect('employee.team', 'team')
 
         if (column && order) {
             queryBuilder.orderBy(`vacation.${column}`, order);
@@ -103,11 +105,12 @@ export const findEmployeeById = async (employeeId: number) => {
     });
 };
 
-export const filterRequestsBySQL = async (sql: string, connection: Connection) => {
+export const filterRequestsBySQL = async (sql: string, values: any[], connection: Connection) => {
     try {
-        const result = await connection.query(sql);
+        const result = await connection.query(sql, values);
         return result;
     } catch (err) {
+        console.error("Error in filterRequestsBySQL:", err);
         throw new Error(`Error executing query: ${err.message}`);
     }
 };

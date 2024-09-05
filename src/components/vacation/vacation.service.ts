@@ -5,8 +5,9 @@ import { RoleTypes } from '../../entities/role';
 import { ReasonTypes } from '../../entities/reason';
 import { Connection } from 'typeorm';
 import { Vacation } from '../../entities/vacation';
+import { response } from 'express';
 
-export const fetchUserRequestsServiceByPages = async (employeeId: number,page: number,limit: number,column: string | null, order: 'ASC' | 'DESC' | null) => {
+export const fetchUserRequestsServiceByPages = async (employeeId: number,page: number,limit: number,column: string | null,order: 'ASC' | 'DESC' | null) => {
     try {
         const employee = await findEmployeeById(employeeId);
 
@@ -27,25 +28,22 @@ export const fetchUserRequestsServiceByPages = async (employeeId: number,page: n
         const finalRequests = requests.map((request: Vacation) => {
             const adjustedDateFrom = new Date(request.dateFrom);
             const adjustedDateTo = new Date(request.dateTo);
-            adjustedDateFrom.setHours(adjustedDateFrom.getHours() + 3);
-            adjustedDateTo.setHours(adjustedDateTo.getHours() + 3);
         
             return {
                 ...request,
                 date: `${adjustedDateFrom.getTime()},${adjustedDateTo.getTime()}`,
-                dateFrom: undefined, 
+                dateFrom: undefined,
                 dateTo: undefined,
             };
         });        
         
-        const cleanedRequests = finalRequests.map(({ dateFrom, dateTo, ...rest }) => rest);
-        
-        return { status: 200, response: cleanedRequests };
+        return { status: 200, response: finalRequests };
         
     } catch (error) {
         return { status: 500, response: { message: "Error fetching requests", error: error.message } };
     }
 };
+
 
 export const fetchUserRequestsService = async (employeeId: number) => {
     try {
@@ -73,19 +71,6 @@ export const fetchUserRequestsService = async (employeeId: number) => {
     }
 };
 
-export const fetchSingleRequest = async (requestId: number) => {
-    try {
-        const request = await requestRepository.findRequestById(requestId);
-        if (!request) {
-            return { status: 404, response: { message: "Request not found" } };
-        }
-
-        return { status: 200, response: { message: "Request fetched successfully", request } };
-    } catch (error) {
-        return { status: 500, response: { message: "Error fetching request", error: error.message } };
-    }
-};
-
 export const createRequestService = async (employeeId: number, dateFrom: Date, dateTo: Date, reason: ReasonTypes) => {
     try {
         const employee = await findEmployeeById(employeeId);
@@ -96,7 +81,7 @@ export const createRequestService = async (employeeId: number, dateFrom: Date, d
 
         let status;
         if (employee.role && employee.role.role === RoleTypes.SuperAdmin) {
-            status = await findVacationStatusByName(StatusTypes.Accepted);
+            status = await findVacationStatusByName(StatusTypes.Approved);
         } else {
             status = await findVacationStatusByName(StatusTypes.Pending);
         }
@@ -113,14 +98,13 @@ export const createRequestService = async (employeeId: number, dateFrom: Date, d
         const request = createVacationRequest(dateFrom, dateTo, reasonEntity, employee, status);
         await saveVacationRequest(request);
 
-        return { status: 201, response: { message: "Inserted a Request successfully", request } };
+        return { status: 201, response: { message: "Inserted a Request successfully"} };
     } catch (error) {
         return { status: 500, response: { message: "Internal Server Error", error: error.message } };
     }
 };
 
-
-export const updateUserRequestService = async (requestId: number,reviewerId?: number,dateFrom?: string,dateTo?: string,reason?: ReasonTypes,status?: VacationStatus) => {
+export const updateUserRequestService = async (requestId: number,reviewerId?: number,dateFrom?: string,dateTo?: string,reason?: ReasonTypes) => {
     try {
         const updateData: Partial<Vacation> = {};
 
@@ -147,10 +131,6 @@ export const updateUserRequestService = async (requestId: number,reviewerId?: nu
             updateData.reason = reasonEntity;
         }
 
-        if (status) {
-            updateData.status = status;
-        }
-
         if (reviewerId !== undefined) {
             updateData.reviewerId = reviewerId;
         }
@@ -159,6 +139,14 @@ export const updateUserRequestService = async (requestId: number,reviewerId?: nu
 
         if (!request) {
             return { status: 404, response: { message: "Request not found" } };
+        }
+
+        if(request.role.role == RoleTypes.SuperAdmin){
+            request.vacation.status.name = StatusTypes.Approved;
+        }
+        
+        if (request.vacation.status.name != StatusTypes.Pending){
+            return { status: 403, response: { message: "Cannot update this request" } };
         }
 
         await updateVacationRequest(request.vacation, updateData);
@@ -203,56 +191,37 @@ export const updateAdminRequestService = async (requestId: number, status: Statu
         }
 
         request.vacation.status = vacationStatus;
-        const updatedRequest = await saveVacationRequest(request.vacation);
-
-        return { status: 200, response: updatedRequest };
+        await saveVacationRequest(request.vacation);
+          
+        return { status: 200, response: {message: "Request updated successfully"} };
     } catch (error) {
         return { status: 500, response: { message: "Internal Server Error", error: error.message } };
     }
 };
 
-export const updateRequests = async (requestId: number, reviewerId: number, dateFrom: string, dateTo: string, reason: ReasonTypes) => {
+export const filterRequests = async (filters: any, connection: Connection) => {
     try {
-        const request = await requestRepository.findRequestById(requestId);
+        let sql = `SELECT * FROM Vacation WHERE `;
+        const filterKeys = Object.keys(filters);
+        const filterValues = Object.values(filters);
 
-        if (!request) {
-            return { status: 404, response: { message: "Request not found" } };
-        }
+        sql += filterKeys.map((key) => `${key} = ?`).join(' AND ');
 
-        const dateFromParsed = new Date(dateFrom);
-        const dateToParsed = new Date(dateTo);
-
-        if (isNaN(dateFromParsed.getTime()) || isNaN(dateToParsed.getTime())) {
-            return { status: 400, response: { message: "Invalid date format" } };
-        }
-
-        if (reviewerId !== undefined) request.reviewerId = reviewerId;
-        if (dateFromParsed !== undefined) request.dateFrom = dateFromParsed;
-        if (dateToParsed !== undefined) request.dateTo = dateToParsed;
-        if (reason) {
-            const reasonEntity = await findReasonByName(reason);
-            if (!reasonEntity) {
-                return { status: 404, response: { message: "Reason not found" } };
-            }
-            request.reason = reasonEntity;
-        }
-        await request.save();
-        return { status: 200, response: request };
+        const requests = await filterRequestsBySQL(sql, filterValues, connection);
+        const finalRequests = requests.map((request: Vacation) => {
+            const adjustedDateFrom = new Date(request.dateFrom);
+            const adjustedDateTo = new Date(request.dateTo);
+        
+            return {
+                ...request,
+                date: `${adjustedDateFrom.getTime()},${adjustedDateTo.getTime()}`,
+                dateFrom: undefined,
+                dateTo: undefined,
+            };
+        });  
+        return { status: 200, response: finalRequests };
     } catch (error) {
-        return { status: 500, response: { message: "Internal Server Error", error: error.message } };
-    }
-};
-
-
-export const filterRequests = async (key: string, value: string, connection: Connection) => {
-    try {
-
-        const sql = `SELECT * FROM Vacation WHERE ${key} = ?`;
-        const requests = filterRequestsBySQL(sql, connection);
-
-        return { status: 200, response: requests };
-    } catch (error) {
-        console.error('Error executing filterRequests:', error);
+        console.error("Error in filterRequests:", error);
         return { status: 500, response: { message: "Internal Server Error", error: error.message } };
     }
 };
@@ -265,7 +234,19 @@ export const getVacationsByTeam = async (teamId: number, connection: Connection)
             return { status: 404, data: "No vacation requests found for the specified team" };
         }
 
-        return { status: 200, data: vacations };
+        const finalRequests = vacations.map((request: Vacation) => {
+            const adjustedDateFrom = new Date(request.dateFrom);
+            const adjustedDateTo = new Date(request.dateTo);
+        
+            return {
+                ...request,
+                date: `${adjustedDateFrom.getTime()},${adjustedDateTo.getTime()}`,
+                dateFrom: undefined,
+                dateTo: undefined,
+            };
+        });  
+
+        return { status: 200, data: finalRequests };
     } catch (error) {
         console.error('Error in getVacationsByTeam service:', error);
         return { status: 500, data: "Internal Server Error" };
@@ -274,13 +255,25 @@ export const getVacationsByTeam = async (teamId: number, connection: Connection)
 
 export const getAllVacations = async (connection: Connection) => {
     try {
-        const vacations = await requestRepository.findAllRequests(connection);
+        let requests = await requestRepository.findAllRequests(connection);
 
-        if (vacations.length === 0) {
+        if (requests.length === 0) {
             return { status: 404, data: "No vacation requests found" };
         }
 
-        return { status: 200, data: vacations };
+        const finalRequests = requests.map((request: Vacation) => {
+            const adjustedDateFrom = new Date(request.dateFrom);
+            const adjustedDateTo = new Date(request.dateTo);
+        
+            return {
+                ...request,
+                date: `${adjustedDateFrom.getTime()},${adjustedDateTo.getTime()}`,
+                dateFrom: undefined,
+                dateTo: undefined,
+            };
+        });   
+
+        return { status: 200, data: finalRequests };
     } catch (error) {
         console.error('Error in getAllVacations service:', error);
         return { status: 500, data: "Internal Server Error" };
