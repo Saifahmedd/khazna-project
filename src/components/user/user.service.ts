@@ -6,7 +6,6 @@ import dotenv from 'dotenv';
 import { RoleTypes } from '../../entities/role';
 import { Vacation } from '../../entities/vacation';
 import * as vacationService from '../vacation/vacation.service';
-import { ReasonTypes } from '../../entities/reason';
 import { TeamType } from '../../entities/team';
 import { StatusTypes } from '../../entities/vacationStatus';
 
@@ -52,12 +51,12 @@ export const loginEmployee = async (email: string, password: string) => {
     try {
         const employee = await employeeRepository.findEmployeeByEmail(email);
         if (!employee) {
-            return { status: 401, message: "Incorrect email or password" };
+            return { status: 401, message: "Invalid Credentials" };
         }
 
         const isPasswordValid = await bcrypt.compare(password, employee.password);
         if (!isPasswordValid) {
-            return { status: 401, message: "Incorrect email or password" };
+            return { status: 401, message: "Invalid Credentials" };
         }
 
         const user = {

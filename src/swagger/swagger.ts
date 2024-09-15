@@ -152,7 +152,7 @@
  *                   type: string
  *                   example: Missing inputs
  *       401:
- *         description: Incorrect email or password
+ *         description: Invalid Credentials
  *         content:
  *           application/json:
  *             schema:
@@ -160,7 +160,7 @@
  *               properties:
  *                 message:
  *                   type: string
- *                   example: Incorrect email or password
+ *                   example: Invalid Credentials
  *       500:
  *         description: Internal server error
  *         content:

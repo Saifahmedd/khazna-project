@@ -32,16 +32,16 @@ export const registerEmployee = async (req: Request, res: Response) => {
         return res.status(400).json({ message: "Missing input" });
     }
 
-    if(!checkName(name)) {
+    if (!checkName(name)) {
         return res.status(400).json({ message: "Invalid name" });
     }
 
-    // if (!checkEmail(email)) {
-    //     return res.status(400).json({ message: "Invalid email" });
-    // }
+    if (!checkEmail(email)) {
+        return res.status(400).json({ message: "Invalid email" });
+    }
 
     if (!checkPhone(phonenumber)) {
-        return res.status(400).json({ message: "Invalid phonenumber" });
+        return res.status(400).json({ message: "Invalid phone number" });
     }
 
     try {
@@ -51,12 +51,13 @@ export const registerEmployee = async (req: Request, res: Response) => {
 
         // Send email with the generated password
         const transporter = nodemailer.createTransport({
-            service: 'gmail',
+            host: process.env.SMTP_HOST, // Your SMTP server host
+            port: parseInt(process.env.SMTP_PORT as string, 10), // Your SMTP server port
+            secure: process.env.SMTP_SECURE === 'true', // Use TLS/SSL
             auth: {
                 user: process.env.EMAIL_USER,
-                pass: process.env.EMAIL_PASSWORD
-            },
-            secure: true,
+                pass: process.env.EMAIL_PASSWORD 
+            }
         });
 
         const mailOptions = {

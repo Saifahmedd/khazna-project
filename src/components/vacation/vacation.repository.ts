@@ -17,19 +17,35 @@ export const findRequestsByEmployeeId = async (employeeId: number) => {
     return requests;
 };
 
-export const findRequestsByEmployeeIdWithSkip = async (employeeId: number,skip: number | null,take: number | null,column: string | null,order: 'ASC' | 'DESC' | null) => {
+export const findRequestsByEmployeeIdWithSkip = async (
+    employeeId: number,
+    skip: number | null,
+    take: number | null,
+    column: string | null,
+    order: 'ASC' | 'DESC' | null
+) => {
     try {
-        const queryBuilder = (Vacation).createQueryBuilder('vacation')
+        const currentYear = new Date().getFullYear();
+        const startOfYear = new Date(currentYear, 0, 1);
+        const endOfYear = new Date(currentYear, 11, 31, 23, 59, 59, 999);
+
+        const queryBuilder = Vacation.createQueryBuilder('vacation')
             .where('vacation.employeeId = :employeeId', { employeeId })
+            .andWhere('vacation.dateFrom BETWEEN :startOfYear AND :endOfYear', {
+                startOfYear,
+                endOfYear,
+            })
             .leftJoinAndSelect('vacation.employee', 'employee')
             .leftJoinAndSelect('vacation.status', 'status')
             .leftJoinAndSelect('vacation.reason', 'reason')
             .leftJoinAndSelect('employee.role', 'role')
-            .leftJoinAndSelect('employee.team', 'team')
+            .leftJoinAndSelect('employee.team', 'team');
 
-        if (column && order) {
-            queryBuilder.orderBy(`vacation.${column}`, order);
-        }
+        const sortOrder = order || 'DESC';
+
+        const sortColumn = column ? `vacation.${column}` : 'vacation.dateFrom';
+
+        queryBuilder.orderBy(sortColumn, sortOrder);
 
         if (skip && take) {
             queryBuilder.skip(skip);
@@ -43,6 +59,7 @@ export const findRequestsByEmployeeIdWithSkip = async (employeeId: number,skip: 
         return { status: 500, response: { message: "Error fetching requests", error: error.message } };
     }
 };
+
 
 export const findRequestById = async (id: number) => {
     return await Vacation.findOne({ where: { id } });
