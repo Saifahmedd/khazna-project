@@ -5,7 +5,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon src/main.ts",
-    "start": "node src/main.js"
+    "start": "node dist/src/main.js",
+    "build": "tsc -p tsconfig.json"
   },
   "author": "",
   "engines": {
