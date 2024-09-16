@@ -12,7 +12,7 @@ steps:
     args: ['app', 'deploy']
 
 # Configure logging (choose the appropriate option)
-build_options:
+options:
   logging: CLOUD_LOGGING_ONLY  # Logs only sent to Cloud Logging (limited details)
   # OR (if you have a GCS bucket for logs)
   # logging: REGIONAL_USER_OWNED_BUCKET  # Cloud B
