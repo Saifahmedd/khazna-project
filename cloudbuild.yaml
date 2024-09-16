@@ -1,7 +1,12 @@
 steps:
 - name: 'gcr.io/cloud-builders/npm'
-  args: ['install']
+  args: ['install']  # Installs project dependencies
+
 - name: 'gcr.io/cloud-builders/npm'
-  args: ['start']
+  args: ['start']  # Runs the 'start' script defined in package.json
+
+- name: 'gcr.io/cloud-builders/gcloud'
+  args: ['app', 'deploy']  # Deploys to App Engine
+
 options:
   logging: CLOUD_LOGGING_ONLY  # Configures logging for Cloud Logging only
