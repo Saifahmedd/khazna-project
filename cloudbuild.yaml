@@ -11,6 +11,5 @@ steps:
   - name: 'gcr.io/cloud-builders/gcloud'
     args: ['app', 'deploy']
 
-  # The Cloud Build service account needs to have access to the logs bucket
-  options:
-    logging: none
+option:
+  logging: none
