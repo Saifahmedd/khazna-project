@@ -3,9 +3,9 @@ steps:
   - name: 'gcr.io/cloud-builders/npm'
     args: ['install']
 
-  # Run tests
+  # Run tests (assuming your test script is named 'test.js')
   - name: 'gcr.io/cloud-builders/npm'
-    args: ['test']
+    args: ['test', 'main.ts']  # Replace 'test.js' with your actual test script name
 
   # Deploy to App Engine
   - name: 'gcr.io/cloud-builders/gcloud'
