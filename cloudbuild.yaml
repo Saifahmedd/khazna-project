@@ -9,4 +9,4 @@ steps:
   args: ['app', 'deploy']
 
 options:
-  logging: NONE
+  logging: CLOUD_LOGGING_ONLY
