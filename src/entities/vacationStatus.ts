@@ -24,3 +24,5 @@ export class VacationStatus extends BaseEntity {
     requests: Vacation[];
     StatusTypes: string;
 }
+
+
