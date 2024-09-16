@@ -11,5 +11,6 @@ steps:
   - name: 'gcr.io/cloud-builders/gcloud'
     args: ['app', 'deploy']
 
-build_options:
-  logging: NONE  # Replace with CLOUD_LOGGING_ONLY if needed
+build:  # Indent the entire build section
+  build_options:
+    logging: NONE  # Replace with CLOUD_LOGGING_ONLY if needed
