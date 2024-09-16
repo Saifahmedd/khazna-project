@@ -1,18 +1,16 @@
 steps:
-  # Install dependencies
-  - name: 'gcr.io/cloud-builders/npm'
-    args: ['install']
+- name: 'gcr.io/cloud-builders/npm'
+  args: ['install']  # Installs project dependencies
 
-  # Run tests (assuming your test script is named 'test.js')
-  - name: 'gcr.io/cloud-builders/npm'
-    args: ['test', 'main.ts']  # Replace 'test.js' with your actual test script name
+- name: 'gcr.io/cloud-builders/npm'
+  args: ['test']  # Runs your project's tests
+  # Handle potential test errors:
+  entrypoint: npm  # Use npm as the entrypoint for the step
+  # (Optional) Manage failures gracefully:
+  #   - Exit with a non-zero status code (e.g., `exit 1`) to trigger build failure
 
-  # Deploy to App Engine
-  - name: 'gcr.io/cloud-builders/gcloud'
-    args: ['app', 'deploy']
+- name: 'gcr.io/cloud-builders/gcloud'
+  args: ['app', 'deploy']  # Deploys to App Engine
 
-# Configure logging (choose the appropriate option)
 options:
-  logging: CLOUD_LOGGING_ONLY  # Logs only sent to Cloud Logging (limited details)
-  # OR (if you have a GCS bucket for logs)
-  # logging: REGIONAL_USER_OWNED_BUCKET  # Cloud B
+  logging: CLOUD_LOGGING_ONLY  # Configures logging for Cloud Logging only
