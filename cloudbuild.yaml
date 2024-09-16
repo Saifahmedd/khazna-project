@@ -11,6 +11,10 @@ steps:
   - name: 'gcr.io/cloud-builders/gcloud'
     args: ['app', 'deploy']
 
-build:  # Indent the entire build section
-  build_options:
-    logging: NONE  # Replace with CLOUD_LOGGING_ONLY if needed
+# Configure logging (choose the appropriate option)
+build_options:
+  logging: NONE  # No logs (not recommended for production)
+  # OR
+  logging: CLOUD_LOGGING_ONLY  # Logs only sent to Cloud Logging (limited details)
+  # OR (if you have a GCS bucket for logs)
+  # logging: REGIONAL_USER_OWNED_BUCKET  # Cloud B
