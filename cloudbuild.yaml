@@ -1,9 +1,12 @@
 steps:
 - name: 'gcr.io/cloud-builders/npm'
-  args: ['install']
+  args: ['install'] 
+
 - name: 'gcr.io/cloud-builders/npm'
   args: ['start']
 
-# Define options at the top level
+- name: 'gcr.io/cloud-builders/gcloud'
+  args: ['app', 'deploy']
+
 options:
   logging: CLOUD_LOGGING_ONLY
