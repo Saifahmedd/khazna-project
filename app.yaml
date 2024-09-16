@@ -1,3 +1,2 @@
 service: khaznaVacation
 runtime: nodejs20
-entrypoint: npm start
