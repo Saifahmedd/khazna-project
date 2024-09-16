@@ -36,9 +36,9 @@ export const registerEmployee = async (req: Request, res: Response) => {
         return res.status(400).json({ message: "Invalid name" });
     }
 
-    if (!checkEmail(email)) {
-        return res.status(400).json({ message: "Invalid email" });
-    }
+    // if (!checkEmail(email)) {
+    //     return res.status(400).json({ message: "Invalid email" });
+    // }
 
     if (!checkPhone(phonenumber)) {
         return res.status(400).json({ message: "Invalid phone number" });
@@ -49,22 +49,19 @@ export const registerEmployee = async (req: Request, res: Response) => {
 
         const password = crypto.randomBytes(8).toString('hex');
 
-        // Send email with the generated password
         const transporter = nodemailer.createTransport({
-            host: process.env.SMTP_HOST, // Your SMTP server host
-            port: parseInt(process.env.SMTP_PORT as string, 10), // Your SMTP server port
-            secure: process.env.SMTP_SECURE === 'true', // Use TLS/SSL
+            service: 'gmail',
             auth: {
                 user: process.env.EMAIL_USER,
-                pass: process.env.EMAIL_PASSWORD 
+                pass: process.env.EMAIL_PASSWORD
             }
         });
-
+        
         const mailOptions = {
             from: process.env.EMAIL_USER,
             to: email,
             subject: 'Your Account Password',
-            text: `Hello ${name},\n\nYour account has been created. Here is your password: ${password}\n\nPlease change it after logging in.\n\nLogin here: https://accounts.google.com\n\nBest regards,\n ${process.env.SuperAdminName}`
+            text: `Hello ${name},\n\nYour account has been created. Here is your password: ${password}\n\nPlease change it after logging in.\n\nLogin here: https://accounts.google.com\n\nBest regards,\n${process.env.SuperAdminName}`
         };
 
         await transporter.sendMail(mailOptions);

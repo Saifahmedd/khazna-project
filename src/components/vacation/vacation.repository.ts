@@ -41,15 +41,17 @@ export const findRequestsByEmployeeIdWithSkip = async (
             .leftJoinAndSelect('employee.role', 'role')
             .leftJoinAndSelect('employee.team', 'team');
 
-        const sortOrder = order || 'DESC';
-
-        const sortColumn = column ? `vacation.${column}` : 'vacation.dateFrom';
-
-        queryBuilder.orderBy(sortColumn, sortOrder);
-
-        if (skip && take) {
+        // Apply pagination if both skip and take are provided
+        if (typeof skip === 'number' && !isNaN(skip) && typeof take === 'number' && !isNaN(take)) {
             queryBuilder.skip(skip);
             queryBuilder.take(take);
+        }
+
+        // Apply sorting with default order by 'createdAt' descending
+        if (column && order) {
+            queryBuilder.orderBy(`vacation.${column}`, order);
+        } else {
+            queryBuilder.orderBy('vacation.createdAt', 'DESC');
         }
 
         const requests = await queryBuilder.getMany();
@@ -59,6 +61,8 @@ export const findRequestsByEmployeeIdWithSkip = async (
         return { status: 500, response: { message: "Error fetching requests", error: error.message } };
     }
 };
+
+
 
 
 export const findRequestById = async (id: number) => {

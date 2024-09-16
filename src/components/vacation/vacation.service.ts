@@ -37,7 +37,7 @@ export const fetchUserRequestsServiceByPages = async (employeeId: number,page: n
             };
         });        
         
-        return { status: 200, response: finalRequests };
+        return { status: 200, response: {data: finalRequests, count: response.length} };
         
     } catch (error) {
         return { status: 500, response: { message: "Error fetching requests", error: error.message } };
@@ -219,7 +219,7 @@ export const filterRequests = async (filters: any, connection: Connection) => {
                 dateTo: undefined,
             };
         });  
-        return { status: 200, response: finalRequests };
+        return { status: 200, response: { data: finalRequests, count: requests.length } };
     } catch (error) {
         console.error("Error in filterRequests:", error);
         return { status: 500, response: { message: "Internal Server Error", error: error.message } };

@@ -527,25 +527,31 @@
  *         content:
  *           application/json:
  *             schema:
- *               type: array
- *               items:
- *                 type: object
- *                 properties:
- *                   id:
- *                     type: integer
- *                     example: 1
- *                   employeeId:
- *                     type: integer
- *                     example: 1
- *                   status:
- *                     type: string
- *                     example: approved
- *                   date:
- *                     type: string
- *                     example: "1627849200000,1627935600000"
- *                   reason:
- *                     type: string
- *                     example: Vacation
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: integer
+ *                         example: 1
+ *                       employeeId:
+ *                         type: integer
+ *                         example: 1
+ *                       status:
+ *                         type: string
+ *                         example: approved
+ *                       date:
+ *                         type: string
+ *                         example: "1627849200000,1627935600000"
+ *                       reason:
+ *                         type: string
+ *                         example: Vacation
+ *                 count:
+ *                   type: integer
+ *                   example: 10
  *       400:
  *         description: Invalid input, such as missing or incorrectly formatted filters
  *         content:
@@ -620,25 +626,32 @@
  *         content:
  *           application/json:
  *             schema:
- *               type: array
- *               items:
- *                 type: object
- *                 properties:
- *                   id:
- *                     type: integer
- *                     example: 1
- *                   employeeId:
- *                     type: integer
- *                     example: 1
- *                   status:
- *                     type: string
- *                     example: accepted
- *                   date:
- *                     type: string
- *                     example: "1627849200000,1627935600000"
- *                   reason:
- *                     type: string
- *                     example: Vacation
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: integer
+ *                         example: 1
+ *                       employeeId:
+ *                         type: integer
+ *                         example: 1
+ *                       status:
+ *                         type: string
+ *                         example: accepted
+ *                       date:
+ *                         type: string
+ *                         description: Timestamp range for vacation
+ *                         example: "1627849200000,1627935600000"
+ *                       reason:
+ *                         type: string
+ *                         example: Vacation
+ *                 count:
+ *                   type: integer
+ *                   example: 3
  *       400:
  *         description: Invalid input, such as missing required parameters
  *         content:
@@ -671,7 +684,7 @@
  *                   example: "Internal Server Error"
  *                 error:
  *                   type: string
- *                   example: Error message
+ *                   example: "Error message"
  */
 //vacation/allVacations
 /**

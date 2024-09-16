@@ -108,7 +108,7 @@ export const createVacationRequest = async (req: Request, res: Response) => {
 };
 
 export const updateUserVacationRequest = async (req: Request, res: Response) => {
-    const { reviewerId, date, reason, status } = req.body;
+    const { reviewerId, date, reason } = req.body;
     const { requestId } = req.params;
 
     const [dateFrom, dateTo] = date.split(",").map(Number);

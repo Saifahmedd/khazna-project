@@ -1,0 +1,2 @@
+service: khaznaVacation
+runtime: nodejs20
