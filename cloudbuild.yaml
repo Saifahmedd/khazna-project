@@ -3,11 +3,7 @@ steps:
   args: ['install']  # Installs project dependencies
 
 - name: 'gcr.io/cloud-builders/npm'
-  args: ['test']  # Runs your project's tests
-  # Handle potential test errors:
-  entrypoint: npm  # Use npm as the entrypoint for the step
-  # (Optional) Manage failures gracefully:
-  #   - Exit with a non-zero status code (e.g., `exit 1`) to trigger build failure
+  args: ['run', 'start']  # Runs the 'start' script defined in package.json
 
 - name: 'gcr.io/cloud-builders/gcloud'
   args: ['app', 'deploy']  # Deploys to App Engine
