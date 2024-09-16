@@ -1,12 +1,10 @@
 steps:
-- name: 'gcr.io/cloud-builders/npm'  # Install dependencies (with force)
-  args: ['install', '--force']
-- name: 'gcr.io/cloud-builders/npm'  # Build for production
-  args: ['run', 'build', '--prod']
-
-- name: 'gcr.io/cloud-builders/gcloud'  # Deploy the application
+- name: 'gcr.io/cloud-builders/npm'
+  args: ['install']
+- name: 'gcr.io/cloud-builders/npm'
+  args: ['run', 'build']
+- name: 'gcr.io/cloud-builders/gcloud'
   args: ['app', 'deploy']
-  # Assuming deployment configuration is already set up in gcloud
 
 options:
-  logging: CLOUD_LOGGING_ONLY  # Only log to Cloud Logging
+  logging: CLOUD_LOGGING_ONLY
