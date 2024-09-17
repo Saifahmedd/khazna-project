@@ -4,7 +4,5 @@ steps:
 - name: 'gcr.io/cloud-builders/npm'
   args: ['run', 'build']
 
-images:
-- gcr.io/${PROJECT_ID}/Khazna-Project
 options:
   logging: CLOUD_LOGGING_ONLY
