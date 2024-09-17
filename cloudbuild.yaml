@@ -1,8 +1,10 @@
 steps:
 - name: 'gcr.io/cloud-builders/npm'
-  args: ['install']  # Install dependencies
+  args: ['install']
 - name: 'gcr.io/cloud-builders/npm'
-  args: ['run', 'build']  # Run your build command
+  args: ['run', 'build']
+- name: 'gcr.io/cloud-builders/gcloud'
+  args: ['app', 'deploy']
 
 options:
   logging: CLOUD_LOGGING_ONLY
