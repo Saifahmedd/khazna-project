@@ -1,7 +1,2 @@
-runtime: nodejs20
-
-entrypoint: src/main.ts
-
-handlers:
-- url: /
-  script: auto
+service: khaznaVacation
+runtime: nodejs
