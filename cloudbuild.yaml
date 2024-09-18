@@ -3,8 +3,9 @@ steps:
   args: ['install', '-g', 'typescript']
 - name: 'gcr.io/cloud-builders/npm'
   args: ['install']
-- name: 'gcr.io/cloud-builders/npm'
-  args: ['run', 'build']
+- name: 'bash'
+  script: |
+    npm run build
 - name: 'gcr.io/cloud-builders/gcloud'
   args: ['app', 'deploy']
 

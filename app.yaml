@@ -14,7 +14,6 @@ EMAIL_PASSWORD = "lsssmezaheetgmld"
 SuperAdminName = "Saif Ahmed"
 SMTP_HOST=smtp.khazna.app
 SMTP_PORT=587
-entrypoint: dist/src/main.js
 
 # Optional: Define handlers for specific routes
 handlers:
