@@ -6,4 +6,4 @@ steps:
 options:
   cache:
     paths: ['/root/.npm']
-  logging: VERBOSE
+  logging: CLOUD_LOGGING_ONLY
