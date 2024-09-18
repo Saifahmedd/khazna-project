@@ -4,7 +4,7 @@ steps:
 - name: 'gcr.io/cloud-builders/npm'
   args: ['install']
 - name: 'gcr.io/cloud-builders/npm'
-  args: ['run', 'tsc']  
+  args: ['run', 'tsc', '--outDir', 'dist']  # Compile TypeScript to a 'dist' directory
 - name: 'gcr.io/cloud-builders/gcloud'
   args: ['app', 'deploy']
   
