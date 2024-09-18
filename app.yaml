@@ -4,4 +4,3 @@ entrypoint: npm start
 handlers:
   - url: /.*
     script: auto
-
