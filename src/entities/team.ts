@@ -12,15 +12,15 @@ export enum TeamType {
 export class Team extends BaseEntity {
 
     @PrimaryGeneratedColumn()
-    id!: number;
+    id: number;
 
     @Column({
         type: "enum",
         enum: TeamType,
         default: TeamType.FRONTEND
     })
-    type!: TeamType;
+    type: TeamType;
 
     @OneToMany(() => Employee, employee => employee.team)
-    employees!: Employee[];
+    employees: Employee[];
 }

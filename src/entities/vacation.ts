@@ -7,30 +7,30 @@ import { Reason } from "./reason";
 export class Vacation extends BaseEntity {
 
     @PrimaryGeneratedColumn()
-    id!: number;
+    id: number;
 
     @ManyToOne(() => Employee, employee => employee.requests, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'employeeId' })
-    employee: Employee = new Employee;
+    employee: Employee;
 
     @Column({ type: 'int', nullable: true, default: null })
-    reviewerId!: number | null;
+    reviewerId: number | null;
 
     @ManyToOne(() => VacationStatus, status => status.requests, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'statusId' })
-    status: VacationStatus = new VacationStatus;
+    status: VacationStatus;
 
     @ManyToOne(() => Reason, reason => reason.vacations, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'reasonId' })
-    reason: Reason = new Reason;
+    reason: Reason;
 
     // Use 'timestamp' to ensure it's handled as a date in SQL
     @Column({ type: 'timestamp' })
-    dateFrom!: Date;
+    dateFrom: Date;
 
     @Column({ type: 'timestamp' })
-    dateTo!: Date;
+    dateTo: Date;
 
     @CreateDateColumn()
-    createdAt!: Date;
+    createdAt: Date;
 }

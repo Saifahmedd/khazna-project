@@ -7,31 +7,31 @@ import { Team } from "./team";
 export class Employee extends BaseEntity {
 
     @PrimaryGeneratedColumn()
-    id!: number;
+    id: number;
 
     @Column()
-    name!: string;
+    name: string;
 
     @Column({ unique: true })
-    email!: string;
+    email: string;
 
     @Column({ nullable: true })
-    password!: string;
+    password: string;
 
     @Column({ nullable: true })
-    phoneNumber!: string;
+    phoneNumber: string;
 
     @ManyToOne(() => Role, role => role.employees, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'roleId' })
-    role!: Role;
+    role: Role;
 
     @OneToMany(() => Vacation, vacation => vacation.employee, { cascade: true })
-    requests!: Vacation[];
+    requests: Vacation[];
 
     @ManyToOne(() => Team, team => team.employees, { nullable: true })
     @JoinColumn({ name: 'teamId' })
     team!: Team;
 
     @Column({ nullable: true })
-    avatarId!: number;
+    avatarId: number;
 }
