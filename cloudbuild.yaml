@@ -1,6 +1,6 @@
 steps:
 - name: 'gcr.io/cloud-builders/npm'
-  args: ['install', '-g', 'typescript']
+  args: ['install', '-g', 'typescript@5.5.3']
 - name: 'gcr.io/cloud-builders/npm'
   args: ['install']
 - name: 'bash'
