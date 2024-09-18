@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 import { createConnection, Connection } from 'typeorm';
 import { Employee } from './entities/employee';
-import { Role, RoleTypes } from './entities/role';
+import { Role } from './entities/role';
 import { Vacation } from './entities/vacation';
 import { Team } from './entities/team';
 import { VacationStatus } from './entities/vacationStatus';

@@ -11,18 +11,18 @@ export enum StatusTypes {
 export class VacationStatus extends BaseEntity {
 
     @PrimaryGeneratedColumn()
-    id: number;
+    id!: number;
 
     @Column({
         type: 'enum',
         enum: StatusTypes,
         default: StatusTypes.Pending
     })
-    name: StatusTypes;
+    name: StatusTypes = StatusTypes.Pending;
 
     @OneToMany(() => Vacation, vacation => vacation.status)
-    requests: Vacation[];
-    StatusTypes: string;
+    requests: Vacation[] = [];
+    StatusTypes!: string;
 }
 
 

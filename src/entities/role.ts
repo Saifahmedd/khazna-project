@@ -11,15 +11,15 @@ export enum RoleTypes {
 export class Role extends BaseEntity {
 
     @PrimaryGeneratedColumn()
-    id: number;
+    id!: number;
 
     @Column({
         type: "enum",
         enum: RoleTypes,
         default: RoleTypes.Employee
     })
-    role: RoleTypes;
+    role!: RoleTypes;
 
     @OneToMany(() => Employee, employee => employee.role)
-    employees: Employee[];
+    employees!: Employee[];
 }

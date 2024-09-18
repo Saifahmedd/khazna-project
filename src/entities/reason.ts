@@ -10,14 +10,14 @@ export enum ReasonTypes {
 @Entity('reason')
 export class Reason extends BaseEntity {
     @PrimaryGeneratedColumn()
-    id: number;
+    id!: number;
 
     @Column({
         type: "enum",
         enum: ReasonTypes
     })
-    name: ReasonTypes;
+    name!: ReasonTypes;
 
     @OneToMany(() => Vacation, vacation => vacation.reason)
-    vacations: Vacation[];
+    vacations!: Vacation[];
 }
