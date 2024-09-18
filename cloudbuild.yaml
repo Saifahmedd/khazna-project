@@ -1,12 +1,10 @@
 steps:
-- name: 'gcr.io/cloud-builders/npm'
-  args: ['install', '-g', 'typescript']
-- name: 'gcr.io/cloud-builders/npm'
-  args: ['install']
-- name: 'gcr.io/cloud-builders/npm'
-  args: ['run', 'build']
-- name: 'gcr.io/cloud-builders/gcloud'
-  args: ['app', 'deploy']
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '-t', 'us-docker.pkg.dev/cloudrun/container/khazna-project', '.']
+- name: 'gcr.io/cloudrun/container/push'
+  args: ['us-docker.pkg.dev/cloudrun/container/khazna-project']
+- name: 'gcr.io/cloudrun/container/deploy'
+  args: ['us-central1', 'khazna-project', '--image', 'us-docker.pkg.dev/cloudrun/container/khazna-project', '--platform', 'managed']
 
 options:
   logging: CLOUD_LOGGING_ONLY

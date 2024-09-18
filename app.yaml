@@ -1,2 +1,22 @@
 runtime: nodejs18
 entrypoint: dist/src/main.js
+
+# Optional: Configure environment variables
+env_variables:
+ACCESS_TOKEN_SECRET="fa71042126d8287538"
+DB_HOST="localhost"
+DB_PORT=3306
+DB_USERNAME=root
+DB_PASSWORD=root123
+DB_DATABASE=khazna-db
+EMAIL_USER = "saifahmedsalah11@gmail.com"
+EMAIL_PASSWORD = "lsssmezaheetgmld"
+SuperAdminName = "Saif Ahmed"
+SMTP_HOST=smtp.khazna.app
+SMTP_PORT=587
+SMTP_SECURE=false
+
+# Optional: Define handlers for specific routes
+handlers:
+- url: /.*
+  script: auto
