@@ -53,7 +53,9 @@ const main = async () => {
         };
 
         const swaggerSpec = swaggerJSDoc(swaggerOptions);
-
+        app.get('/', (req, res) => {
+            res.send('Hello World!');
+        });
         // Swagger docs
         app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
