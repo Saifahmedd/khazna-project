@@ -18,7 +18,7 @@ dotenv.config({ path: 'C:/Users/hp/Desktop/khazna-project/src/.env' });
 
 const app = express();
 let connection: Connection;
-app.use(cors());
+app.use(cors({ origin: '*' })); // Allow all origins for testing
 const main = async () => {
     try {
         connection = await createConnection({
@@ -45,7 +45,7 @@ const main = async () => {
                 },
                 servers: [
                     {
-                        url: 'http://localhost:8080/',
+                        url: 'http://localhost:3000/',
                     },
                 ],
             },
@@ -57,7 +57,7 @@ const main = async () => {
             res.send('Hello World!');
         });
         // Swagger docs
-        app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+        //app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
         // const outputFile = path.resolve(__dirname, 'swagger.json');
         // fs.writeFileSync(outputFile, JSON.stringify(swaggerSpec, null, 2));
@@ -67,8 +67,8 @@ const main = async () => {
         app.use(userRoutes); // User Endpoints
         app.use(vacationRoutes); // Vacation Endpoints
         
-        app.listen(8080, () => {
-            console.log(`Server running on http://localhost:8080`);
+        app.listen(3000, () => {
+            console.log(`Server running on http://localhost:3000`);
         });
     } catch (error) {
         console.error("Error connecting to database:", error);
