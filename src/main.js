@@ -8,112 +8,76 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __generator = (this && this.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g = Object.create((typeof Iterator === "function" ? Iterator : Object).prototype);
-    return g.next = verb(0), g["throw"] = verb(1), g["return"] = verb(2), typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-    function verb(n) { return function (v) { return step([n, v]); }; }
-    function step(op) {
-        if (f) throw new TypeError("Generator is already executing.");
-        while (g && (g = 0, op[0] && (_ = 0)), _) try {
-            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [op[0] & 2, t.value];
-            switch (op[0]) {
-                case 0: case 1: t = op; break;
-                case 4: _.label++; return { value: op[1], done: false };
-                case 5: _.label++; y = op[1]; op = [0]; continue;
-                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-                    if (t[2]) _.ops.pop();
-                    _.trys.pop(); continue;
-            }
-            op = body.call(thisArg, _);
-        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
-    }
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.connection = void 0;
-var dotenv_1 = require("dotenv");
-var typeorm_1 = require("typeorm");
-var employee_1 = require("./entities/employee");
-var role_1 = require("./entities/role");
-var vacation_1 = require("./entities/vacation");
-var team_1 = require("./entities/team");
-var vacationStatus_1 = require("./entities/vacationStatus");
-var express_1 = require("express");
-var vacation_routes_1 = require("./components/vacation/vacation.routes");
-var user_routes_1 = require("./components/user/user.routes");
-var authenticateToken_1 = require("../middleware/authenticateToken");
-var swagger_jsdoc_1 = require("swagger-jsdoc");
-var swagger_ui_express_1 = require("swagger-ui-express");
-var constants_1 = require("./constants");
-var cors_1 = require("cors");
-var reason_1 = require("./entities/reason");
+const dotenv_1 = __importDefault(require("dotenv"));
+const typeorm_1 = require("typeorm");
+const employee_1 = require("./entities/employee");
+const role_1 = require("./entities/role");
+const vacation_1 = require("./entities/vacation");
+const team_1 = require("./entities/team");
+const vacationStatus_1 = require("./entities/vacationStatus");
+const express_1 = __importDefault(require("express"));
+const vacation_routes_1 = require("./components/vacation/vacation.routes");
+const user_routes_1 = require("./components/user/user.routes");
+const authenticateToken_1 = require("../middleware/authenticateToken");
+const swagger_jsdoc_1 = __importDefault(require("swagger-jsdoc"));
+const swagger_ui_express_1 = __importDefault(require("swagger-ui-express"));
+const constants_1 = require("./constants");
+const cors_1 = __importDefault(require("cors"));
+const reason_1 = require("./entities/reason");
 dotenv_1.default.config({ path: 'C:/Users/hp/Desktop/khazna-project/src/.env' });
-var app = (0, express_1.default)();
-var connection;
+const app = (0, express_1.default)();
+let connection;
 app.use((0, cors_1.default)());
-var main = function () { return __awaiter(void 0, void 0, void 0, function () {
-    var swaggerOptions, swaggerSpec, error_1;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0:
-                _a.trys.push([0, 3, , 4]);
-                return [4 /*yield*/, (0, typeorm_1.createConnection)({
-                        type: 'mysql',
-                        host: "localhost",
-                        port: 3306,
-                        username: "root",
-                        password: "root123",
-                        database: 'khazna-db',
-                        entities: [employee_1.Employee, role_1.Role, vacation_1.Vacation, vacationStatus_1.VacationStatus, team_1.Team, reason_1.Reason],
-                        synchronize: true,
-                    })];
-            case 1:
-                exports.connection = connection = _a.sent();
-                console.log("Connected to MySQL database");
-                return [4 /*yield*/, (0, constants_1.initializeData)(connection)];
-            case 2:
-                _a.sent();
-                swaggerOptions = {
-                    definition: {
-                        openapi: '3.0.0',
-                        info: {
-                            title: 'Khazna API Project',
-                            version: '1.0.0',
-                        },
-                        servers: [
-                            {
-                                url: 'http://localhost:8080/',
-                            },
-                        ],
+const main = () => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        exports.connection = connection = yield (0, typeorm_1.createConnection)({
+            type: 'mysql',
+            host: "localhost",
+            port: 3306,
+            username: "root",
+            password: "root123",
+            database: 'khazna-db',
+            entities: [employee_1.Employee, role_1.Role, vacation_1.Vacation, vacationStatus_1.VacationStatus, team_1.Team, reason_1.Reason],
+            synchronize: true,
+        });
+        console.log("Connected to MySQL database");
+        yield (0, constants_1.initializeData)(connection);
+        const swaggerOptions = {
+            definition: {
+                openapi: '3.0.0',
+                info: {
+                    title: 'Khazna API Project',
+                    version: '1.0.0',
+                },
+                servers: [
+                    {
+                        url: 'http://localhost:8080/',
                     },
-                    apis: ['./src/swagger/*.ts'],
-                };
-                swaggerSpec = (0, swagger_jsdoc_1.default)(swaggerOptions);
-                // Swagger docs
-                app.use('/api/docs', swagger_ui_express_1.default.serve, swagger_ui_express_1.default.setup(swaggerSpec));
-                // const outputFile = path.resolve(__dirname, 'swagger.json');
-                // fs.writeFileSync(outputFile, JSON.stringify(swaggerSpec, null, 2));
-                app.use(express_1.default.json());
-                app.use(authenticateToken_1.authenticateToken); // Middleware Token
-                app.use(user_routes_1.userRoutes); // User Endpoints
-                app.use(vacation_routes_1.vacationRoutes); // Vacation Endpoints
-                app.listen(8080, function () {
-                    console.log("Server running on http://localhost:8080");
-                });
-                return [3 /*break*/, 4];
-            case 3:
-                error_1 = _a.sent();
-                console.error("Error connecting to database:", error_1);
-                return [3 /*break*/, 4];
-            case 4: return [2 /*return*/];
-        }
-    });
-}); };
+                ],
+            },
+            apis: ['./src/swagger/*.ts'],
+        };
+        const swaggerSpec = (0, swagger_jsdoc_1.default)(swaggerOptions);
+        // Swagger docs
+        app.use('/api/docs', swagger_ui_express_1.default.serve, swagger_ui_express_1.default.setup(swaggerSpec));
+        // const outputFile = path.resolve(__dirname, 'swagger.json');
+        // fs.writeFileSync(outputFile, JSON.stringify(swaggerSpec, null, 2));
+        app.use(express_1.default.json());
+        app.use(authenticateToken_1.authenticateToken); // Middleware Token
+        app.use(user_routes_1.userRoutes); // User Endpoints
+        app.use(vacation_routes_1.vacationRoutes); // Vacation Endpoints
+        app.listen(8080, () => {
+            console.log(`Server running on http://localhost:8080`);
+        });
+    }
+    catch (error) {
+        console.error("Error connecting to database:", error);
+    }
+});
 main();
 exports.default = app;

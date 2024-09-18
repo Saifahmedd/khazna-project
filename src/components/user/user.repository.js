@@ -1,30 +1,30 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.findTeamByTeamType = exports.findRoleByRoleName = exports.deleteEmployee = exports.saveEmployee = exports.findEmployeeById = exports.findEmployeeByEmail = void 0;
-var employee_1 = require("../../entities/employee");
-var role_1 = require("../../entities/role");
-var team_1 = require("../../entities/team");
-var findEmployeeByEmail = function (email) {
-    return employee_1.Employee.findOne({ where: { email: email }, relations: ['role'] });
+const employee_1 = require("../../entities/employee");
+const role_1 = require("../../entities/role");
+const team_1 = require("../../entities/team");
+const findEmployeeByEmail = (email) => {
+    return employee_1.Employee.findOne({ where: { email }, relations: ['role'] });
 };
 exports.findEmployeeByEmail = findEmployeeByEmail;
-var findEmployeeById = function (employeeId) {
+const findEmployeeById = (employeeId) => {
     return employee_1.Employee.findOne({ where: { id: employeeId }, relations: ['role', 'team'] });
 };
 exports.findEmployeeById = findEmployeeById;
-var saveEmployee = function (employee) {
+const saveEmployee = (employee) => {
     return employee_1.Employee.save(employee);
 };
 exports.saveEmployee = saveEmployee;
-var deleteEmployee = function (employee) {
+const deleteEmployee = (employee) => {
     return employee_1.Employee.remove(employee);
 };
 exports.deleteEmployee = deleteEmployee;
-var findRoleByRoleName = function (role) {
-    return role_1.Role.findOneBy({ role: role });
+const findRoleByRoleName = (role) => {
+    return role_1.Role.findOneBy({ role });
 };
 exports.findRoleByRoleName = findRoleByRoleName;
-var findTeamByTeamType = function (team) {
+const findTeamByTeamType = (team) => {
     return team_1.Team.findOneBy({ type: team });
 };
 exports.findTeamByTeamType = findTeamByTeamType;

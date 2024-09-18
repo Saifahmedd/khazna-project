@@ -1,19 +1,4 @@
 "use strict";
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        if (typeof b !== "function" && b !== null)
-            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 var __esDecorate = (this && this.__esDecorate) || function (ctor, descriptorIn, decorators, contextIn, initializers, extraInitializers) {
     function accept(f) { if (f !== void 0 && typeof f !== "function") throw new TypeError("Function expected"); return f; }
     var kind = contextIn.kind, key = kind === "getter" ? "get" : kind === "setter" ? "set" : "value";
@@ -54,60 +39,57 @@ var __setFunctionName = (this && this.__setFunctionName) || function (f, name, p
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Role = exports.RoleTypes = void 0;
-var typeorm_1 = require("typeorm");
-var employee_1 = require("./employee");
+const typeorm_1 = require("typeorm");
+const employee_1 = require("./employee");
 var RoleTypes;
 (function (RoleTypes) {
     RoleTypes["SuperAdmin"] = "superadmin";
     RoleTypes["Admin"] = "admin";
     RoleTypes["Employee"] = "employee";
 })(RoleTypes || (exports.RoleTypes = RoleTypes = {}));
-var Role = function () {
-    var _classDecorators = [(0, typeorm_1.Entity)('role')];
-    var _classDescriptor;
-    var _classExtraInitializers = [];
-    var _classThis;
-    var _classSuper = typeorm_1.BaseEntity;
-    var _id_decorators;
-    var _id_initializers = [];
-    var _id_extraInitializers = [];
-    var _role_decorators;
-    var _role_initializers = [];
-    var _role_extraInitializers = [];
-    var _employees_decorators;
-    var _employees_initializers = [];
-    var _employees_extraInitializers = [];
-    var Role = _classThis = /** @class */ (function (_super) {
-        __extends(Role_1, _super);
-        function Role_1() {
-            var _this = _super !== null && _super.apply(this, arguments) || this;
-            _this.id = __runInitializers(_this, _id_initializers, void 0);
-            _this.role = (__runInitializers(_this, _id_extraInitializers), __runInitializers(_this, _role_initializers, void 0));
-            _this.employees = (__runInitializers(_this, _role_extraInitializers), __runInitializers(_this, _employees_initializers, void 0));
-            __runInitializers(_this, _employees_extraInitializers);
-            return _this;
+let Role = (() => {
+    let _classDecorators = [(0, typeorm_1.Entity)('role')];
+    let _classDescriptor;
+    let _classExtraInitializers = [];
+    let _classThis;
+    let _classSuper = typeorm_1.BaseEntity;
+    let _id_decorators;
+    let _id_initializers = [];
+    let _id_extraInitializers = [];
+    let _role_decorators;
+    let _role_initializers = [];
+    let _role_extraInitializers = [];
+    let _employees_decorators;
+    let _employees_initializers = [];
+    let _employees_extraInitializers = [];
+    var Role = _classThis = class extends _classSuper {
+        constructor() {
+            super(...arguments);
+            this.id = __runInitializers(this, _id_initializers, void 0);
+            this.role = (__runInitializers(this, _id_extraInitializers), __runInitializers(this, _role_initializers, void 0));
+            this.employees = (__runInitializers(this, _role_extraInitializers), __runInitializers(this, _employees_initializers, void 0));
+            __runInitializers(this, _employees_extraInitializers);
         }
-        return Role_1;
-    }(_classSuper));
+    };
     __setFunctionName(_classThis, "Role");
-    (function () {
+    (() => {
         var _a;
-        var _metadata = typeof Symbol === "function" && Symbol.metadata ? Object.create((_a = _classSuper[Symbol.metadata]) !== null && _a !== void 0 ? _a : null) : void 0;
+        const _metadata = typeof Symbol === "function" && Symbol.metadata ? Object.create((_a = _classSuper[Symbol.metadata]) !== null && _a !== void 0 ? _a : null) : void 0;
         _id_decorators = [(0, typeorm_1.PrimaryGeneratedColumn)()];
         _role_decorators = [(0, typeorm_1.Column)({
                 type: "enum",
                 enum: RoleTypes,
                 default: RoleTypes.Employee
             })];
-        _employees_decorators = [(0, typeorm_1.OneToMany)(function () { return employee_1.Employee; }, function (employee) { return employee.role; })];
-        __esDecorate(null, null, _id_decorators, { kind: "field", name: "id", static: false, private: false, access: { has: function (obj) { return "id" in obj; }, get: function (obj) { return obj.id; }, set: function (obj, value) { obj.id = value; } }, metadata: _metadata }, _id_initializers, _id_extraInitializers);
-        __esDecorate(null, null, _role_decorators, { kind: "field", name: "role", static: false, private: false, access: { has: function (obj) { return "role" in obj; }, get: function (obj) { return obj.role; }, set: function (obj, value) { obj.role = value; } }, metadata: _metadata }, _role_initializers, _role_extraInitializers);
-        __esDecorate(null, null, _employees_decorators, { kind: "field", name: "employees", static: false, private: false, access: { has: function (obj) { return "employees" in obj; }, get: function (obj) { return obj.employees; }, set: function (obj, value) { obj.employees = value; } }, metadata: _metadata }, _employees_initializers, _employees_extraInitializers);
+        _employees_decorators = [(0, typeorm_1.OneToMany)(() => employee_1.Employee, employee => employee.role)];
+        __esDecorate(null, null, _id_decorators, { kind: "field", name: "id", static: false, private: false, access: { has: obj => "id" in obj, get: obj => obj.id, set: (obj, value) => { obj.id = value; } }, metadata: _metadata }, _id_initializers, _id_extraInitializers);
+        __esDecorate(null, null, _role_decorators, { kind: "field", name: "role", static: false, private: false, access: { has: obj => "role" in obj, get: obj => obj.role, set: (obj, value) => { obj.role = value; } }, metadata: _metadata }, _role_initializers, _role_extraInitializers);
+        __esDecorate(null, null, _employees_decorators, { kind: "field", name: "employees", static: false, private: false, access: { has: obj => "employees" in obj, get: obj => obj.employees, set: (obj, value) => { obj.employees = value; } }, metadata: _metadata }, _employees_initializers, _employees_extraInitializers);
         __esDecorate(null, _classDescriptor = { value: _classThis }, _classDecorators, { kind: "class", name: _classThis.name, metadata: _metadata }, null, _classExtraInitializers);
         Role = _classThis = _classDescriptor.value;
         if (_metadata) Object.defineProperty(_classThis, Symbol.metadata, { enumerable: true, configurable: true, writable: true, value: _metadata });
         __runInitializers(_classThis, _classExtraInitializers);
     })();
     return Role = _classThis;
-}();
+})();
 exports.Role = Role;

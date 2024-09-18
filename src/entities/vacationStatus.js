@@ -1,19 +1,4 @@
 "use strict";
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        if (typeof b !== "function" && b !== null)
-            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 var __esDecorate = (this && this.__esDecorate) || function (ctor, descriptorIn, decorators, contextIn, initializers, extraInitializers) {
     function accept(f) { if (f !== void 0 && typeof f !== "function") throw new TypeError("Function expected"); return f; }
     var kind = contextIn.kind, key = kind === "getter" ? "get" : kind === "setter" ? "set" : "value";
@@ -54,60 +39,57 @@ var __setFunctionName = (this && this.__setFunctionName) || function (f, name, p
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.VacationStatus = exports.StatusTypes = void 0;
-var typeorm_1 = require("typeorm");
-var vacation_1 = require("./vacation");
+const typeorm_1 = require("typeorm");
+const vacation_1 = require("./vacation");
 var StatusTypes;
 (function (StatusTypes) {
     StatusTypes["Pending"] = "pending";
     StatusTypes["Approved"] = "approved";
     StatusTypes["Rejected"] = "rejected";
 })(StatusTypes || (exports.StatusTypes = StatusTypes = {}));
-var VacationStatus = function () {
-    var _classDecorators = [(0, typeorm_1.Entity)('vacation_status')];
-    var _classDescriptor;
-    var _classExtraInitializers = [];
-    var _classThis;
-    var _classSuper = typeorm_1.BaseEntity;
-    var _id_decorators;
-    var _id_initializers = [];
-    var _id_extraInitializers = [];
-    var _name_decorators;
-    var _name_initializers = [];
-    var _name_extraInitializers = [];
-    var _requests_decorators;
-    var _requests_initializers = [];
-    var _requests_extraInitializers = [];
-    var VacationStatus = _classThis = /** @class */ (function (_super) {
-        __extends(VacationStatus_1, _super);
-        function VacationStatus_1() {
-            var _this = _super !== null && _super.apply(this, arguments) || this;
-            _this.id = __runInitializers(_this, _id_initializers, void 0);
-            _this.name = (__runInitializers(_this, _id_extraInitializers), __runInitializers(_this, _name_initializers, void 0));
-            _this.requests = (__runInitializers(_this, _name_extraInitializers), __runInitializers(_this, _requests_initializers, void 0));
-            _this.StatusTypes = __runInitializers(_this, _requests_extraInitializers);
-            return _this;
+let VacationStatus = (() => {
+    let _classDecorators = [(0, typeorm_1.Entity)('vacation_status')];
+    let _classDescriptor;
+    let _classExtraInitializers = [];
+    let _classThis;
+    let _classSuper = typeorm_1.BaseEntity;
+    let _id_decorators;
+    let _id_initializers = [];
+    let _id_extraInitializers = [];
+    let _name_decorators;
+    let _name_initializers = [];
+    let _name_extraInitializers = [];
+    let _requests_decorators;
+    let _requests_initializers = [];
+    let _requests_extraInitializers = [];
+    var VacationStatus = _classThis = class extends _classSuper {
+        constructor() {
+            super(...arguments);
+            this.id = __runInitializers(this, _id_initializers, void 0);
+            this.name = (__runInitializers(this, _id_extraInitializers), __runInitializers(this, _name_initializers, void 0));
+            this.requests = (__runInitializers(this, _name_extraInitializers), __runInitializers(this, _requests_initializers, void 0));
+            this.StatusTypes = __runInitializers(this, _requests_extraInitializers);
         }
-        return VacationStatus_1;
-    }(_classSuper));
+    };
     __setFunctionName(_classThis, "VacationStatus");
-    (function () {
+    (() => {
         var _a;
-        var _metadata = typeof Symbol === "function" && Symbol.metadata ? Object.create((_a = _classSuper[Symbol.metadata]) !== null && _a !== void 0 ? _a : null) : void 0;
+        const _metadata = typeof Symbol === "function" && Symbol.metadata ? Object.create((_a = _classSuper[Symbol.metadata]) !== null && _a !== void 0 ? _a : null) : void 0;
         _id_decorators = [(0, typeorm_1.PrimaryGeneratedColumn)()];
         _name_decorators = [(0, typeorm_1.Column)({
                 type: 'enum',
                 enum: StatusTypes,
                 default: StatusTypes.Pending
             })];
-        _requests_decorators = [(0, typeorm_1.OneToMany)(function () { return vacation_1.Vacation; }, function (vacation) { return vacation.status; })];
-        __esDecorate(null, null, _id_decorators, { kind: "field", name: "id", static: false, private: false, access: { has: function (obj) { return "id" in obj; }, get: function (obj) { return obj.id; }, set: function (obj, value) { obj.id = value; } }, metadata: _metadata }, _id_initializers, _id_extraInitializers);
-        __esDecorate(null, null, _name_decorators, { kind: "field", name: "name", static: false, private: false, access: { has: function (obj) { return "name" in obj; }, get: function (obj) { return obj.name; }, set: function (obj, value) { obj.name = value; } }, metadata: _metadata }, _name_initializers, _name_extraInitializers);
-        __esDecorate(null, null, _requests_decorators, { kind: "field", name: "requests", static: false, private: false, access: { has: function (obj) { return "requests" in obj; }, get: function (obj) { return obj.requests; }, set: function (obj, value) { obj.requests = value; } }, metadata: _metadata }, _requests_initializers, _requests_extraInitializers);
+        _requests_decorators = [(0, typeorm_1.OneToMany)(() => vacation_1.Vacation, vacation => vacation.status)];
+        __esDecorate(null, null, _id_decorators, { kind: "field", name: "id", static: false, private: false, access: { has: obj => "id" in obj, get: obj => obj.id, set: (obj, value) => { obj.id = value; } }, metadata: _metadata }, _id_initializers, _id_extraInitializers);
+        __esDecorate(null, null, _name_decorators, { kind: "field", name: "name", static: false, private: false, access: { has: obj => "name" in obj, get: obj => obj.name, set: (obj, value) => { obj.name = value; } }, metadata: _metadata }, _name_initializers, _name_extraInitializers);
+        __esDecorate(null, null, _requests_decorators, { kind: "field", name: "requests", static: false, private: false, access: { has: obj => "requests" in obj, get: obj => obj.requests, set: (obj, value) => { obj.requests = value; } }, metadata: _metadata }, _requests_initializers, _requests_extraInitializers);
         __esDecorate(null, _classDescriptor = { value: _classThis }, _classDecorators, { kind: "class", name: _classThis.name, metadata: _metadata }, null, _classExtraInitializers);
         VacationStatus = _classThis = _classDescriptor.value;
         if (_metadata) Object.defineProperty(_classThis, Symbol.metadata, { enumerable: true, configurable: true, writable: true, value: _metadata });
         __runInitializers(_classThis, _classExtraInitializers);
     })();
     return VacationStatus = _classThis;
-}();
+})();
 exports.VacationStatus = VacationStatus;
