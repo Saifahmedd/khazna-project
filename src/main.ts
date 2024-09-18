@@ -23,11 +23,11 @@ const main = async () => {
     try {
         connection = await createConnection({
             type: 'mysql',
-            host: "localhost",
-            port: 3306,
-            username: "root",
-            password: "root123",
-            database: 'khazna-db',
+            host: process.env.DB_HOST,
+            port: Number(process.env.DB_PORT) || 3306,
+            username: process.env.DB_USERNAME,
+            password: process.env.DB_PASSWORD,
+            database: process.env.DB_DATABASE,
             entities: [Employee, Role, Vacation, VacationStatus, Team, Reason],
             synchronize: true,
         });
@@ -54,6 +54,7 @@ const main = async () => {
 
         const swaggerSpec = swaggerJSDoc(swaggerOptions);
         app.get('/', (req, res) => {
+            console.log("Hello World");
             res.send('Hello World!');
         });
         // Swagger docs
