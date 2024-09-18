@@ -3,7 +3,13 @@ steps:
   args: ['npm', 'install', '-g', 'typescript@5.5.3', '--production']
 - name: 'node:16'
   args: ['npm', 'run', 'tsc']
+- name: 'gcr.io/cloud-builders/npm'
+  args: ['run', 'tsc', '--outDir', 'dist']  # Compile TypeScript to a 'dist' directory
+- name: 'gcr.io/cloud-builders/gcloud'
+  args: ['app', 'deploy']
+  
+
 options:
-  cache:
-    paths: ['/root/.npm']
   logging: CLOUD_LOGGING_ONLY
+  env:
+  - TSC_USER_ENABLED=1
