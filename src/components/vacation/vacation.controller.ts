@@ -25,6 +25,10 @@ export const filterVacationRequests = async (req: Request, res: Response) => {
         if (filters.date) {
             const [dateFrom, dateTo] = (filters.date as string).split(",").map(Number);
 
+            if (dateFrom === undefined || dateTo === undefined) {
+                return res.status(400).json({ message: "Both dateFrom and dateTo are required" });
+            }
+
             const dateFromObj = new Date(dateFrom);
             const dateToObj = new Date(dateTo);
 
@@ -43,7 +47,8 @@ export const filterVacationRequests = async (req: Request, res: Response) => {
         const result = await filterRequests(filters, connection);
         return res.status(result.status).json(result.response);
     } catch (error) {
-        return res.status(500).json({ message: "Internal Server Error", error: error.message });
+        const errorMessage = (error instanceof Error) ? error.message : "Unknown error";
+        return res.status(500).json({ message: "Internal Server Error", error: errorMessage });
     }
 };
 
@@ -74,11 +79,12 @@ export const getUserVacationRequests = async (req: Request, res: Response) => {
     try {
         const orderType = (order?.toUpperCase() === 'ASC' || order?.toUpperCase() === 'DESC') ? order.toUpperCase() as 'ASC' | 'DESC' : null;
 
-        const result = await fetchUserRequestsServiceByPages(parseInt(employeeId), parseInt(page), parseInt(limit), column, orderType);
+        const result = await fetchUserRequestsServiceByPages(parseInt(employeeId), parseInt(page || '0'), parseInt(limit || '0'), column || '', orderType);
         
         return res.status(result.status).json(result.response);
     } catch (error) {
-        return res.status(500).json({ message: "Internal Server Error", error: error.message });
+        const errorMessage = (error instanceof Error) ? error.message : "Unknown error";
+        return res.status(500).json({ message: "Internal Server Error", error: errorMessage });
     }
 };
 
@@ -131,7 +137,8 @@ export const updateUserVacationRequest = async (req: Request, res: Response) => 
         const result = await updateUserRequestService(parseInt(requestId), reviewerId, formattedDateFrom, formattedDateTo, reason);
         return res.status(result.status).json(result.response);
     } catch (error) {
-        return res.status(500).json({ message: "Internal Server Error", error: error.message });
+        const errorMessage = (error instanceof Error) ? error.message : "Unknown error";
+        return res.status(500).json({ message: "Internal Server Error", error: errorMessage });
     }
 };
 
@@ -146,7 +153,8 @@ export const deleteVacationRequest = async (req: Request, res: Response) => {
         const result = await deleteUserRequestService(parseInt(requestId, 10));
         return res.status(result.status).json(result.response);
     } catch (error) {
-        return res.status(500).json({ message: "Internal Server Error", error: error.message });
+        const errorMessage = (error instanceof Error) ? error.message : "Unknown error";
+        return res.status(500).json({ message: "Internal Server Error", error: errorMessage });
     }
 };
 
@@ -164,7 +172,8 @@ export const updateAdminVacationRequest = async (req: Request, res: Response) =>
         const result = await updateAdminRequestService(parseInt(requestId, 10), status as StatusTypes);
         return res.status(result.status).json(result.response);
     } catch (error) {
-        return res.status(500).json({ message: "Internal Server Error", error: error.message });
+        const errorMessage = (error instanceof Error) ? error.message : "Unknown error";
+        return res.status(500).json({ message: "Internal Server Error", error: errorMessage });
     }
 };
 
@@ -180,7 +189,8 @@ export const getVacationRequestsByTeam = async (req: Request, res: Response) => 
 
         return res.status(result.status).json(result.data);
     } catch (error) {
-        return res.status(500).json({ message: "Internal Server Error", error: error.message });
+        const errorMessage = (error instanceof Error) ? error.message : "Unknown error";
+        return res.status(500).json({ message: "Internal Server Error", error: errorMessage });
     }
 };
 
@@ -190,6 +200,7 @@ export const getAllVacationRequests = async (req: Request, res: Response) => {
         
         return res.status(result.status).json(result.data);
     } catch (error) {
-        return res.status(500).json({ message: "Internal Server Error", error: error.message });
+        const errorMessage = (error instanceof Error) ? error.message : "Unknown error";
+        return res.status(500).json({ message: "Internal Server Error", error: errorMessage });
     }
 };

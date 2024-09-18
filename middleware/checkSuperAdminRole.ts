@@ -25,7 +25,7 @@ const checkSuperAdminRole = async (req: AuthenticatedRequest, res: Response, nex
         next();
         return;
     } catch (error) {
-        return res.status(500).json({ message: "Internal Server Error", error: error.message });
+        return res.status(500).json({ message: "Internal Server Error", error: (error as Error).message });
     }
 };
 

@@ -58,7 +58,8 @@ export const findRequestsByEmployeeIdWithSkip = async (
 
         return { status: 200, response: requests };
     } catch (error) {
-        return { status: 500, response: { message: "Error fetching requests", error: error.message } };
+        const errorMessage = (error instanceof Error) ? error.message : "Unknown error";
+        return { status: 500, response: { message: "Error fetching requests", error: errorMessage } };
     }
 };
 
@@ -132,7 +133,8 @@ export const filterRequestsBySQL = async (sql: string, values: any[], connection
         return result;
     } catch (err) {
         console.error("Error in filterRequestsBySQL:", err);
-        throw new Error(`Error executing query: ${err.message}`);
+        const errorMessage = (err instanceof Error) ? err.message : "Unknown error";
+        throw new Error(`Error executing query: ${errorMessage}`);
     }
 };
 

@@ -40,7 +40,7 @@ export const fetchUserRequestsServiceByPages = async (employeeId: number,page: n
         return { status: 200, response: {data: finalRequests, count: response.length} };
         
     } catch (error) {
-        return { status: 500, response: { message: "Error fetching requests", error: error.message } };
+        return { status: 500, response: { message: "Error fetching requests", error: (error as Error).message } };
     }
 };
 
@@ -67,7 +67,7 @@ export const fetchUserRequestsService = async (employeeId: number) => {
 
         return { status: 200, response: requests };
     } catch (error) {
-        return { status: 500, response: { message: "Error fetching requests", error: error.message } };
+        return { status: 500, response: { message: "Error fetching requests", error: (error as Error).message } };
     }
 };
 
@@ -100,7 +100,7 @@ export const createRequestService = async (employeeId: number, dateFrom: Date, d
 
         return { status: 201, response: { message: "Inserted a Request successfully"} };
     } catch (error) {
-        return { status: 500, response: { message: "Internal Server Error", error: error.message } };
+        return { status: 500, response: { message: "Internal Server Error", error: (error as Error).message } };
     }
 };
 
@@ -153,7 +153,7 @@ export const updateUserRequestService = async (requestId: number,reviewerId?: nu
 
         return { status: 200, response: { message: "Request updated successfully" } };
     } catch (error) {
-        return { status: 500, response: { message: "Internal Server Error", error: error.message } };
+        return { status: 500, response: { message: "Internal Server Error", error: (error as Error).message } };
     }
 };
 
@@ -174,7 +174,7 @@ export const deleteUserRequestService = async (requestId: number) => {
 
         return { status: 200, response: { message: "Request deleted successfully" } };
     } catch (error) {
-        return { status: 500, response: { message: "Internal Server Error", error: error.message } };
+        return { status: 500, response: { message: "Internal Server Error", error: (error as Error).message } };
     }
 };
 
@@ -195,7 +195,7 @@ export const updateAdminRequestService = async (requestId: number, status: Statu
           
         return { status: 200, response: {message: "Request updated successfully"} };
     } catch (error) {
-        return { status: 500, response: { message: "Internal Server Error", error: error.message } };
+        return { status: 500, response: { message: "Internal Server Error", error: (error as Error).message } };
     }
 };
 
@@ -222,7 +222,7 @@ export const filterRequests = async (filters: any, connection: Connection) => {
         return { status: 200, response: { data: finalRequests, count: requests.length } };
     } catch (error) {
         console.error("Error in filterRequests:", error);
-        return { status: 500, response: { message: "Internal Server Error", error: error.message } };
+        return { status: 500, response: { message: "Internal Server Error", error: (error as Error).message } };
     }
 };
 

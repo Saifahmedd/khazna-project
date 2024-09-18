@@ -25,7 +25,7 @@ const checkAdminRole = async (req: AuthenticatedRequest, res: Response, next: Ne
         next();
         return;
     } catch (error) {
-        return res.status(500).json({ message: "Internal Server Error", error: error.message });
+        return res.status(500).json({ message: "Internal Server Error", error: (error as Error).message });
     }
 };
 
