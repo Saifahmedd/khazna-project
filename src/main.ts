@@ -11,8 +11,6 @@ import { userRoutes } from './components/user/user.routes';
 import { authenticateToken } from '../middleware/authenticateToken';
 import swaggerJSDoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
-import path from 'path';
-import fs from 'fs';
 import { initializeData } from './constants';
 import cors from "cors"
 import { Reason } from './entities/reason';
@@ -20,18 +18,16 @@ dotenv.config({ path: 'C:/Users/hp/Desktop/khazna-project/src/.env' });
 
 const app = express();
 let connection: Connection;
-
 app.use(cors());
-
 const main = async () => {
     try {
         connection = await createConnection({
             type: 'mysql',
-            host: process.env.DB_HOST as string,
-            port: parseInt(process.env.DB_PORT as string, 10),
-            username: process.env.DB_USERNAME as string,
-            password: process.env.DB_PASSWORD as string,
-            database: process.env.DB_DATABASE as string,
+            host: "localhost",
+            port: 3306,
+            username: "root",
+            password: "root123",
+            database: 'khazna-db',
             entities: [Employee, Role, Vacation, VacationStatus, Team, Reason],
             synchronize: true,
         });

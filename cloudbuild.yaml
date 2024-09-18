@@ -4,6 +4,16 @@ steps:
 - name: 'gcr.io/cloud-builders/npm'
   args: ['install']
 - name: 'gcr.io/cloud-builders/npm'
+args: ['install', 'build']
+permissions:
+  - 'cloudbuild.builds.create'
+  - 'cloudbuild.builds.edit'
+  - 'storage.objects.get'
+  - 'storage.objects.list'
+env:
+  - 'name: NPM_TOKEN'
+    value: '$(secret.NPM_TOKEN)'
+- name: 'gcr.io/cloud-builders/npm'
   args: ['run', 'build']
 - name: 'gcr.io/cloud-builders/gcloud'
   args: ['app', 'deploy']
