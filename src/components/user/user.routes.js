@@ -1,0 +1,14 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.userRoutes = void 0;
+var express_1 = require("express");
+var userController = require("./user.controller");
+var checkSuperAdminRole_1 = require("../../../middleware/checkSuperAdminRole");
+var router = express_1.default.Router();
+exports.userRoutes = router;
+router.post('/register', userController.registerEmployee);
+router.post('/login', userController.loginEmployee);
+router.get('/user/:employeeId/info', userController.getUserInfo);
+router.put('/user/:avatarId', userController.updateAvatar);
+router.put('/user/:employeeId/role/:role', checkSuperAdminRole_1.checkSuperAdminRole, userController.updateRole);
+router.put('/user/:employeeId/changePass', userController.changePassword);

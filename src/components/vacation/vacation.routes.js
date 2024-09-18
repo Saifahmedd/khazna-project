@@ -1,0 +1,17 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.vacationRoutes = void 0;
+var express_1 = require("express");
+var checkAdminRole_1 = require("../../../middleware/checkAdminRole");
+var vacationController = require("./vacation.controller");
+var checkSuperAdminRole_1 = require("../../../middleware/checkSuperAdminRole");
+var router = express_1.default.Router();
+exports.vacationRoutes = router;
+router.get('/vacation/filter', vacationController.filterVacationRequests);
+router.get('/vacation/:employeeId/:page/:limit/:column/:order', vacationController.getUserVacationRequests);
+router.get('/vacation/superAdmin/allVacations', checkSuperAdminRole_1.checkSuperAdminRole, vacationController.getAllVacationRequests);
+router.post('/vacation', vacationController.createVacationRequest);
+router.put('/vacation/:requestId', vacationController.updateUserVacationRequest);
+router.delete('/vacation/:requestId', vacationController.deleteVacationRequest);
+router.put('/vacation/:requestId/admin/:status', checkAdminRole_1.checkAdminRole, vacationController.updateAdminVacationRequest);
+router.get('/vacation/admin/team/:teamId', checkAdminRole_1.checkAdminRole, vacationController.getVacationRequestsByTeam);
