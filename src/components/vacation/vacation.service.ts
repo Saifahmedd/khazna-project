@@ -1,11 +1,10 @@
 import { findRequestsByEmployeeIdWithSkip ,findEmployeeById, findVacationStatusByName, findRequestsByEmployeeId, createVacationRequest, findVacationById, saveVacationRequest, updateVacationRequest, deleteVacationRequest, fetchVacationsByTeam, findReasonByName, filterRequestsBySQL } from './vacation.repository';
-import { VacationStatus, StatusTypes } from '../../entities/vacationStatus';
+import { StatusTypes } from '../../entities/vacationStatus';
 import * as requestRepository from './vacation.repository';
 import { RoleTypes } from '../../entities/role';
 import { ReasonTypes } from '../../entities/reason';
 import { Connection } from 'typeorm';
 import { Vacation } from '../../entities/vacation';
-import { response } from 'express';
 
 export const fetchUserRequestsServiceByPages = async (employeeId: number,page: number,limit: number,column: string | null,order: 'ASC' | 'DESC' | null) => {
     try {

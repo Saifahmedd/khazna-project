@@ -4,7 +4,6 @@ import { RoleTypes } from '../../entities/role';
 import { TeamType } from '../../entities/team';
 import crypto from 'crypto';
 import nodemailer from 'nodemailer';
-import { Check } from 'typeorm';
 
 const checkPassword = (password: string): boolean => {
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>])[A-Za-z\d!@#$%^&*(),.?":{}|<>]{8,}$/;
@@ -36,9 +35,9 @@ export const registerEmployee = async (req: Request, res: Response) => {
         return res.status(400).json({ message: "Invalid name" });
     }
 
-    // if (!checkEmail(email)) {
-    //     return res.status(400).json({ message: "Invalid email" });
-    // }
+    if (!checkEmail(email)) {
+        return res.status(400).json({ message: "Invalid email" });
+    }
 
     if (!checkPhone(phonenumber)) {
         return res.status(400).json({ message: "Invalid phone number" });

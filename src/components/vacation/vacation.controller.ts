@@ -194,7 +194,7 @@ export const getVacationRequestsByTeam = async (req: Request, res: Response) => 
     }
 };
 
-export const getAllVacationRequests = async (req: Request, res: Response) => {
+export const getAllVacationRequests = async (_req: Request, res: Response) => {
     try {
         const result = await getAllVacations(connection);
         
