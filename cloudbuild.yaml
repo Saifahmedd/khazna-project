@@ -1,16 +1,14 @@
 steps:
 - name: 'gcr.io/cloud-builders/npm'
-  args: ['install']  # Installs all dependencies from package.json
-
-# If your build script is a custom shell script named 'build.sh':
-- name: 'bash'
-  args: ['./build.sh']  # Replace with the path to your build script
-
+  args: ['install', '-g', 'typescript']
 - name: 'gcr.io/cloud-builders/npm'
-  args: ['run', 'build']  # Assuming build script is defined in package.json
-
+  args: ['install']
+- name: 'gcr.io/cloud-builders/npm'
+  args: ['run', 'build']
 - name: 'gcr.io/cloud-builders/gcloud'
   args: ['app', 'deploy']
 
 options:
   logging: CLOUD_LOGGING_ONLY
+  env:
+  - TSC_USER_ENABLED=1
