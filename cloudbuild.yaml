@@ -1,10 +1,10 @@
 steps:
 - name: 'gcr.io/cloud-builders/npm'
   args: ['install', '-g', 'typescript']
-- name: 'node:16'
-  entrypoint: 'bash'
-  cmd: ['-c', 'npm install && npm run build']
-
+- name: 'gcr.io/cloud-builders/npm'
+  args: ['install']
+- name: 'gcr.io/cloud-builders/npm'
+  args: ['run', 'build']
 - name: 'gcr.io/cloud-builders/gcloud'
   args: ['app', 'deploy']
 

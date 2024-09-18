@@ -1,2 +1,2 @@
-service: khaznaVacation
-runtime: nodejs20
+runtime: nodejs18
+entrypoint: dist/src/main.js
