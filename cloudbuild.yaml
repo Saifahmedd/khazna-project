@@ -1,5 +1,7 @@
 steps:
-- name: 'node:18'  # Use a Node.js 18 image with npm installed
+- name: 'node:18'  # Use a Node.js 18 image
+  args: ['npm', 'install', '-g', 'npx']  # Install npx globally
+- name: 'node:18'
   args: ['npm', 'install']
 - name: 'node:18'
   args: ['npm', 'run', 'build']
