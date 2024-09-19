@@ -21,3 +21,6 @@ env_variables:
   SMTP_PORT: 587
   SMTP_SECURE: "false"
 
+health_check:
+  enable_health_check: False
+

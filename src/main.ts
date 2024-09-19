@@ -37,14 +37,14 @@ const main = async () => {
 
         connection = await createConnection({
             type: 'mysql',
-            host: process.env.DB_HOST  || '34.176.41.161',
+            host: process.env.DB_HOST || 'localhost', // Change to local host in case of missing ENV
             port: Number(process.env.DB_PORT) || 3306,
-            username: process.env.DB_USERNAME || 'khazna-sql',
-            password: process.env.DB_PASSWORD || 'Khazna2024',
+            username: process.env.DB_USERNAME || 'root', // Use root if no user provided
+            password: process.env.DB_PASSWORD || 'password', // Provide fallback for password
             database: process.env.DB_DATABASE || 'khazna-db',
             entities: [Employee, Role, Vacation, VacationStatus, Team, Reason],
             synchronize: true,
-        });
+        });        
 
         console.log("Connected to MySQL database");
 
@@ -71,11 +71,16 @@ const main = async () => {
             console.log("Hello World");
             res.send('Hello World!');
         });
-
+        
+        app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+        
         app.use(express.json());
+        
+        // Apply middleware after public routes
         app.use(authenticateToken); // Middleware Token
         app.use(userRoutes); // User Endpoints
         app.use(vacationRoutes); // Vacation Endpoints
+        
         
         app.listen(3000, () => {
             console.log(`Server running on http://localhost:3000`);
@@ -85,7 +90,9 @@ const main = async () => {
     }
 };
 
-main();
+main().catch((err) => {
+    console.error("App failed to start:", err);
+});
 
 export { connection };
 
