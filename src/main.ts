@@ -14,20 +14,34 @@ import swaggerUi from 'swagger-ui-express';
 import { initializeData } from './constants';
 import cors from "cors"
 import { Reason } from './entities/reason';
-dotenv.config({ path: 'C:/Users/hp/Desktop/khazna-project/src/.env' });
+
+console.log("App is starting...");
 
 const app = express();
 let connection: Connection;
 app.use(cors({ origin: '*' })); // Allow all origins for testing
+
 const main = async () => {
     try {
-        connection = await createConnection({
-            type: 'mysql',
+        console.log("Loading .env");
+        const envResult = dotenv.config({ path: 'C:/Users/hp/Desktop/khazna-project/src/.env' });
+        console.log("dotenv result:", envResult);
+
+        console.log({
             host: process.env.DB_HOST,
-            port: Number(process.env.DB_PORT) || 3306,
+            port: process.env.DB_PORT,
             username: process.env.DB_USERNAME,
             password: process.env.DB_PASSWORD,
-            database: process.env.DB_DATABASE,
+            database: process.env.DB_DATABASE
+        });
+
+        connection = await createConnection({
+            type: 'mysql',
+            host: process.env.DB_HOST  || '34.176.41.161',
+            port: Number(process.env.DB_PORT) || 3306,
+            username: process.env.DB_USERNAME || 'khazna-sql',
+            password: process.env.DB_PASSWORD || 'Khazna2024',
+            database: process.env.DB_DATABASE || 'khazna-db',
             entities: [Employee, Role, Vacation, VacationStatus, Team, Reason],
             synchronize: true,
         });
@@ -57,11 +71,6 @@ const main = async () => {
             console.log("Hello World");
             res.send('Hello World!');
         });
-        // Swagger docs
-        //app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
-
-        // const outputFile = path.resolve(__dirname, 'swagger.json');
-        // fs.writeFileSync(outputFile, JSON.stringify(swaggerSpec, null, 2));
 
         app.use(express.json());
         app.use(authenticateToken); // Middleware Token
