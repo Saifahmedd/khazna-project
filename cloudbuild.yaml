@@ -1,13 +1,18 @@
 steps:
-  # Step 1: Install TypeScript globally
+  # Step 1: Install TypeScript locally (instead of globally)
   - name: 'node:20'
-    args: ['npm', 'install', '-g', 'typescript']
+    args: ['npm', 'install']
 
-  # Step 2: Compile TypeScript using the globally installed tsc
+  # Step 2: Make sure the local tsc is executable (if needed, skip if not required)
   - name: 'node:20'
-    args: ['tsc', '--outDir', 'dist']
+    entrypoint: 'chmod'
+    args: ['+x', './node_modules/.bin/tsc']
 
-  # Step 3: Deploy the application using gcloud
+  # Step 3: Run the local tsc using npx to compile TypeScript to a 'dist' directory
+  - name: 'node:20'
+    args: ['npx', 'tsc', '--outDir', 'dist']
+
+  # Step 4: Deploy the application using gcloud
   - name: 'gcr.io/cloud-builders/gcloud'
     args: ['app', 'deploy']
 
