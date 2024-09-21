@@ -1,7 +1,7 @@
 steps:
-  - name: 'gcr.io/cloud-builders/node'
+  - name: 'gcr.io/cloud-builders/node:20'
     args: ['npm', 'install']
-  - name: 'gcr.io/cloud-builders/node'
+  - name: 'gcr.io/cloud-builders/node:20'
     args: ['npm', 'run', 'build']
   - name: 'gcr.io/cloud-builders/gcloud'
     args: ['app', 'deploy']
