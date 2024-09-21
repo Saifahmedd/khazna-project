@@ -1,4 +1,5 @@
 import dotenv from 'dotenv';
+dotenv.config({ path: 'C:\\Users\\hp\\OneDrive\\Desktop\\khazna-project\\src\\.env' });
 import { createConnection, Connection } from 'typeorm';
 import { Employee } from './entities/employee';
 import { Role } from './entities/role';
@@ -12,39 +13,27 @@ import { authenticateToken } from '../middleware/authenticateToken';
 import swaggerJSDoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 import { initializeData } from './constants';
-import cors from "cors"
+import cors from "cors";
 import { Reason } from './entities/reason';
 
 console.log("App is starting...");
-
 const app = express();
 let connection: Connection;
 app.use(cors({ origin: '*' })); // Allow all origins for testing
 
+
 const main = async () => {
     try {
-        console.log("Loading .env");
-        const envResult = dotenv.config({ path: 'C:/Users/hp/Desktop/khazna-project/src/.env' });
-        console.log("dotenv result:", envResult);
-
-        console.log({
-            host: process.env.DB_HOST,
-            port: process.env.DB_PORT,
-            username: process.env.DB_USERNAME,
-            password: process.env.DB_PASSWORD,
-            database: process.env.DB_DATABASE
-        });
-
-        connection = await createConnection({
+        const connection = await createConnection({
             type: 'mysql',
-            host: process.env.DB_HOST || 'localhost', // Change to local host in case of missing ENV
-            port: Number(process.env.DB_PORT) || 3306,
-            username: process.env.DB_USERNAME || 'root', // Use root if no user provided
-            password: process.env.DB_PASSWORD || 'password', // Provide fallback for password
-            database: process.env.DB_DATABASE || 'khazna-db',
+            host: process.env.DB_HOST || '127.0.0.1',           // Default to localhost if undefined
+            port: +(process.env.DB_PORT || 3306),               // Provide default port (3306 for MySQL)
+            username: process.env.DB_USERNAME || 'root',        // Default username
+            password: process.env.DB_PASSWORD || 'root123',            // Default empty password
+            database: process.env.DB_DATABASE || 'khazna-db',     // Default database
             entities: [Employee, Role, Vacation, VacationStatus, Team, Reason],
             synchronize: true,
-        });        
+        });     
 
         console.log("Connected to MySQL database");
 
@@ -80,7 +69,6 @@ const main = async () => {
         app.use(authenticateToken); // Middleware Token
         app.use(userRoutes); // User Endpoints
         app.use(vacationRoutes); // Vacation Endpoints
-        
         
         app.listen(3000, () => {
             console.log(`Server running on http://localhost:3000`);
