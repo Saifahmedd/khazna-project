@@ -1,15 +1,15 @@
 steps:
-  - name: 'node:20'  # Install dependencies
-    args: ['npm', 'install']  
+  - name: 'node:20'  # Step to install dependencies
+    args: ['npm', 'install']
 
-  - name: 'node:20'  # Run build script (assuming it exists)
+  - name: 'node:20'  # Step to run the TypeScript compiler
     args: ['npm', 'run', 'build']
 
-  - name: 'gcr.io/cloud-builders/gcloud'  # Deploy the application
+  - name: 'gcr.io/cloud-builders/gcloud'  # Step to deploy the application
     args: ['app', 'deploy']
 
 options:
-  logging: CLOUD_LOGGING_ONLY
+  logging: CLOUD_LOGGING_ONLY  # Only log to Cloud Logging
   env:
-    - TSC_USER_ENABLED=1
-    - NPM_CONFIG_LOGLEVEL=verbose  # Enable verbose logging for npm (optional)
+    - TSC_USER_ENABLED=1  # Example environment variable
+    - NPM_CONFIG_LOGLEVEL=verbose  # Enable verbose logging for npm
