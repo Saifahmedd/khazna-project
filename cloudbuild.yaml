@@ -2,8 +2,8 @@ steps:
   - name: 'node:20'  # Step to install dependencies
     args: ['npm', 'install']
 
-- name: 'node:20'  # Step to run the TypeScript compiler
-  args: ['npm', 'run', 'build', '--verbose']
+  - name: 'node:20'  # Step to run the TypeScript compiler
+    args: ['npm', 'run', 'build', '--verbose']
 
 
   - name: 'gcr.io/cloud-builders/gcloud'  # Step to deploy the application
