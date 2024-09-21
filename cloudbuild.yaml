@@ -2,8 +2,8 @@ steps:
   - name: 'gcr.io/cloud-builders/npm'
     args: ['install', '--force']  # Install dependencies
 
-  - name: 'node:20'  # Switch to a Node.js environment
-    args: ['npm', 'run', 'build', '--prod']  # Run build script with prod flag
+  - name: 'gcr.io/cloud-builders/npm'  # Switch to a Node.js environment
+    args: ['run', 'build', '--prod']  # Run build script with prod flag
 
   # Assuming your build script outputs to dist/src/main.js
   - name: 'gcloud'  # No need for the full image name if in the default Cloud Build pool
