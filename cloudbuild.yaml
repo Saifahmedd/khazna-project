@@ -1,10 +1,9 @@
 steps:
-  - name: 'gcr.io/cloud-builders/node:20'
-    args: ['npm', 'install']
-  - name: 'gcr.io/cloud-builders/node:20'
-    args: ['npm', 'run', 'build']
+  - name: 'gcr.io/cloud-builders/npm'
+    args: ['install', '--force']
+  - name: 'gcr.io/cloud-builders/npm'
+    args: ['run', 'build', '--prod']
   - name: 'gcr.io/cloud-builders/gcloud'
     args: ['app', 'deploy']
-
 options:
   logging: CLOUD_LOGGING_ONLY
