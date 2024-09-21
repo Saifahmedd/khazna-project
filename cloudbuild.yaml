@@ -1,12 +1,15 @@
 steps:
-  - name: 'gcr.io/cloud-builders/npm'
-    args: ['install', '--force']  # Install dependencies
+  - name: 'node:20'  # Install dependencies
+    args: ['npm', 'install']  
 
-  - name: 'gcr.io/cloud-builders/npm'  # Switch to a Node.js environment
-    args: ['run', 'build', '--prod']  # Run build script with prod flag
+  - name: 'node:20'  # Run build script (assuming it exists)
+    args: ['npm', 'run', 'build']
 
-  # Assuming your build script outputs to dist/src/main.js
-  - name: 'gcloud'  # No need for the full image name if in the default Cloud Build pool
-    args: ['app', 'deploy', '--quiet']  # Deploy the application (optional: --quiet)
+  - name: 'gcr.io/cloud-builders/gcloud'  # Deploy the application
+    args: ['app', 'deploy']
+
 options:
   logging: CLOUD_LOGGING_ONLY
+  env:
+    - TSC_USER_ENABLED=1
+    - NPM_CONFIG_LOGLEVEL=verbose  # Enable verbose logging for npm (optional)
