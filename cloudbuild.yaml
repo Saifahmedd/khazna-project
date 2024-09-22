@@ -14,3 +14,9 @@ steps:
   # Step 4: Deploy the application using gcloud
   - name: 'gcr.io/cloud-builders/gcloud'
     args: ['app', 'deploy']
+
+options:
+  logging: CLOUD_LOGGING_ONLY
+  env:
+    - TSC_USER_ENABLED=1
+    - NPM_CONFIG_LOGLEVEL=verbose  # Enable verbose logging for npm to troubleshoot issues
