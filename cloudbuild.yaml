@@ -1,16 +1,18 @@
 steps:
-  - name: 'node:20'  # Step to install dependencies
+  # Step 1: Install TypeScript locally (instead of globally)
+  - name: 'node:20'
+    args: ['npm', 'install', '-g', 'typescript']
     args: ['npm', 'install']
 
-  - name: 'node:20'  # Step to run the TypeScript compiler
-    args: ['npm', 'run', 'build', '--verbose']
+  # Step 2: Make sure the local tsc is executable (if needed, skip if not required)
+  - name: 'node:20'
+    args: ['tsc', '--outDir', 'dist']
+    entrypoint: 'chmod'
+    args: ['+x', './node_modules/.bin/tsc']
 
-
-  - name: 'gcr.io/cloud-builders/gcloud'  # Step to deploy the application
+  # Step 3: Run the local tsc using npx to compile TypeScript to a 'dist' directory
+  - name: 'node:20'
+    args: ['npx', 'tsc', '--outDir', 'dist']
+  # Step 4: Deploy the application using gcloud
+  - name: 'gcr.io/cloud-builders/gcloud'
     args: ['app', 'deploy']
-
-options:
-  logging: CLOUD_LOGGING_ONLY  # Only log to Cloud Logging
-  env:
-    - TSC_USER_ENABLED=1  # Example environment variable
-    - NPM_CONFIG_LOGLEVEL=verbose  # Enable verbose logging for npm
