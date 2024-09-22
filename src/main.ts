@@ -24,20 +24,20 @@ app.use(cors({ origin: '*' })); // Allow all origins for testing
 
 const main = async () => {
     try {
-        const connection = await createConnection({
-            type: 'mysql',
-            host: process.env.DB_HOST || '127.0.0.1',           // Default to localhost if undefined
-            port: +(process.env.DB_PORT || 3306),               // Provide default port (3306 for MySQL)
-            username: process.env.DB_USERNAME || 'root',        // Default username
-            password: process.env.DB_PASSWORD || 'root123',            // Default empty password
-            database: process.env.DB_DATABASE || 'khazna-db',     // Default database
-            entities: [Employee, Role, Vacation, VacationStatus, Team, Reason],
-            synchronize: true,
-        });     
+        // const connection = await createConnection({
+        //     type: 'mysql',
+        //     host: process.env.DB_HOST || '127.0.0.1',           // Default to localhost if undefined
+        //     port: +(process.env.DB_PORT || 3306),               // Provide default port (3306 for MySQL)
+        //     username: process.env.DB_USERNAME || 'root',        // Default username
+        //     password: process.env.DB_PASSWORD || 'root123',            // Default empty password
+        //     database: process.env.DB_DATABASE || 'khazna-db',     // Default database
+        //     entities: [Employee, Role, Vacation, VacationStatus, Team, Reason],
+        //     synchronize: true,
+        // });     
 
         console.log("Connected to MySQL database");
 
-        await initializeData(connection);
+        // await initializeData(connection);
 
         const swaggerOptions = {
             definition: {
