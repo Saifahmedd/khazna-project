@@ -13,7 +13,7 @@ env_variables:
   DB_PORT: "3306"
   DB_USERNAME: "khazna-vacation"
   DB_PASSWORD: "Khazna2024"
-  DB_DATABASE: "khazna-db"
+  DB_DATABASE: "khazna-sql"
   EMAIL_USER: "saifahmedsalah11@gmail.com"
   EMAIL_PASSWORD: "lsssmezaheetgmld"
   SuperAdminName: "Saif Ahmed"

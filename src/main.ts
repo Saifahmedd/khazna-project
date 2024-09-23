@@ -30,7 +30,7 @@ const main = async () => {
             port: +(process.env.DB_PORT || 3306),               // Provide default port (3306 for MySQL)
             username: process.env.DB_USERNAME || 'khazna-vacation',        // Default username
             password: process.env.DB_PASSWORD || 'Khazna2024',            // Default empty password
-            database: process.env.DB_DATABASE || 'khazna-db',     // Default database
+            database: process.env.DB_DATABASE || 'khazna-sql',     // Default database
             entities: [Employee, Role, Vacation, VacationStatus, Team, Reason],
             synchronize: true,
         });     
