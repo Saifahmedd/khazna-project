@@ -11,8 +11,8 @@ env_variables:
   ACCESS_TOKEN_SECRET: "fa71042126d8287538"
   DB_HOST: "34.89.121.129"              # Cloud SQL Public IP
   DB_PORT: "3306"
-  DB_USERNAME: "root"
-  DB_PASSWORD: "root1234"
+  DB_USERNAME: "khazna-username"
+  DB_PASSWORD: "khazna123"
   DB_DATABASE: "khazna-database"
   EMAIL_USER: "saifahmedsalah11@gmail.com"
   EMAIL_PASSWORD: "lsssmezaheetgmld"
