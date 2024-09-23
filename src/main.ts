@@ -26,15 +26,16 @@ const main = async () => {
     try {
         const connection = await createConnection({
             type: 'mysql',
-            host: process.env.DB_HOST || '34.89.121.129',           // Default to localhost if undefined
-            port: Number(process.env.DB_PORT || 3306),               // Provide default port (3306 for MySQL)
-            username: process.env.DB_USERNAME || 'khazna-vacation',        // Default username
-            password: process.env.DB_PASSWORD || 'Khazna2024',            // Default empty password
-            database: process.env.DB_DATABASE || 'khazna-sql',     // Default database
+            host: process.env.DB_HOST || '34.89.121.129',
+            port: Number(process.env.DB_PORT || 3306),
+            username: process.env.DB_USERNAME || 'khazna-username',
+            password: process.env.DB_PASSWORD || 'Khazna123',
+            database: process.env.DB_DATABASE || 'khazna-database',
             entities: [Employee, Role, Vacation, VacationStatus, Team, Reason],
             synchronize: true,
+            logging: true
         });
-
+        
         console.log("Connected to MySQL database");
 
         await initializeData(connection);
