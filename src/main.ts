@@ -32,6 +32,7 @@ const main = async () => {
             password: process.env.DB_PASSWORD || 'Khazna2024',            // Default empty password
             database: process.env.DB_DATABASE || 'khazna-sql',     // Default database
             entities: [Employee, Role, Vacation, VacationStatus, Team, Reason],
+            
         });
 
         console.log("Connected to MySQL database");
