@@ -39,23 +39,23 @@ const main = async () => {
 
         await initializeData(connection);
 
-        const swaggerOptions = {
-            definition: {
-                openapi: '3.0.0',
-                info: {
-                    title: 'Khazna API Project',
-                    version: '1.0.0',
-                },
-                servers: [
-                    {
-                        url: 'http://localhost:3000/',
-                    },
-                ],
-            },
-            apis: ['./src/swagger/*.ts'],
-        };
+        // const swaggerOptions = {
+        //     definition: {
+        //         openapi: '3.0.0',
+        //         info: {
+        //             title: 'Khazna API Project',
+        //             version: '1.0.0',
+        //         },
+        //         servers: [
+        //             {
+        //                 url: 'http://localhost:3000/',
+        //             },
+        //         ],
+        //     },
+        //     apis: ['./src/swagger/*.ts'],
+        // };
 
-        const swaggerSpec = swaggerJSDoc(swaggerOptions);
+        // const swaggerSpec = swaggerJSDoc(swaggerOptions);
         app.get('/', (req, res) => {
             console.log("Hello World");
             res.send('Hello World!');
