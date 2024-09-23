@@ -13,14 +13,13 @@ import { authenticateToken } from '../middleware/authenticateToken';
 import swaggerJSDoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 import { initializeData } from './constants';
-import cors from "cors";
+import cors from 'cors';
 import { Reason } from './entities/reason';
 
 console.log("App is starting...");
 const app = express();
 let connection: Connection;
 app.use(cors({ origin: '*' })); // Allow all origins for testing
-
 
 const main = async () => {
     try {
@@ -40,29 +39,28 @@ const main = async () => {
 
         await initializeData(connection);
 
-        // const swaggerOptions = {
-        //     definition: {
-        //         openapi: '3.0.0',
-        //         info: {
-        //             title: 'Khazna API Project',
-        //             version: '1.0.0',
-        //         },
-        //         servers: [
-        //             {
-        //                 url: 'http://localhost:3000/',
-        //             },
-        //         ],
-        //     },
-        //     apis: ['./src/swagger/*.ts'],
-        // };
+        const swaggerOptions = {
+            definition: {
+                openapi: '3.0.0',
+                info: {
+                    title: 'Khazna API Project',
+                    version: '1.0.0',
+                },
+                servers: [
+                    {
+                        url: `http://localhost:${process.env.PORT || 3000}/`,
+                    },
+                ],
+            },
+            apis: ['./src/swagger/*.ts'],
+        };
 
-        // const swaggerSpec = swaggerJSDoc(swaggerOptions);
+        const swaggerSpec = swaggerJSDoc(swaggerOptions);
         app.get('/', (req, res) => {
-            console.log("Hello World");
             res.send('Hello World!');
         });
         
-        // app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+        app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
         
         app.use(express.json());
         
@@ -71,7 +69,7 @@ const main = async () => {
         app.use(userRoutes); // User Endpoints
         app.use(vacationRoutes); // Vacation Endpoints
         app.listen(process.env.PORT || 3000, () => {
-            console.log(`Server running on http://localhost:3000`);
+            console.log(`Server running on port ${process.env.PORT || 3000}`);
         });
     } catch (error) {
         console.error("Error connecting to database:", error);
