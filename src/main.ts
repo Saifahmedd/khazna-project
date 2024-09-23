@@ -56,10 +56,10 @@ const main = async () => {
         // };
 
         // const swaggerSpec = swaggerJSDoc(swaggerOptions);
-        // app.get('/', (req, res) => {
-        //     console.log("Hello World");
-        //     res.send('Hello World!');
-        // });
+        app.get('/', (req, res) => {
+            console.log("Hello World");
+            res.send('Hello World!');
+        });
         
         // app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
         
