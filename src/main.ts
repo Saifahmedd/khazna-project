@@ -39,38 +39,38 @@ const main = async () => {
 
         // await initializeData(connection);
 
-        const swaggerOptions = {
-            definition: {
-                openapi: '3.0.0',
-                info: {
-                    title: 'Khazna API Project',
-                    version: '1.0.0',
-                },
-                servers: [
-                    {
-                        url: 'http://localhost:3000/',
-                    },
-                ],
-            },
-            apis: ['./src/swagger/*.ts'],
-        };
+        // const swaggerOptions = {
+        //     definition: {
+        //         openapi: '3.0.0',
+        //         info: {
+        //             title: 'Khazna API Project',
+        //             version: '1.0.0',
+        //         },
+        //         servers: [
+        //             {
+        //                 url: 'http://localhost:3000/',
+        //             },
+        //         ],
+        //     },
+        //     apis: ['./src/swagger/*.ts'],
+        // };
 
-        const swaggerSpec = swaggerJSDoc(swaggerOptions);
-        app.get('/', (req, res) => {
-            console.log("Hello World");
-            res.send('Hello World!');
-        });
+        // const swaggerSpec = swaggerJSDoc(swaggerOptions);
+        // app.get('/', (req, res) => {
+        //     console.log("Hello World");
+        //     res.send('Hello World!');
+        // });
         
-        app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+        // app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
         
         app.use(express.json());
         
         // Apply middleware after public routes
-        app.use(authenticateToken); // Middleware Token
-        app.use(userRoutes); // User Endpoints
-        app.use(vacationRoutes); // Vacation Endpoints
-        
-        app.listen(3000, () => {
+        // app.use(authenticateToken); // Middleware Token
+        // app.use(userRoutes); // User Endpoints
+        // app.use(vacationRoutes); // Vacation Endpoints
+        console.log("7amada");
+        app.listen(process.env.PORT || 3000, () => {
             console.log(`Server running on http://localhost:3000`);
         });
     } catch (error) {
