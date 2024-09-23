@@ -26,9 +26,9 @@ const main = async () => {
     try {
         const connection = await createConnection({
             type: 'mysql',
-            host: process.env.DB_HOST || '34.176.41.161',           // Default to localhost if undefined
+            host: process.env.DB_HOST || '34.89.121.129',           // Default to localhost if undefined
             port: +(process.env.DB_PORT || 3306),               // Provide default port (3306 for MySQL)
-            username: process.env.DB_USERNAME || 'khazna-sql',        // Default username
+            username: process.env.DB_USERNAME || 'khazna-vacation',        // Default username
             password: process.env.DB_PASSWORD || 'Khazna2024',            // Default empty password
             database: process.env.DB_DATABASE || 'khazna-db',     // Default database
             entities: [Employee, Role, Vacation, VacationStatus, Team, Reason],
@@ -39,23 +39,23 @@ const main = async () => {
 
         await initializeData(connection);
 
-        // const swaggerOptions = {
-        //     definition: {
-        //         openapi: '3.0.0',
-        //         info: {
-        //             title: 'Khazna API Project',
-        //             version: '1.0.0',
-        //         },
-        //         servers: [
-        //             {
-        //                 url: 'http://localhost:3000/',
-        //             },
-        //         ],
-        //     },
-        //     apis: ['./src/swagger/*.ts'],
-        // };
+        const swaggerOptions = {
+            definition: {
+                openapi: '3.0.0',
+                info: {
+                    title: 'Khazna API Project',
+                    version: '1.0.0',
+                },
+                servers: [
+                    {
+                        url: 'http://localhost:3000/',
+                    },
+                ],
+            },
+            apis: ['./src/swagger/*.ts'],
+        };
 
-        // const swaggerSpec = swaggerJSDoc(swaggerOptions);
+        const swaggerSpec = swaggerJSDoc(swaggerOptions);
         app.get('/', (req, res) => {
             console.log("Hello World");
             res.send('Hello World!');
