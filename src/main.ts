@@ -21,17 +21,18 @@ const app = express();
 let connection: Connection;
 app.use(cors({ origin: '*' })); // Allow all origins for testing
 
+
 const main = async () => {
     try {
         const connection = await createConnection({
             type: 'mysql',
             host: process.env.DB_HOST || '34.89.121.129',           // Default to localhost if undefined
-            port: +(process.env.DB_PORT || 3306),               // Provide default port (3306 for MySQL)
+            port: Number(process.env.DB_PORT || 3306),               // Provide default port (3306 for MySQL)
             username: process.env.DB_USERNAME || 'khazna-vacation',        // Default username
             password: process.env.DB_PASSWORD || 'Khazna2024',            // Default empty password
             database: process.env.DB_DATABASE || 'khazna-sql',     // Default database
             entities: [Employee, Role, Vacation, VacationStatus, Team, Reason],
-
+            synchronize: true,
         });
 
         console.log("Connected to MySQL database");
@@ -68,7 +69,6 @@ const main = async () => {
         app.use(authenticateToken); // Middleware Token
         app.use(userRoutes); // User Endpoints
         app.use(vacationRoutes); // Vacation Endpoints
-        console.log("7amada");
         app.listen(process.env.PORT || 3000, () => {
             console.log(`Server running on http://localhost:3000`);
         });
