@@ -63,6 +63,49 @@ export const findRequestsByEmployeeIdWithSkip = async (
     }
 };
 
+export const findAllRequestsWithSkip = async (
+    skip: number | null,
+    take: number | null,
+    column: string | null,
+    order: 'ASC' | 'DESC' | null
+) => {
+    try {
+        const currentYear = new Date().getFullYear();
+        const startOfYear = new Date(currentYear, 0, 1);
+        const endOfYear = new Date(currentYear, 11, 31, 23, 59, 59, 999);
+
+        const queryBuilder = Vacation.createQueryBuilder('vacation')
+            .andWhere('vacation.dateFrom BETWEEN :startOfYear AND :endOfYear', {
+                startOfYear,
+                endOfYear,
+            })
+            .leftJoinAndSelect('vacation.employee', 'employee')
+            .leftJoinAndSelect('vacation.status', 'status')
+            .leftJoinAndSelect('vacation.reason', 'reason')
+            .leftJoinAndSelect('employee.role', 'role')
+            .leftJoinAndSelect('employee.team', 'team');
+
+        // Apply pagination if both skip and take are provided
+        if (typeof skip === 'number' && !isNaN(skip) && typeof take === 'number' && !isNaN(take)) {
+            queryBuilder.skip(skip);
+            queryBuilder.take(take);
+        }
+
+        // Apply sorting with default order by 'createdAt' descending
+        if (column && order) {
+            queryBuilder.orderBy(`vacation.${column}`, order);
+        } else {
+            queryBuilder.orderBy('vacation.createdAt', 'DESC');
+        }
+
+        const requests = await queryBuilder.getMany();
+
+        return { status: 200, response: requests };
+    } catch (error) {
+        const errorMessage = (error instanceof Error) ? error.message : "Unknown error";
+        return { status: 500, response: { message: "Error fetching requests", error: errorMessage } };
+    }
+};
 
 
 
@@ -156,18 +199,28 @@ export const fetchVacationsByTeam = async (teamId: number, connection: Connectio
     }
 };
 
-export const findAllRequests = async (connection: Connection) => {
+export const findAllVacations = async (
+    connection: Connection, 
+    skip: number, 
+    limit: number, 
+    column: string, 
+    order: 'ASC' | 'DESC'
+) => {
     try {
-        const requests = await connection
+        // Using getManyAndCount to fetch both results and total count
+        const [requests, total] = await connection
             .getRepository(Vacation)
             .createQueryBuilder('vacation')
             .innerJoinAndSelect('vacation.employee', 'employee')
             .innerJoinAndSelect('vacation.status', 'status')
             .innerJoinAndSelect('vacation.reason', 'reason')
-            .getMany();
+            .orderBy(column, order)
+            .skip(skip)  // Pagination
+            .take(limit) // Limit
+            .getManyAndCount(); // Returns both data and count
 
-        return requests;
+        return { requests, total };
     } catch (error) {
-        throw new Error('Failed to fetch all requests');
+        throw new Error('Failed to fetch vacation requests');
     }
 };

@@ -14,6 +14,8 @@ router.put('/user/:avatarId', userController.updateAvatar);
 
 router.put('/user/:employeeId/role/:role' ,checkSuperAdminRole, userController.updateRole);
 
-router.put('/user/:employeeId/changePass', userController.changePassword)
+router.put('/user/:employeeId/changePass', userController.changePassword);
+
+router.get('/user', checkSuperAdminRole, userController.getAllUsers);
 
 export { router as userRoutes };

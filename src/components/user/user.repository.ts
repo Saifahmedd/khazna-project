@@ -3,6 +3,9 @@ import { Employee } from "../../entities/employee";
 import { Role, RoleTypes } from "../../entities/role";
 import { Team } from "../../entities/team";
 
+export const findAllEmployees = () => {
+    return Employee.find({ relations: ['role', 'team'] });
+}
 export const findEmployeeByEmail = (email: string) => {
     return Employee.findOne({ where: { email }, relations: ['role'] });
 };

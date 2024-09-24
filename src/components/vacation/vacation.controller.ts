@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { getAllVacations, fetchUserRequestsServiceByPages ,getVacationsByTeam, filterRequests, createRequestService, updateUserRequestService, deleteUserRequestService, updateAdminRequestService } from './vacation.service';
+import { fetchAllVacationRequestsServiceByPages, fetchUserRequestsServiceByPages ,getVacationsByTeam, filterRequests, createRequestService, updateUserRequestService, deleteUserRequestService, updateAdminRequestService } from './vacation.service';
 import { StatusTypes, VacationStatus } from '../../entities/vacationStatus';
 import { connection } from '../../main';
 
@@ -69,11 +69,13 @@ export const getUserVacationRequests = async (req: Request, res: Response) => {
     if (!employeeId) {
         return res.status(400).json({ message: "employeeId is required" });
     }
-    if ((!page && limit) || (page && !limit)) {
-        return res.status(400).json({ message: "page, limit are required" });
+    if ((!(page==':page') && limit==':limit') || (page==':page' && !(limit==':limit'))) {
+        return res.status(400).json({ message: "Both page and limit are required together" });
     }
-    if ((!column && order) || (column && !order)) {
-        return res.status(400).json({ message: "column, order are required" });
+
+    // Check if column or order is provided without the other
+    if ((!(column==':column') && (order==':order')) || (column==':column' && !(order==':order'))) {
+        return res.status(400).json({ message: "Both column and order are required together" });
     }
 
     try {
@@ -194,13 +196,38 @@ export const getVacationRequestsByTeam = async (req: Request, res: Response) => 
     }
 };
 
-export const getAllVacationRequests = async (_req: Request, res: Response) => {
+export const getAllVacationRequests = async (req: Request, res: Response) => {
+    let { page, limit, column, order } = req.params;
+
+    // Check if page or limit is provided without the other
+    if ((!(page==':page') && limit==':limit') || (page==':page' && !(limit==':limit'))) {
+        return res.status(400).json({ message: "Both page and limit are required together" });
+    }
+
+    // Check if column or order is provided without the other
+    if ((!(column==':column') && (order==':order')) || (column==':column' && !(order==':order'))) {
+        return res.status(400).json({ message: "Both column and order are required together" });
+    }
+
+    console.log("Column and order are: ", column, order);
+
     try {
-        const result = await getAllVacations(connection);
-        
-        return res.status(result.status).json(result.data);
+        // If page or limit are null, set them to default values (e.g., page 1, limit 10)
+        const currentPage = page ? parseInt(page) : 1;
+        const currentLimit = limit ? parseInt(limit) : 10;
+
+        // Check if order is valid (ASC or DESC)
+        const orderType = (order?.toUpperCase() === 'ASC' || order?.toUpperCase() === 'DESC')
+            ? order.toUpperCase() as 'ASC' | 'DESC'
+            : null;
+
+        // Fetch all vacation requests with pagination and sorting
+        const result = await fetchAllVacationRequestsServiceByPages(currentPage, currentLimit, column || '', orderType);
+
+        return res.status(result.status).json(result.response);
     } catch (error) {
         const errorMessage = (error instanceof Error) ? error.message : "Unknown error";
         return res.status(500).json({ message: "Internal Server Error", error: errorMessage });
     }
 };
+

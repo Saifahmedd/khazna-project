@@ -1,4 +1,4 @@
-import { findRequestsByEmployeeIdWithSkip ,findEmployeeById, findVacationStatusByName, findRequestsByEmployeeId, createVacationRequest, findVacationById, saveVacationRequest, updateVacationRequest, deleteVacationRequest, fetchVacationsByTeam, findReasonByName, filterRequestsBySQL } from './vacation.repository';
+import { findAllRequestsWithSkip,findRequestsByEmployeeIdWithSkip ,findEmployeeById, findVacationStatusByName, findRequestsByEmployeeId, createVacationRequest, findVacationById, saveVacationRequest, updateVacationRequest, deleteVacationRequest, fetchVacationsByTeam, findReasonByName, filterRequestsBySQL } from './vacation.repository';
 import { StatusTypes } from '../../entities/vacationStatus';
 import * as requestRepository from './vacation.repository';
 import { RoleTypes } from '../../entities/role';
@@ -43,6 +43,40 @@ export const fetchUserRequestsServiceByPages = async (employeeId: number,page: n
     }
 };
 
+export const fetchAllVacationRequestsServiceByPages = async (
+    page: number,
+    limit: number,
+    column: string | null,
+    order: 'ASC' | 'DESC' | null
+) => {
+    try {
+        const skip = (page - 1) * limit;
+
+        const { status, response } = await findAllRequestsWithSkip(skip, limit, column, order);
+
+        if (status !== 200 || !Array.isArray(response)) {
+            return { status, response };
+        }
+
+        const requests: Vacation[] = response;
+
+        const finalRequests = requests.map((request: Vacation) => {
+            const adjustedDateFrom = new Date(request.dateFrom);
+            const adjustedDateTo = new Date(request.dateTo);
+        
+            return {
+                ...request,
+                date: `${adjustedDateFrom.getTime()},${adjustedDateTo.getTime()}`,
+                dateFrom: undefined,
+                dateTo: undefined,
+            };
+        });
+
+        return { status: 200, response: { data: finalRequests, count: response.length } };
+    } catch (error) {
+        return { status: 500, response: { message: "Error fetching requests", error: (error as Error).message } };
+    }
+};
 
 export const fetchUserRequestsService = async (employeeId: number) => {
     try {
@@ -252,27 +286,39 @@ export const getVacationsByTeam = async (teamId: number, connection: Connection)
     }
 };
 
-export const getAllVacations = async (connection: Connection) => {
+export const getAllVacations = async (
+    connection: Connection, 
+    page: number, 
+    limit: number, 
+    column: string, 
+    order: 'ASC' | 'DESC'
+) => {
     try {
-        let requests = await requestRepository.findAllRequests(connection);
+        const skip = (page - 1) * limit; // Calculate how many records to skip for pagination
+        const sortColumn = column || 'vacation.createdAt'; // Default sorting column
+
+        // Fetch requests and total count from repository
+        const { requests, total } = await requestRepository.findAllVacations(connection, skip, limit, sortColumn, order);
 
         if (requests.length === 0) {
             return { status: 404, data: "No vacation requests found" };
         }
 
+        // Process the requests (modify date format, etc.)
         const finalRequests = requests.map((request: Vacation) => {
             const adjustedDateFrom = new Date(request.dateFrom);
             const adjustedDateTo = new Date(request.dateTo);
-        
+
             return {
                 ...request,
                 date: `${adjustedDateFrom.getTime()},${adjustedDateTo.getTime()}`,
                 dateFrom: undefined,
                 dateTo: undefined,
             };
-        });   
+        });
 
-        return { status: 200, data: finalRequests };
+        // Return both the final requests and the total number of records
+        return { status: 200, data: { total, requests: finalRequests } };
     } catch (error) {
         console.error('Error in getAllVacations service:', error);
         return { status: 500, data: "Internal Server Error" };

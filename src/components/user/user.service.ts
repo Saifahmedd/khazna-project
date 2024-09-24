@@ -11,6 +11,14 @@ import { StatusTypes } from '../../entities/vacationStatus';
 
 dotenv.config();
 
+export const getAllUsers = async () => {
+    try {
+        const employees = await employeeRepository.findAllEmployees();
+        return { status: 200, employees };
+    } catch (error) {
+        return { status: 500, message: "Internal server error" };
+    }
+}
 export const registerEmployee = async (name: string, password: string, team: TeamType, phonenumber: string, email: string) => {
     try {
         const existingEmployee = await employeeRepository.findEmployeeByEmail(email);

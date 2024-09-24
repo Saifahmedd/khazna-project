@@ -11,7 +11,8 @@ const checkPassword = (password: string): boolean => {
 };
 
 const checkEmail = (email: string): boolean => {
-    const emailRegex = /^[^\s@]+@khazna\.app$/;
+    // Update regex to allow dots before the @khazna.app
+    const emailRegex = /^[^\s@]+(\.[^\s@]+)*@khazna\.app$/;
     return emailRegex.test(email);
 };
 
@@ -20,8 +21,14 @@ const checkPhone = (phone: string): boolean => {
 };
 
 const checkName = (name: string): boolean => {
-    const nameRegex = /^[A-Za-z]+$/;
+    // Update regex to allow letters and spaces
+    const nameRegex = /^[A-Za-z\s]+$/;
     return nameRegex.test(name);
+};
+
+export const getAllUsers = async (req: Request, res: Response) => {
+    const employees = await employeeService.getAllUsers();
+    return res.status(200).json(employees);
 };
 
 export const registerEmployee = async (req: Request, res: Response) => {

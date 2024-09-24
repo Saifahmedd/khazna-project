@@ -59,7 +59,7 @@ export const initializeData = async (connection: Connection) => {
     let superAdmin = await Employee.findOne({ where: { email: defaultSuperAdminEmail } });
 
     if (!superAdmin) {
-        const hashedPassword = await bcrypt.hash('SuperAdminPassword123!', 10);
+        const hashedPassword = await bcrypt.hash('Superadmin10!', 10);
 
         superAdmin = Employee.create({
             name: 'SuperAdmin',
