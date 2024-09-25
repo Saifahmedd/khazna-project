@@ -58,17 +58,17 @@ export const fetchAllVacationRequestsServiceByPages = async (
             return { status, response };
         }
 
-        const requests: Vacation[] = response;
-
-        const finalRequests = requests.map((request: Vacation) => {
+        const finalRequests = response.map((request: Vacation) => {
             const adjustedDateFrom = new Date(request.dateFrom);
             const adjustedDateTo = new Date(request.dateTo);
         
             return {
-                ...request,
+                id: request.id,
+                name: request.employee.name,
+                team: request.employee.team.type,
                 date: `${adjustedDateFrom.getTime()},${adjustedDateTo.getTime()}`,
-                dateFrom: undefined,
-                dateTo: undefined,
+                reason: request.reason.name,
+                status: request.status.name
             };
         });
 
@@ -77,6 +77,7 @@ export const fetchAllVacationRequestsServiceByPages = async (
         return { status: 500, response: { message: "Error fetching requests", error: (error as Error).message } };
     }
 };
+
 
 export const fetchUserRequestsService = async (employeeId: number) => {
     try {

@@ -75,7 +75,7 @@ export const getUserVacationRequests = async (req: Request, res: Response) => {
 
     // Check if column or order is provided without the other
     if ((!(sortField==':sortField') && (sortDirection==':sortDirection')) || (sortField==':sortField' && !(sortDirection==':sortDirection'))) {
-        return res.status(400).json({ message: "Both column and order are required together" });
+        return res.status(400).json({ message: "Both sortField and sortDirection are required together" });
     }
 
     try {
@@ -200,13 +200,13 @@ export const getAllVacationRequests = async (req: Request, res: Response) => {
     let { page, limit, sortField, sortDirection } = req.params;
 
     // Check if page or limit is provided without the other
-    if ((!(page==':page') && limit==':limit') || (page==':page' && !(limit==':limit'))) {
+    if ((!(page == ':page') && limit == ':limit') || (page == ':page' && !(limit == ':limit'))) {
         return res.status(400).json({ message: "Both page and limit are required together" });
     }
 
     // Check if column or order is provided without the other
-    if ((!(sortField==':sortField') && (sortDirection==':sortDirection')) || (sortField==':sortField' && !(sortDirection==':sortDirection'))) {
-        return res.status(400).json({ message: "Both column and order are required together" });
+    if ((!(sortField == ':sortField') && (sortDirection == ':sortDirection')) || (sortField == ':sortField' && !(sortDirection == ':sortDirection'))) {
+        return res.status(400).json({ message: "Both sortField and sortDirection are required together" });
     }
 
     try {

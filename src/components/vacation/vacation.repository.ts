@@ -82,7 +82,6 @@ export const findAllRequestsWithSkip = async (
             .leftJoinAndSelect('vacation.employee', 'employee')
             .leftJoinAndSelect('vacation.status', 'status')
             .leftJoinAndSelect('vacation.reason', 'reason')
-            .leftJoinAndSelect('employee.role', 'role')
             .leftJoinAndSelect('employee.team', 'team');
 
         // Apply pagination if both skip and take are provided
@@ -106,8 +105,6 @@ export const findAllRequestsWithSkip = async (
         return { status: 500, response: { message: "Error fetching requests", error: errorMessage } };
     }
 };
-
-
 
 export const findRequestById = async (id: number) => {
     return await Vacation.findOne({ where: { id } });
