@@ -60,8 +60,6 @@ const main = async () => {
         const swaggerSpec = swaggerJSDoc(swaggerOptions);
         
         app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
-        const swaggerFilePath = path.resolve(__dirname, './swagger.json');  // Define where swagger.json will be saved
-        fs.writeFileSync(swaggerFilePath, JSON.stringify(swaggerSpec, null, 2));  // Write the swaggerSpec to swagger.json
         
         app.use(express.json());
         
