@@ -8,6 +8,7 @@ import { Vacation } from '../../entities/vacation';
 import * as vacationService from '../vacation/vacation.service';
 import { TeamType } from '../../entities/team';
 import { StatusTypes } from '../../entities/vacationStatus';
+import axios from 'axios';
 
 dotenv.config();
 
@@ -19,12 +20,19 @@ export const getAllUsers = async () => {
         return { status: 500, message: "Internal server error" };
     }
 }
-export const registerEmployee = async (name: string, password: string, team: TeamType, phonenumber: string, email: string) => {
+export const registerEmployee = async (name: string, password: string, team: TeamType, email: string) => {
     try {
         const existingEmployee = await employeeRepository.findEmployeeByEmail(email);
         if (existingEmployee) {
             return { status: 409, message: "Email already exists" };
         }
+        const emailCheck = await axios.get(`https://emailvalidator.io/api/verify?email=${email}`)
+        .then((res: { data: any; }) => res.data)
+        .catch((_: any) => ({ valid: false }));
+
+    if (!emailCheck.valid) {
+        return { status: 400, message: "Email does not exist" };
+    }
 
         const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -41,7 +49,6 @@ export const registerEmployee = async (name: string, password: string, team: Tea
         const employee = Employee.create({
             name,
             password: hashedPassword,
-            phoneNumber: phonenumber,
             email,
             role,
             team: teamEntity
@@ -68,9 +75,11 @@ export const loginEmployee = async (email: string, password: string) => {
         }
 
         const user = {
+            name: employee.name,
             employeeId: employee.id,
             email,
-            role: employee.role
+            role: employee.role,
+            team: employee.team
         };
 
         const accessToken = generateToken(user);
@@ -117,12 +126,11 @@ export const getUserInfo = async (employeeId: number) => {
         return { 
             status: 200,
             data: { 
-                employee,
-                daysLeft 
+                employee: employee,
+                daysLeft: daysLeft 
             } 
         };
     } catch (error) {
-        console.error("Error:", error); // Debugging log
         return { status: 500, message: "Internal server error" };
     }
 };

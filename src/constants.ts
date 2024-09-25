@@ -56,19 +56,24 @@ export const initializeData = async (connection: Connection) => {
     }
 
     const defaultSuperAdminEmail = 'superadmin@khazna.app';
-    let superAdmin = await Employee.findOne({ where: { email: defaultSuperAdminEmail } });
+    let superAdmin = await connection.getRepository(Employee).findOne({ where: { email: defaultSuperAdminEmail } });
 
     if (!superAdmin) {
         const hashedPassword = await bcrypt.hash('Superadmin10!', 10);
+        const teamEntity = await employeeRepository.findTeamByTeamType(TeamType.PRODUCT);
+        if (teamEntity) {
+            superAdmin = connection.getRepository(Employee).create({
+                name: 'SuperAdmin',
+                email: defaultSuperAdminEmail,
+                password: hashedPassword,
+                phoneNumber: '01023255440',
+                role: superAdminRole,
+                team: teamEntity
+            });
 
-        superAdmin = Employee.create({
-            name: 'SuperAdmin',
-            email: defaultSuperAdminEmail,
-            password: hashedPassword,
-            phoneNumber: '01023255440',
-            role: superAdminRole,
-        });
-
-        await Employee.save(superAdmin);
+            await connection.getRepository(Employee).save(superAdmin);
+        } else {
+            console.error('Team entity not found. Please check your initialization data.');
+        }
     }
 };

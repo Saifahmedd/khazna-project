@@ -31,10 +31,38 @@ export const getAllUsers = async (req: Request, res: Response) => {
     return res.status(200).json(employees);
 };
 
-export const registerEmployee = async (req: Request, res: Response) => {
-    const { name, team, phonenumber, email } = req.body;
+function generatePassword(length: number) {
+    const upperCase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const lowerCase = 'abcdefghijklmnopqrstuvwxyz';
+    const numbers = '0123456789';
+    const specialChars = '!@#$%^&*()_+-=[]{}|;:,.<>?';
+    
+    // Ensure at least one character from each set
+    const requiredCharacters = [
+        upperCase[Math.floor(Math.random() * upperCase.length)],
+        lowerCase[Math.floor(Math.random() * lowerCase.length)],
+        numbers[Math.floor(Math.random() * numbers.length)],
+        specialChars[Math.floor(Math.random() * specialChars.length)]
+    ];
 
-    if (!name || !team || !phonenumber || !email) {
+    // Create a pool of all characters
+    const allChars = upperCase + lowerCase + numbers + specialChars;
+
+    // Fill the rest of the password length with random characters from allChars
+    for (let i = requiredCharacters.length; i < length; i++) {
+        requiredCharacters.push(allChars[Math.floor(Math.random() * allChars.length)]);
+    }
+
+    // Shuffle the result to avoid predictable patterns
+    const shuffledPassword = requiredCharacters.sort(() => 0.5 - Math.random()).join('');
+
+    return shuffledPassword;
+}
+
+export const registerEmployee = async (req: Request, res: Response) => {
+    const { name, team, email } = req.body;
+
+    if (!name || !team || !email) {
         return res.status(400).json({ message: "Missing input" });
     }
 
@@ -46,33 +74,31 @@ export const registerEmployee = async (req: Request, res: Response) => {
         return res.status(400).json({ message: "Invalid email" });
     }
 
-    if (!checkPhone(phonenumber)) {
-        return res.status(400).json({ message: "Invalid phone number" });
-    }
-
     try {
         const teamType = TeamType[team.toUpperCase() as keyof typeof TeamType];
+        const password = generatePassword(12);
 
-        const password = crypto.randomBytes(8).toString('hex');
+        const result = await employeeService.registerEmployee(name, password, teamType, email);
 
-        const transporter = nodemailer.createTransport({
-            service: 'gmail',
-            auth: {
-                user: process.env.EMAIL_USER,
-                pass: process.env.EMAIL_PASSWORD
-            }
-        });
+        if (result.status == 200) {
+            const transporter = nodemailer.createTransport({
+                service: 'gmail',
+                auth: {
+                    user: process.env.EMAIL_USER,
+                    pass: process.env.EMAIL_PASSWORD
+                }
+            });
+            
+            const mailOptions = {
+                from: process.env.EMAIL_USER,
+                to: email,
+                subject: 'Your Account Password',
+                text: `Hello ${name},\n\nYour account has been created. Here is your password: ${password}\n\nPlease change it after logging in.\n\nLogin here: https://accounts.google.com\n\nBest regards,\n${process.env.SuperAdminName}`
+            };
+    
+            await transporter.sendMail(mailOptions);
+        }
         
-        const mailOptions = {
-            from: process.env.EMAIL_USER,
-            to: email,
-            subject: 'Your Account Password',
-            text: `Hello ${name},\n\nYour account has been created. Here is your password: ${password}\n\nPlease change it after logging in.\n\nLogin here: https://accounts.google.com\n\nBest regards,\n${process.env.SuperAdminName}`
-        };
-
-        await transporter.sendMail(mailOptions);
-
-        const result = await employeeService.registerEmployee(name, password, teamType, phonenumber, email);
         return res.status(result.status).json(result.message);
     } catch (error) {
         return res.status(500).json({ message: "Internal server error" });

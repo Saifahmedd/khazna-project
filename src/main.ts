@@ -15,6 +15,8 @@ import swaggerUi from 'swagger-ui-express';
 import { initializeData } from './constants';
 import cors from 'cors';
 import { Reason } from './entities/reason';
+import path from 'path';
+import fs from 'fs';
 
 console.log("App is starting...");
 const app = express();
@@ -56,11 +58,10 @@ const main = async () => {
         };
 
         const swaggerSpec = swaggerJSDoc(swaggerOptions);
-        app.get('/', (req, res) => {
-            res.send('Hello World!');
-        });
         
         app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+        const swaggerFilePath = path.resolve(__dirname, './swagger.json');  // Define where swagger.json will be saved
+        fs.writeFileSync(swaggerFilePath, JSON.stringify(swaggerSpec, null, 2));  // Write the swaggerSpec to swagger.json
         
         app.use(express.json());
         

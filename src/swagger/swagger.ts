@@ -14,7 +14,6 @@
  *             required:
  *               - name
  *               - team
- *               - phonenumber
  *               - email
  *             properties:
  *               name:
@@ -25,10 +24,6 @@
  *                 type: string
  *                 description: The team type the employee belongs to
  *                 example: Backend
- *               phonenumber:
- *                 type: string
- *                 description: Employee's phone number
- *                 example: 01023255440
  *               email:
  *                 type: string
  *                 description: Employee's email address
@@ -576,10 +571,10 @@
  *                   type: string
  *                   example: Error message
  */
-//vacation/:employeeId/:page/:limit/:column/:order
+//vacation/:employeeId/:page/:limit/:sortField/:sortDirection
 /**
  * @swagger
- * /vacation/{employeeId}/{page}/{limit}/{column}/{order}:
+ * /vacation/{employeeId}/{page}/{limit}/{sortField}/{sortDirection}:
  *   get:
  *     summary: Retrieve vacation requests for a specific employee with pagination, sorting, and ordering
  *     tags: [Vacation]
@@ -606,14 +601,14 @@
  *         description: The number of records to retrieve per page
  *         example: 10
  *       - in: path
- *         name: column
+ *         name: sortField
  *         schema:
  *           type: string
  *         required: true
  *         description: The column to sort the results by
  *         example: "status"
  *       - in: path
- *         name: order
+ *         name: sortDirection
  *         schema:
  *           type: string
  *           enum: [ASC, DESC]
@@ -686,40 +681,81 @@
  *                   type: string
  *                   example: "Error message"
  */
-//vacation/allVacations
+//vacation/allVacations/:page/:limit/:sortField/:sortDirection
 /**
  * @swagger
- * /vacation/superAdmin/allVacations:
+ * /vacation/superAdmin/allVacations/{page}/{limit}/{sortField}/{sortDirection}:
  *   get:
- *     summary: Retrieve all vacation requests for a super admin
- *     tags: [Vacation]
+ *     summary: Retrieve all vacation requests with pagination and sorting
+ *     description: This endpoint allows a super admin to retrieve all vacation requests, optionally paginated and sorted by a specified field and direction.
+ *     tags:
+ *       - Vacation
+ *     parameters:
+ *       - in: path
+ *         name: page
+ *         required: true
+ *         schema:
+ *           type: integer
+ *           example: 1
+ *         description: Page number to retrieve
+ *       - in: path
+ *         name: limit
+ *         required: true
+ *         schema:
+ *           type: integer
+ *           example: 10
+ *         description: Number of records to retrieve per page
+ *       - in: path
+ *         name: sortField
+ *         required: true
+ *         schema:
+ *           type: string
+ *           example: "createdAt"
+ *         description: Field to sort the results by. Default is 'createdAt'
+ *       - in: path
+ *         name: sortDirection
+ *         required: true
+ *         schema:
+ *           type: string
+ *           enum: [ASC, DESC]
+ *           example: "DESC"
+ *         description: Direction of sorting, either ascending ('ASC') or descending ('DESC'). Default is 'DESC'.
  *     responses:
  *       200:
- *         description: List of all vacation requests
+ *         description: List of vacation requests
  *         content:
  *           application/json:
  *             schema:
- *               type: array
- *               items:
- *                 type: object
- *                 properties:
- *                   id:
- *                     type: integer
- *                     example: 1
- *                   employeeId:
- *                     type: integer
- *                     example: 1
- *                   status:
- *                     type: string
- *                     example: accepted
- *                   date:
- *                     type: string
- *                     example: "1627849200000,1627935600000"
- *                   reason:
- *                     type: string
- *                     example: Vacation
- *       404:
- *         description: No vacation requests found
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: integer
+ *                         example: 1
+ *                       employee:
+ *                         type: object
+ *                         properties:
+ *                           name:
+ *                             type: string
+ *                             example: "John Doe"
+ *                           role:
+ *                             type: string
+ *                             example: "Admin"
+ *                       date:
+ *                         type: string
+ *                         example: "1692355200000,1692921600000"
+ *                       status:
+ *                         type: string
+ *                         example: "Pending"
+ *                 count:
+ *                   type: integer
+ *                   example: 2
+ *       400:
+ *         description: Bad request due to missing or invalid pagination/sorting parameters
  *         content:
  *           application/json:
  *             schema:
@@ -727,7 +763,7 @@
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "No vacation requests found"
+ *                   example: "Both page and limit are required together"
  *       500:
  *         description: Internal server error
  *         content:
@@ -740,7 +776,7 @@
  *                   example: "Internal Server Error"
  *                 error:
  *                   type: string
- *                   example: Error message
+ *                   example: "Error fetching requests"
  */
 //vacation
 /**
@@ -1132,4 +1168,39 @@
  *                 error:
  *                   type: string
  *                   example: Error message
+ */
+//user
+/**
+ * @swagger
+ * /user:
+ *   get:
+ *     summary: Get all users
+ *     description: Retrieves a list of all employees. Only accessible by Super Admin.
+ *     tags: [Employees]
+ *     responses:
+ *       200:
+ *         description: A list of all employees.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: number
+ *                     description: The employee ID.
+ *                   name:
+ *                     type: string
+ *                     description: The employee's name.
+ *                   email:
+ *                     type: string
+ *                     description: The employee's email.
+ *                   role:
+ *                     type: string
+ *                     description: The employee's role (e.g., Admin, User).
+ *       401:
+ *         description: Unauthorized, the user is not authenticated or lacks permission.
+ *       500:
+ *         description: Internal server error.
  */
