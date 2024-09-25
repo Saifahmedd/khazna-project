@@ -7,7 +7,7 @@ export const findAllEmployees = () => {
     return Employee.find({ relations: ['role', 'team'] });
 }
 export const findEmployeeByEmail = (email: string) => {
-    return Employee.findOne({ where: { email }, relations: ['role'] });
+    return Employee.findOne({ where: { email }, relations: ['role', 'team'] });
 };
 
 export const findEmployeeById = (employeeId: number)=>{

@@ -82,6 +82,9 @@ export const loginEmployee = async (email: string, password: string) => {
             team: employee.team
         };
 
+        console.log(user);
+
+
         const accessToken = generateToken(user);
 
         return {
