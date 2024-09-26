@@ -235,27 +235,35 @@ export const updateAdminRequestService = async (requestId: number, status: Statu
 
 export const filterRequests = async (filters: any, connection: Connection) => {
     try {
-        let sql = `SELECT * FROM Vacation WHERE `;
-        const filterKeys = Object.keys(filters);
-        const filterValues = Object.values(filters);
+        let sql = `SELECT * FROM vacation Where 1=1`; // Start with a condition that is always true
+        const filterValues: any[] = [];
 
-        sql += filterKeys.map((key) => `${key} = ?`).join(' AND ');
+        // Dynamically build the query by appending filters
+        Object.keys(filters).forEach((key) => {
+            if (filters[key] !== undefined) {
+                sql += ` AND ${key} = ?`; // Add dynamic filtering for each key
+                filterValues.push(filters[key]);
+            }
+        });
 
+        // Execute the SQL query with dynamic filters
         const requests = await filterRequestsBySQL(sql, filterValues, connection);
+
+        // Map and format the results before returning
         const finalRequests = requests.map((request: Vacation) => {
             const adjustedDateFrom = new Date(request.dateFrom);
             const adjustedDateTo = new Date(request.dateTo);
-        
+
             return {
                 ...request,
                 date: `${adjustedDateFrom.getTime()},${adjustedDateTo.getTime()}`,
                 dateFrom: undefined,
                 dateTo: undefined,
             };
-        });  
+        });
+
         return { status: 200, response: { data: finalRequests, count: requests.length } };
     } catch (error) {
-        console.error("Error in filterRequests:", error);
         return { status: 500, response: { message: "Internal Server Error", error: (error as Error).message } };
     }
 };
@@ -282,46 +290,6 @@ export const getVacationsByTeam = async (teamId: number, connection: Connection)
 
         return { status: 200, data: finalRequests };
     } catch (error) {
-        console.error('Error in getVacationsByTeam service:', error);
-        return { status: 500, data: "Internal Server Error" };
-    }
-};
-
-export const getAllVacations = async (
-    connection: Connection, 
-    page: number, 
-    limit: number, 
-    column: string, 
-    order: 'ASC' | 'DESC'
-) => {
-    try {
-        const skip = (page - 1) * limit; // Calculate how many records to skip for pagination
-        const sortColumn = column || 'vacation.createdAt'; // Default sorting column
-
-        // Fetch requests and total count from repository
-        const { requests, total } = await requestRepository.findAllVacations(connection, skip, limit, sortColumn, order);
-
-        if (requests.length === 0) {
-            return { status: 404, data: "No vacation requests found" };
-        }
-
-        // Process the requests (modify date format, etc.)
-        const finalRequests = requests.map((request: Vacation) => {
-            const adjustedDateFrom = new Date(request.dateFrom);
-            const adjustedDateTo = new Date(request.dateTo);
-
-            return {
-                ...request,
-                date: `${adjustedDateFrom.getTime()},${adjustedDateTo.getTime()}`,
-                dateFrom: undefined,
-                dateTo: undefined,
-            };
-        });
-
-        // Return both the final requests and the total number of records
-        return { status: 200, data: { total, requests: finalRequests } };
-    } catch (error) {
-        console.error('Error in getAllVacations service:', error);
         return { status: 500, data: "Internal Server Error" };
     }
 };

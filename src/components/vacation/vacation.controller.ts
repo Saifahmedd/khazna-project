@@ -4,8 +4,7 @@ import { StatusTypes, VacationStatus } from '../../entities/vacationStatus';
 import { connection } from '../../main';
 
 export const filterVacationRequests = async (req: Request, res: Response) => {
-    const filters = req.query;
-
+    const filters = req.query; // Use req.query to accept multiple key-value pairs from the query string
     if (!Object.keys(filters).length) {
         return res.status(400).json({ message: "At least one filter is required" });
     }
@@ -44,6 +43,7 @@ export const filterVacationRequests = async (req: Request, res: Response) => {
             delete filters.date;
         }
 
+        // Pass the filters to the request handler
         const result = await filterRequests(filters, connection);
         return res.status(result.status).json(result.response);
     } catch (error) {
@@ -51,6 +51,7 @@ export const filterVacationRequests = async (req: Request, res: Response) => {
         return res.status(500).json({ message: "Internal Server Error", error: errorMessage });
     }
 };
+
 
 function formatToLocalMySQL(date: Date): string {
     const year = date.getFullYear();

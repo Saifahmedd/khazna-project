@@ -124,7 +124,6 @@ export const findReasonByName = async (reasonName: ReasonTypes): Promise<Reason 
         const reason = await Reason.findOne({ where: { name: reasonName } });
         return reason || null;
     } catch (error) {
-        console.error("Error finding reason by name:", error);
         throw new Error("Could not find reason");
     }
 };
@@ -172,7 +171,6 @@ export const filterRequestsBySQL = async (sql: string, values: any[], connection
         const result = await connection.query(sql, values);
         return result;
     } catch (err) {
-        console.error("Error in filterRequestsBySQL:", err);
         const errorMessage = (err instanceof Error) ? err.message : "Unknown error";
         throw new Error(`Error executing query: ${errorMessage}`);
     }
@@ -191,7 +189,6 @@ export const fetchVacationsByTeam = async (teamId: number, connection: Connectio
 
         return vacations;
     } catch (error) {
-        console.error('Error fetching vacations by team:', error);
         throw new Error('Failed to fetch vacations by team');
     }
 };

@@ -20,12 +20,12 @@ import fs from 'fs';
 
 console.log("App is starting...");
 const app = express();
-let connection: Connection;
+let connection: Connection; // Global connection variable
 app.use(cors({ origin: '*' })); // Allow all origins for testing
 
 const main = async () => {
     try {
-        const connection = await createConnection({
+        connection = await createConnection({  // Assign to the global connection variable
             type: 'mysql',
             host: process.env.DB_HOST || '34.89.121.129',
             port: Number(process.env.DB_PORT || 3306),
@@ -36,7 +36,7 @@ const main = async () => {
             synchronize: true,
             logging: true
         });
-        
+
         console.log("Connected to MySQL database");
 
         await initializeData(connection);
@@ -58,15 +58,16 @@ const main = async () => {
         };
 
         const swaggerSpec = swaggerJSDoc(swaggerOptions);
-        
+
         app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
-        
+
         app.use(express.json());
-        
+
         // Apply middleware after public routes
         app.use(authenticateToken); // Middleware Token
         app.use(userRoutes); // User Endpoints
         app.use(vacationRoutes); // Vacation Endpoints
+
         app.listen(process.env.PORT || 3000, () => {
             console.log(`Server running on port ${process.env.PORT || 3000}`);
         });
@@ -79,6 +80,6 @@ main().catch((err) => {
     console.error("App failed to start:", err);
 });
 
-export { connection };
+export { connection }; // Export global connection variable
 
 export default app;
