@@ -18,9 +18,6 @@ export class Employee extends BaseEntity {
     @Column({ nullable: true })
     password: string;
 
-    @Column({ nullable: true })
-    phoneNumber: string;
-
     @ManyToOne(() => Role, role => role.employees, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'roleId' })
     role: Role;

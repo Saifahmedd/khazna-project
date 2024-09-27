@@ -51,7 +51,6 @@ export const initializeData = async (connection: Connection) => {
 
     const superAdminRole = await employeeRepository.findRoleByRoleName(RoleTypes.SuperAdmin)
     if (!superAdminRole) {
-        console.error('SuperAdmin role not found. Please check your initialization data.');
         return;
     }
 
@@ -66,7 +65,6 @@ export const initializeData = async (connection: Connection) => {
                 name: 'SuperAdmin',
                 email: defaultSuperAdminEmail,
                 password: hashedPassword,
-                phoneNumber: '01023255440',
                 role: superAdminRole,
                 team: teamEntity
             });

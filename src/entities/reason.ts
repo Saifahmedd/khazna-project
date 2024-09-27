@@ -2,7 +2,7 @@ import { Entity, BaseEntity, PrimaryGeneratedColumn, Column, OneToMany } from "t
 import { Vacation } from "./vacation";
 
 export enum ReasonTypes {
-    SICK_LEAVE = "sick_leave",
+    SICK_LEAVE = "sick leave",
     PERSONAL = "personal",
     EMERGENCY = "emergency"
 }
