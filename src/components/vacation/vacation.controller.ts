@@ -2,9 +2,11 @@ import { Request, Response } from 'express';
 import { fetchAllVacationRequestsServiceByPages, fetchUserRequestsServiceByPages ,getVacationsByTeam, filterRequests, createRequestService, updateUserRequestService, deleteUserRequestService, updateAdminRequestService } from './vacation.service';
 import { StatusTypes, VacationStatus } from '../../entities/vacationStatus';
 import { connection } from '../../main';
+import { Employee } from '../../entities/employee';
+import { Reason, ReasonTypes } from '../../entities/reason';
 
 export const filterVacationRequests = async (req: Request, res: Response) => {
-    const filters = req.query; // Use req.query to accept multiple key-value pairs from the query string
+    const filters = req.query; // Extract query string filters
     if (!Object.keys(filters).length) {
         return res.status(400).json({ message: "At least one filter is required" });
     }
@@ -43,6 +45,22 @@ export const filterVacationRequests = async (req: Request, res: Response) => {
             delete filters.date;
         }
 
+        // Handle the name filter
+        if (filters.name) {
+            filters.employeeName = filters.name;
+            delete filters.name;
+        }
+
+        // Handle the reason filter
+        if (filters.reason) {
+            const reason = await Reason.findOne({ where: { name: filters.reason as ReasonTypes } });
+            if (!reason) {
+                return res.status(400).json({ message: "Invalid reason" });
+            }
+            filters.reasonId = reason.id.toString();
+            delete filters.reason;
+        }
+
         // Pass the filters to the request handler
         const result = await filterRequests(filters, connection);
         return res.status(result.status).json(result.response);
@@ -51,7 +69,6 @@ export const filterVacationRequests = async (req: Request, res: Response) => {
         return res.status(500).json({ message: "Internal Server Error", error: errorMessage });
     }
 };
-
 
 function formatToLocalMySQL(date: Date): string {
     const year = date.getFullYear();
@@ -117,8 +134,12 @@ export const createVacationRequest = async (req: Request, res: Response) => {
 };
 
 export const updateUserVacationRequest = async (req: Request, res: Response) => {
-    const { reviewerId, date, reason } = req.body;
+    const { employeeId, date, reason } = req.body;
     const { requestId } = req.params;
+
+    if (!requestId) {
+        return res.status(400).json({ message: "Request ID is required" });
+    }
 
     const [dateFrom, dateTo] = date.split(",").map(Number);
 
@@ -132,12 +153,14 @@ export const updateUserVacationRequest = async (req: Request, res: Response) => 
     const formattedDateFrom = formatToLocalMySQL(dateFromObj);
     const formattedDateTo = formatToLocalMySQL(dateToObj);
 
-    if (!requestId) {
-        return res.status(400).json({ message: "Request ID is required" });
-    }
-
     try {
-        const result = await updateUserRequestService(parseInt(requestId), reviewerId, formattedDateFrom, formattedDateTo, reason);
+        const result = await updateUserRequestService(
+            parseInt(requestId),
+            employeeId,
+            formattedDateFrom,
+            formattedDateTo,
+            reason
+        );
         return res.status(result.status).json(result.response);
     } catch (error) {
         const errorMessage = (error instanceof Error) ? error.message : "Unknown error";

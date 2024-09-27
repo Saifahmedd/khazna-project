@@ -138,10 +138,17 @@ export const createRequestService = async (employeeId: number, dateFrom: Date, d
     }
 };
 
-export const updateUserRequestService = async (requestId: number,reviewerId?: number,dateFrom?: string,dateTo?: string,reason?: ReasonTypes) => {
+export const updateUserRequestService = async (
+    requestId: number,
+    employeeId?: number,
+    dateFrom?: string,
+    dateTo?: string,
+    reason?: ReasonTypes
+) => {
     try {
         const updateData: Partial<Vacation> = {};
 
+        // Validate and update dates
         if (dateFrom || dateTo) {
             const dateFromParsed = dateFrom ? new Date(dateFrom) : undefined;
             const dateToParsed = dateTo ? new Date(dateTo) : undefined;
@@ -157,6 +164,7 @@ export const updateUserRequestService = async (requestId: number,reviewerId?: nu
             if (dateToParsed) updateData.dateTo = dateToParsed;
         }
 
+        // Validate and update reason
         if (reason) {
             const reasonEntity = await findReasonByName(reason);
             if (!reasonEntity) {
@@ -165,24 +173,21 @@ export const updateUserRequestService = async (requestId: number,reviewerId?: nu
             updateData.reason = reasonEntity;
         }
 
-        if (reviewerId !== undefined) {
-            updateData.reviewerId = reviewerId;
-        }
-
+        // Fetch the vacation request
         const request = await findVacationById(requestId);
 
         if (!request) {
             return { status: 404, response: { message: "Request not found" } };
         }
 
-        if(request.role.role == RoleTypes.SuperAdmin){
+        // Validate role and status
+        if (request.vacation.employee.role.role === RoleTypes.SuperAdmin) {
             request.vacation.status.name = StatusTypes.Approved;
-        }
-        
-        if (request.vacation.status.name != StatusTypes.Pending){
-            return { status: 403, response: { message: "Cannot update this request" } };
+        } else {
+            request.vacation.status.name = StatusTypes.Pending;
         }
 
+        // Save the updated request
         await updateVacationRequest(request.vacation, updateData);
 
         return { status: 200, response: { message: "Request updated successfully" } };
@@ -235,14 +240,25 @@ export const updateAdminRequestService = async (requestId: number, status: Statu
 
 export const filterRequests = async (filters: any, connection: Connection) => {
     try {
-        let sql = `SELECT * FROM vacation Where 1=1`; // Start with a condition that is always true
+        let sql = `SELECT vacation.* FROM vacation 
+                   JOIN employee ON vacation.employeeId = employee.id 
+                   LEFT JOIN reason ON vacation.reasonId = reason.id 
+                   WHERE 1=1`; // Join with employee and reason tables
         const filterValues: any[] = [];
 
         // Dynamically build the query by appending filters
         Object.keys(filters).forEach((key) => {
             if (filters[key] !== undefined) {
-                sql += ` AND ${key} = ?`; // Add dynamic filtering for each key
-                filterValues.push(filters[key]);
+                if (key === 'employeeName') {
+                    sql += ` AND employee.name LIKE ?`; // Add dynamic filtering for employee name
+                    filterValues.push(`%${filters[key]}%`); // Use a wildcard search for partial matches
+                } else if (key === 'reasonId') {
+                    sql += ` AND vacation.reasonId = ?`; // Filter by reason
+                    filterValues.push(filters[key]);
+                } else {
+                    sql += ` AND ${key} = ?`; // Add dynamic filtering for other keys
+                    filterValues.push(filters[key]);
+                }
             }
         });
 
