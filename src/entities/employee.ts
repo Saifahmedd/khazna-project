@@ -1,11 +1,11 @@
-import { Entity, BaseEntity, Column, PrimaryGeneratedColumn, ManyToOne, OneToMany, JoinColumn } from "typeorm";
-import { Role } from "./role";
-import { Vacation } from "./vacation";
-import { Team } from "./team";
+// src/entities/employee.ts
+import { Entity, BaseEntity, Column, PrimaryGeneratedColumn, ManyToOne, OneToMany, JoinColumn } from 'typeorm';
+import { Role } from './role';
+import { Vacation } from './vacation';
+import { Team } from './team';
 
 @Entity('employee')
 export class Employee extends BaseEntity {
-
     @PrimaryGeneratedColumn()
     id: number;
 
@@ -31,4 +31,8 @@ export class Employee extends BaseEntity {
 
     @Column({ nullable: true })
     avatarId: number;
+
+    // If you want to store the avatar URL or path
+    @Column({ type: 'varchar', nullable: true })
+    avatarSrc: string;  // Change the type to string
 }

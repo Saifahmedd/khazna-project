@@ -27,8 +27,29 @@ const checkName = (name: string): boolean => {
 };
 
 export const getAllUsers = async (req: Request, res: Response) => {
-    const employees = await employeeService.getAllUsers();
-    return res.status(200).json(employees);
+    try {
+        const employees = await employeeService.getAllUsers();
+
+        // Remove password and include avatarId
+        const formattedEmployees = employees.map((employee: any) => ({
+            id: employee.id,
+            name: employee.name,
+            email: employee.email,
+            avatarSrc: employee.avatarSrc,
+            role: {
+                id: employee.role.id,
+                role: employee.role.role,
+            },
+            team: {
+                id: employee.team.id,
+                type: employee.team.type,
+            }
+        }));
+
+        return res.status(200).json({ status: 200, employees: formattedEmployees });
+    } catch (error) {
+        return res.status(500).json({ status: 500, message: "Internal server error" });
+    }
 };
 
 function generatePassword(length: number) {
@@ -146,14 +167,14 @@ export const getUserInfo = async (req: Request, res: Response) => {
 
 export const updateAvatar = async (req: Request, res: Response) => {
     const { employeeId } = req.body;
-    const { avatarId } = req.params;
+    const { avatarSrc } = req.params;
 
-    if (!employeeId || !avatarId) {
+    if (!employeeId || !avatarSrc) {
         return res.status(400).json({ message: "Invalid input" });
     }
 
     try {
-        const result = await employeeService.addingAvatar(parseInt(employeeId), parseInt(avatarId));
+        const result = await employeeService.addingAvatar(parseInt(employeeId), avatarSrc);
 
         if (result.status === 404) {
             return res.status(404).json({ message: result.message });

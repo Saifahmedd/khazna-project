@@ -15,11 +15,11 @@ dotenv.config();
 export const getAllUsers = async () => {
     try {
         const employees = await employeeRepository.findAllEmployees();
-        return { status: 200, employees };
+        return employees;
     } catch (error) {
-        return { status: 500, message: "Internal server error" };
+        throw new Error("Error retrieving employees");
     }
-}
+};
 export const registerEmployee = async (name: string, password: string, team: TeamType, email: string) => {
     try {
         const existingEmployee = await employeeRepository.findEmployeeByEmail(email);
@@ -180,14 +180,14 @@ const getVacationDates = (): Date[] => {
     return dateStrings.map(dateString => new Date(dateString));
 };
 
-export const addingAvatar = async (employeeId: number, avatarId: number) => {
+export const addingAvatar = async (employeeId: number, avatarSrc: string) => {
     const employee = await employeeRepository.findEmployeeById(employeeId);
 
     if (!employee) {
         return { status: 404, message: "Cannot find the employee" };
     }
 
-    employee.avatarId = avatarId;
+    employee.avatarSrc = avatarSrc;
     await employeeRepository.saveEmployee(employee);
 
     return { status: 200, employee };

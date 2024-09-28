@@ -15,8 +15,7 @@ import swaggerUi from 'swagger-ui-express';
 import { initializeData } from './constants';
 import cors from 'cors';
 import { Reason } from './entities/reason';
-import path from 'path';
-import fs from 'fs';
+
 
 console.log("App is starting...");
 const app = express();

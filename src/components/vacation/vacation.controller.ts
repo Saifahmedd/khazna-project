@@ -4,6 +4,7 @@ import { StatusTypes, VacationStatus } from '../../entities/vacationStatus';
 import { connection } from '../../main';
 import { Employee } from '../../entities/employee';
 import { Reason, ReasonTypes } from '../../entities/reason';
+import { TeamType } from '../../entities/team';
 
 export const filterVacationRequests = async (req: Request, res: Response) => {
     const filters = req.query; // Extract query string filters
@@ -59,6 +60,12 @@ export const filterVacationRequests = async (req: Request, res: Response) => {
             }
             filters.reasonId = reason.id.toString();
             delete filters.reason;
+        }
+
+        // Handle the team filter
+        if (filters.team) {
+            filters.teamType = filters.team as TeamType;
+            delete filters.team;
         }
 
         // Pass the filters to the request handler

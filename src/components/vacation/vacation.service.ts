@@ -240,20 +240,27 @@ export const updateAdminRequestService = async (requestId: number, status: Statu
 
 export const filterRequests = async (filters: any, connection: Connection) => {
     try {
-        let sql = `SELECT vacation.* FROM vacation 
+        let sql = `SELECT vacation.id, employee.name, vacation.dateFrom, vacation.dateTo, 
+                   reason.name as reasonName, vacation_status.name as statusName
+                   FROM vacation 
                    JOIN employee ON vacation.employeeId = employee.id 
                    LEFT JOIN reason ON vacation.reasonId = reason.id 
-                   WHERE 1=1`; // Join with employee and reason tables
+                   LEFT JOIN vacation_status ON vacation.statusId = vacation_status.id 
+                   LEFT JOIN team ON employee.teamId = team.id -- Join with team
+                   WHERE 1=1`; // Join with employee, reason, status, and team tables
         const filterValues: any[] = [];
 
         // Dynamically build the query by appending filters
         Object.keys(filters).forEach((key) => {
             if (filters[key] !== undefined) {
                 if (key === 'employeeName') {
-                    sql += ` AND employee.name LIKE ?`; // Add dynamic filtering for employee name
-                    filterValues.push(`%${filters[key]}%`); // Use a wildcard search for partial matches
+                    sql += ` AND employee.name LIKE ?`; // Filter by employee name
+                    filterValues.push(`%${filters[key]}%`); // Wildcard search for partial matches
                 } else if (key === 'reasonId') {
                     sql += ` AND vacation.reasonId = ?`; // Filter by reason
+                    filterValues.push(filters[key]);
+                } else if (key === 'teamType') {
+                    sql += ` AND team.type = ?`; // Filter by team type
                     filterValues.push(filters[key]);
                 } else {
                     sql += ` AND ${key} = ?`; // Add dynamic filtering for other keys
@@ -266,15 +273,16 @@ export const filterRequests = async (filters: any, connection: Connection) => {
         const requests = await filterRequestsBySQL(sql, filterValues, connection);
 
         // Map and format the results before returning
-        const finalRequests = requests.map((request: Vacation) => {
+        const finalRequests = requests.map((request: any) => {
             const adjustedDateFrom = new Date(request.dateFrom);
             const adjustedDateTo = new Date(request.dateTo);
 
             return {
-                ...request,
-                date: `${adjustedDateFrom.getTime()},${adjustedDateTo.getTime()}`,
-                dateFrom: undefined,
-                dateTo: undefined,
+                requestId: request.id,
+                name: request.name,
+                duration: `${adjustedDateFrom.getTime()}, ${adjustedDateTo.getTime()}`, // Duration in date format
+                reason: request.reasonName,
+                status: request.statusName
             };
         });
 
