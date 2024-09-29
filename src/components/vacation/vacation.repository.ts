@@ -135,7 +135,7 @@ export const saveVacationRequest = async (request: Vacation) => {
 export const findVacationById = async (requestId: number) => {
     const vacation = await Vacation.findOne({
         where: { id: requestId },
-        relations: ['employee', 'employee.role', 'status', 'reason']
+        relations: ['employee', 'employee.role', 'status', 'reason', 'employee.team']
     })
     if (!vacation) {
         throw new Error(`Vacation with ID ${requestId} not found`);

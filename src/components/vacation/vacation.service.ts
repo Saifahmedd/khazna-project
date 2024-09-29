@@ -190,11 +190,27 @@ export const updateUserRequestService = async (
         // Save the updated request
         await updateVacationRequest(request.vacation, updateData);
 
-        return { status: 200, response: { message: "Request updated successfully" } };
+        // Return the updated request details
+        return {
+            status: 200,
+            response: {
+                message: "Request updated successfully",
+                updatedRequest: {
+                    requestId: request.vacation.id,
+                    employeeId: request.vacation.employee.id,
+                    employeeName: request.vacation.employee.name,
+                    date: `${request.vacation.dateFrom.getTime()},${request.vacation.dateTo.getTime()}`,
+                    reason: request.vacation.reason ? request.vacation.reason.name : null,
+                    status: request.vacation.status.name,
+                    teamName: request.vacation.employee.team ? request.vacation.employee.team.type : null
+                }
+            }
+        };
     } catch (error) {
         return { status: 500, response: { message: "Internal Server Error", error: (error as Error).message } };
     }
 };
+
 
 
 export const deleteUserRequestService = async (requestId: number) => {
@@ -241,13 +257,15 @@ export const updateAdminRequestService = async (requestId: number, status: Statu
 export const filterRequests = async (filters: any, connection: Connection) => {
     try {
         let sql = `SELECT vacation.id, employee.name, vacation.dateFrom, vacation.dateTo, 
-                   reason.name as reasonName, vacation_status.name as statusName
-                   FROM vacation 
-                   JOIN employee ON vacation.employeeId = employee.id 
-                   LEFT JOIN reason ON vacation.reasonId = reason.id 
-                   LEFT JOIN vacation_status ON vacation.statusId = vacation_status.id 
-                   LEFT JOIN team ON employee.teamId = team.id -- Join with team
-                   WHERE 1=1`; // Join with employee, reason, status, and team tables
+        reason.name as reasonName, vacation_status.name as statusName,
+        team.type as teamType -- Retrieve team type
+        FROM vacation 
+        JOIN employee ON vacation.employeeId = employee.id 
+        LEFT JOIN reason ON vacation.reasonId = reason.id 
+        LEFT JOIN vacation_status ON vacation.statusId = vacation_status.id 
+        LEFT JOIN team ON employee.teamId = team.id -- Join with team
+        WHERE 1=1`;
+
         const filterValues: any[] = [];
 
         // Dynamically build the query by appending filters
@@ -276,15 +294,17 @@ export const filterRequests = async (filters: any, connection: Connection) => {
         const finalRequests = requests.map((request: any) => {
             const adjustedDateFrom = new Date(request.dateFrom);
             const adjustedDateTo = new Date(request.dateTo);
-
+        
             return {
                 requestId: request.id,
                 name: request.name,
                 duration: `${adjustedDateFrom.getTime()}, ${adjustedDateTo.getTime()}`, // Duration in date format
                 reason: request.reasonName,
-                status: request.statusName
+                status: request.statusName,
+                team: request.teamType // Include team type in the response
             };
         });
+        
 
         return { status: 200, response: { data: finalRequests, count: requests.length } };
     } catch (error) {
