@@ -296,9 +296,9 @@ export const filterRequests = async (filters: any, connection: Connection) => {
             const adjustedDateTo = new Date(request.dateTo);
         
             return {
-                requestId: request.id,
+                id: request.id,
                 name: request.name,
-                duration: `${adjustedDateFrom.getTime()}, ${adjustedDateTo.getTime()}`, // Duration in date format
+                date: `${adjustedDateFrom.getTime()}, ${adjustedDateTo.getTime()}`, // Duration in date format
                 reason: request.reasonName,
                 status: request.statusName,
                 team: request.teamType // Include team type in the response
