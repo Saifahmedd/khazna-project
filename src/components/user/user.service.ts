@@ -82,9 +82,6 @@ export const loginEmployee = async (email: string, password: string) => {
             team: employee.team
         };
 
-        console.log(user);
-
-
         const accessToken = generateToken(user);
 
         return {
@@ -167,7 +164,6 @@ function getDaysDifference(startDate: Date, endDate: Date, vacationDates: Date[]
         const isVacationDate = filteredDays.has(currentDate.toDateString());
 
         if (!isWeekend && !isVacationDate) {
-            console.log("Current date:", currentDate.toDateString());
             totalDays += 1;
         }
     }

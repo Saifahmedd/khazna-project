@@ -29,9 +29,6 @@ export class Employee extends BaseEntity {
     @JoinColumn({ name: 'teamId' })
     team!: Team;
 
-    @Column({ nullable: true })
-    avatarId: number;
-
     // If you want to store the avatar URL or path
     @Column({ type: 'varchar', nullable: true })
     avatarSrc: string;  // Change the type to string
