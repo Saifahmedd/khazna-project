@@ -218,7 +218,7 @@ export const changePassword = async (req: Request, res: Response) => {
 
     try{
         const result = await employeeService.changePassword(parseInt(employeeId), oldPassword, newPassword);
-        return res.status(result.status).json({message: "Password changed successfully"});
+        return res.status(result.status).json({employeeId:  employeeId , message: "Password changed successfully"});
     } catch (error) {
         console.error(error);
         return res.status(500).json({ message: "Internal server error" });
