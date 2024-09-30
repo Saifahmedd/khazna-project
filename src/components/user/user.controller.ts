@@ -170,7 +170,7 @@ export const updateAvatar = async (req: Request, res: Response) => {
     const { avatarSrc } = req.body;
 
     if (!employeeId || !avatarSrc) {
-        return res.status(400).json({ message: "Invalid input" });
+        return res.status(400).json({ message: "Invalid inputtttt" });
     }
 
     try {
