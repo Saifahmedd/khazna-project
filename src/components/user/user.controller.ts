@@ -166,8 +166,8 @@ export const getUserInfo = async (req: Request, res: Response) => {
 };
 
 export const updateAvatar = async (req: Request, res: Response) => {
-    const { employeeId } = req.body;
-    const { avatarSrc } = req.params;
+    const { employeeId } = req.params;
+    const { avatarSrc } = req.body;
 
     if (!employeeId || !avatarSrc) {
         return res.status(400).json({ message: "Invalid input" });

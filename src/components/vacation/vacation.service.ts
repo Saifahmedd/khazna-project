@@ -105,7 +105,12 @@ export const fetchUserRequestsService = async (employeeId: number) => {
     }
 };
 
-export const createRequestService = async (employeeId: number, dateFrom: Date, dateTo: Date, reason: ReasonTypes) => {
+export const createRequestService = async (
+    employeeId: number, 
+    dateFrom: Date, 
+    dateTo: Date, 
+    reason: ReasonTypes
+) => {
     try {
         const employee = await findEmployeeById(employeeId);
 
@@ -129,12 +134,33 @@ export const createRequestService = async (employeeId: number, dateFrom: Date, d
             return { status: 404, response: { message: "Reason not found" } };
         }
 
+        // Create and save the request
         const request = createVacationRequest(dateFrom, dateTo, reasonEntity, employee, status);
         await saveVacationRequest(request);
 
-        return { status: 201, response: { message: "Inserted a Request successfully"} };
+        // Return a success response including all the details of the request
+        return {
+            status: 200,
+            response: {
+                message: "Inserted a Request successfully",
+                request: {
+                    id: request.id,
+                    employee: {
+                        id: employee.id,
+                        name: employee.name,
+                        role: employee.role.role
+                    },
+                    date: `${dateFrom.getTime()},${dateTo.getTime()}`,
+                    reason: reasonEntity.name,
+                    status: status.name,
+                }
+            }
+        };
     } catch (error) {
-        return { status: 500, response: { message: "Internal Server Error", error: (error as Error).message } };
+        return {
+            status: 500,
+            response: { message: "Internal Server Error", error: (error as Error).message }
+        };
     }
 };
 
