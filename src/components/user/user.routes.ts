@@ -10,7 +10,7 @@ router.post('/login', userController.loginEmployee);
 
 router.get('/user/:employeeId/info', userController.getUserInfo);
 
-router.put('/user/:avatarId', userController.updateAvatar);
+router.put('/user/:employeeId', userController.updateAvatar);
 
 router.put('/user/:employeeId/role/:role' ,checkSuperAdminRole, userController.updateRole);
 
