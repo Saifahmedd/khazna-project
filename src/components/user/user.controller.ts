@@ -169,8 +169,12 @@ export const updateAvatar = async (req: Request, res: Response) => {
     const { employeeId } = req.params;
     const { avatarSrc } = req.body;
 
-    if (!employeeId || !avatarSrc) {
-        return res.status(400).json({ message: "Invalid inputtttt" });
+    if (!avatarSrc) {
+        return res.status(400).json({ message: "Invalid avatarSrc" });
+    }
+
+    if(!employeeId){
+        return res.status(400).json({ message: "Invalid employeeId" });
     }
 
     try {
