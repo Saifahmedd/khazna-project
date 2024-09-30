@@ -145,14 +145,15 @@ export const createRequestService = async (
                 message: "Inserted a Request successfully",
                 request: {
                     id: request.id,
+                    name: employee.name,
                     employee: {
                         id: employee.id,
-                        name: employee.name,
                         role: employee.role.role
                     },
                     date: `${dateFrom.getTime()},${dateTo.getTime()}`,
                     reason: reasonEntity.name,
                     status: status.name,
+                    team: employee.team.type
                 }
             }
         };
