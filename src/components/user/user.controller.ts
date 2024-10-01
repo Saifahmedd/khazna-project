@@ -91,9 +91,9 @@ export const registerEmployee = async (req: Request, res: Response) => {
         return res.status(400).json({ message: "Invalid name" });
     }
 
-    // if (!checkEmail(email)) {
-    //     return res.status(400).json({ message: "Invalid email" });
-    // }
+    if (!checkEmail(email)) {
+        return res.status(400).json({ message: "Invalid email" });
+    }
 
     try {
         const teamType = TeamType[team.toUpperCase() as keyof typeof TeamType];

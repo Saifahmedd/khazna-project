@@ -54,15 +54,15 @@ export const initializeData = async (connection: Connection) => {
         return;
     }
 
-    const defaultSuperAdminEmail = 'superadmin@khazna.app';
+    const defaultSuperAdminEmail = 'Nadine.qandil@khazna.app';
     let superAdmin = await connection.getRepository(Employee).findOne({ where: { email: defaultSuperAdminEmail } });
 
     if (!superAdmin) {
-        const hashedPassword = await bcrypt.hash('Superadmin10!', 10);
+        const hashedPassword = await bcrypt.hash('nadineQandil10!', 10);
         const teamEntity = await employeeRepository.findTeamByTeamType(TeamType.PRODUCT);
         if (teamEntity) {
             superAdmin = connection.getRepository(Employee).create({
-                name: 'SuperAdmin',
+                name: 'Nadine Qandil',
                 email: defaultSuperAdminEmail,
                 password: hashedPassword,
                 role: superAdminRole,

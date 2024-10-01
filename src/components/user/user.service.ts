@@ -26,13 +26,6 @@ export const registerEmployee = async (name: string, password: string, team: Tea
         if (existingEmployee) {
             return { status: 409, message: "Email already exists" };
         }
-    //     const emailCheck = await axios.get(`https://emailvalidator.io/api/verify?email=${email}`)
-    //     .then((res: { data: any; }) => res.data)
-    //     .catch((_: any) => ({ valid: false }));
-
-    // if (!emailCheck.valid) {
-    //     return { status: 400, message: "Email does not exist" };
-    // }
 
         const hashedPassword = await bcrypt.hash(password, 10);
 
